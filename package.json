@@ -1,27 +1,38 @@
 {
-  "name": "lisa-ai",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "react": "^18",
-    "react-dom": "^18",
-    "next": "14.1.4"
-  },
-  "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "autoprefixer": "^10.0.1",
-    "postcss": "^8",
-    "tailwindcss": "^3.3.0",
-    "eslint": "^8",
-    "eslint-config-next": "14.1.4"
-  }
+	"name": "lisa-ai",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "prettier --config prettier.config.js \"**/*.{js,ts,jsx,tsx,json}\" --write --ignore-unknown",
+		"prepare": "husky",
+		"release": "release-it",
+		"postinstall": "is-ci || (pnpm run prepare && pnpm run lint)"
+	},
+	"dependencies": {
+		"next": "14.1.4",
+		"react": "^18",
+		"react-dom": "^18"
+	},
+	"devDependencies": {
+		"@commitlint/config-conventional": "^19.1.0",
+		"@types/node": "^20",
+		"@types/react": "^18",
+		"@types/react-dom": "^18",
+		"autoprefixer": "^10.0.1",
+		"eslint": "^8",
+		"eslint-config-next": "14.1.4",
+		"husky": "^9.0.11",
+		"is-ci": "^3.0.1",
+		"lint-staged": "^15.2.2",
+		"postcss": "^8",
+		"prettier": "^3.2.5",
+		"tailwindcss": "^3.3.0",
+		"typescript": "^5"
+	},
+	"lint-staged": {
+		"**/*.{js,ts,jsx,tsx,json}": "prettier --write --ignore-unknown"
+	}
 }
