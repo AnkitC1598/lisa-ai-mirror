@@ -66,7 +66,7 @@ const CommandList = React.forwardRef<
 	<CommandPrimitive.List
 		ref={ref}
 		className={cn(
-			"max-h-[300px] overflow-y-auto overflow-x-hidden",
+			"max-h-[300px] overflow-y-auto overflow-x-hidden scrollbar",
 			className
 		)}
 		{...props}
@@ -95,7 +95,7 @@ const CommandGroup = React.forwardRef<
 	<CommandPrimitive.Group
 		ref={ref}
 		className={cn(
-			"overflow-hidden p-1 text-neutral-950 dark:text-neutral-50 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-neutral-500 dark:[&_[cmdk-group-heading]]:text-neutral-400",
+			"overflow-hidden p-1 pb-2 text-neutral-950 dark:text-neutral-50 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-neutral-500 dark:[&_[cmdk-group-heading]]:text-neutral-400",
 			className
 		)}
 		{...props}
@@ -122,11 +122,14 @@ CommandSeparator.displayName = CommandPrimitive.Separator.displayName
 const CommandItem = React.forwardRef<
 	React.ElementRef<typeof CommandPrimitive.Item>,
 	React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
->(({ className, ...props }, ref) => (
+>(({ className, asChild, ...props }, ref) => (
 	<CommandPrimitive.Item
 		ref={ref}
 		className={cn(
-			"relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-neutral-100 aria-selected:text-neutral-900 data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 dark:aria-selected:bg-neutral-800 dark:aria-selected:text-neutral-50",
+			"relative mb-2 flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none last:mb-0 data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
+			asChild
+				? ""
+				: "aria-selected:bg-neutral-100 aria-selected:text-neutral-900 dark:aria-selected:bg-neutral-800 dark:aria-selected:text-neutral-50",
 			className
 		)}
 		{...props}

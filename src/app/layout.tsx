@@ -24,7 +24,7 @@ const AppLayout: React.FC<Readonly<IAppLayout>> = ({ children }) => {
 			<body
 				className={cn(
 					// inter.className,
-					"flex h-screen w-screen justify-center overflow-hidden bg-gray-50 text-gray-900 dark:bg-neutral-950 dark:text-gray-200"
+					"flex h-screen w-screen justify-center overflow-hidden bg-gray-50 text-gray-900 transition-all duration-300 ease-in-out dark:bg-neutral-950 dark:text-gray-200"
 				)}
 			>
 				<NextThemeProvider

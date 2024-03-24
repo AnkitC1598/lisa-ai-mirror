@@ -13,6 +13,7 @@ import {
 	CommandList,
 	CommandSeparator,
 } from "../ui/command"
+import HierarchyCard from "./HierarchyCard"
 
 interface ISearchMenu {
 	size?: string
@@ -62,27 +63,47 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 				<CommandInput placeholder="Search any topic from your curriculum" />
 				<CommandList>
 					<CommandEmpty>No results found.</CommandEmpty>
-					<CommandGroup heading="Suggestions">
-						<CommandItem>
-							<span>Calendar</span>
+					<CommandGroup heading="Topics">
+						<CommandItem
+							asChild
+							className="!p-0"
+						>
+							<HierarchyCard type="topic" />
 						</CommandItem>
-						<CommandItem onSelect={console.log}>
-							<span>Search Emoji</span>
+						<CommandItem
+							asChild
+							className="!p-0"
+							onSelect={console.log}
+						>
+							<HierarchyCard type="topic" />
 						</CommandItem>
-						<CommandItem disabled>
-							<span>Calculator</span>
+						<CommandItem
+							asChild
+							className="!p-0"
+							disabled
+						>
+							<HierarchyCard type="topic" />
 						</CommandItem>
 					</CommandGroup>
 					<CommandSeparator />
-					<CommandGroup heading="Settings">
-						<CommandItem>
-							<span>Profile</span>
+					<CommandGroup heading="Others">
+						<CommandItem
+							asChild
+							className="!p-0"
+						>
+							<HierarchyCard type="chapter" />
 						</CommandItem>
-						<CommandItem>
-							<span>Billing</span>
+						<CommandItem
+							asChild
+							className="!p-0"
+						>
+							<HierarchyCard type="subject" />
 						</CommandItem>
-						<CommandItem>
-							<span>Settings</span>
+						<CommandItem
+							asChild
+							className="!p-0"
+						>
+							<HierarchyCard type="term" />
 						</CommandItem>
 					</CommandGroup>
 				</CommandList>
