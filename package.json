@@ -12,9 +12,27 @@
 		"postinstall": "is-ci || (pnpm run prepare && pnpm run lint)"
 	},
 	"dependencies": {
+		"@heroicons/react": "^2.1.1",
+		"@radix-ui/react-accordion": "^1.1.2",
+		"@radix-ui/react-dialog": "^1.0.5",
+		"@radix-ui/react-popover": "^1.0.7",
+		"@radix-ui/react-select": "^2.0.0",
+		"@radix-ui/react-slot": "^1.0.2",
+		"@radix-ui/react-tabs": "^1.0.4",
+		"class-variance-authority": "^0.7.0",
+		"clsx": "^2.1.0",
+		"cmdk": "^1.0.0",
+		"immer": "^10.0.4",
+		"lucide-react": "^0.359.0",
 		"next": "14.1.4",
+		"next-themes": "^0.3.0",
 		"react": "^18",
-		"react-dom": "^18"
+		"react-dom": "^18",
+		"react-intersection-observer": "^9.8.1",
+		"tailwind-merge": "^2.2.2",
+		"tailwindcss-animate": "^1.0.7",
+		"vaul": "^0.9.0",
+		"zustand": "^4.5.2"
 	},
 	"devDependencies": {
 		"@commitlint/config-conventional": "^19.1.0",
@@ -29,7 +47,8 @@
 		"lint-staged": "^15.2.2",
 		"postcss": "^8",
 		"prettier": "^3.2.5",
-		"tailwindcss": "^3.3.0",
+		"prettier-plugin-tailwindcss": "^0.5.12",
+		"tailwindcss": "^3.4.1",
 		"typescript": "^5"
 	},
 	"lint-staged": {
