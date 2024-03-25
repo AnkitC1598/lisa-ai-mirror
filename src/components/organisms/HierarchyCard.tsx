@@ -54,7 +54,7 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 				href={`${typeToUse === "topic" ? "/topic" : pathname}/${routes[typeToUse]}`}
 				className={cn(
 					"relative flex w-full items-center justify-between gap-4 rounded-md bg-gray-50 p-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-950 dark:shadow-neutral-800 dark:ring-neutral-800",
-					{ "mt-4": showHierarchy }
+					{ "mt-6": showHierarchy }
 				)}
 			>
 				{showHierarchy ? (

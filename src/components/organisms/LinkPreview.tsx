@@ -11,7 +11,7 @@ import { Button } from "../ui/button"
 type TOrientation = "landscape" | "portrait"
 
 interface ILinkPreview {
-	orientation: TOrientation
+	orientation?: TOrientation
 }
 
 const LinkPreview: React.FC<ILinkPreview> = ({ orientation = "landscape" }) => {
