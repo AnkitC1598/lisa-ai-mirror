@@ -1,7 +1,7 @@
 import BookmarkFilters from "@/components/organisms/BookmarkFilters"
 import Search from "@/components/organisms/Search"
 import { sleep } from "@/lib"
-import { cache } from "react"
+import { cache, Suspense } from "react"
 
 interface IBookmarksLayout {
 	children: React.ReactNode
@@ -25,8 +25,12 @@ const BookmarksLayout: React.FC<Readonly<IBookmarksLayout>> = async ({
 						Bookmarks
 					</p>
 				</div>
-				<BookmarkFilters />
-				<Search />
+				<Suspense fallback="Loading...">
+					<BookmarkFilters />
+				</Suspense>
+				<Suspense fallback="Loading...">
+					<Search />
+				</Suspense>
 				{children}
 			</div>
 		</>
