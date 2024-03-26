@@ -54,10 +54,11 @@ const LinkPreview: React.FC<ILinkPreview> = ({ orientation = "landscape" }) => {
 					<div className="flex flex-col gap-1">
 						<span className="text-xs">Title</span>
 						<span className="line-clamp-2 text-xs text-gray-500">
-							Description Description Description Description
-							Description Description Description Description
-							Description Description Description Description
-							Description Description
+							Lorem ipsum dolor sit amet consectetur adipisicing
+							elit. Quidem ipsum, placeat animi pariatur magnam
+							labore, quibusdam quasi minus impedit debitis
+							voluptatum expedita enim nulla id? Doloribus
+							nesciunt quasi impedit aspernatur?
 						</span>
 					</div>
 					<div className="flex items-center justify-between gap-4">

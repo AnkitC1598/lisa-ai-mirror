@@ -1,6 +1,5 @@
 import CourseList from "@/components/organisms/CourseList"
 import HierarchyCard from "@/components/organisms/HierarchyCard"
-import SearchMenu from "@/components/organisms/SearchMenu"
 import { sleep } from "@/lib"
 
 const getCourses = async () => {
@@ -19,7 +18,6 @@ const Home = async () => {
 	return (
 		<>
 			<div className="flex h-full flex-col gap-8 overflow-y-auto overflow-x-hidden p-4 scrollbar">
-				<SearchMenu size="large" />
 				<div className="flex flex-col gap-5">
 					<div className="text-xl font-bold">Your Courses</div>
 					<CourseList courses={courses} />
@@ -28,38 +26,18 @@ const Home = async () => {
 					<div className="text-xl font-bold">Recent Topics</div>
 					<HierarchyCard
 						type="topic"
-						showHierarchy
-					/>
-					<HierarchyCard
-						type="topic"
-						showHierarchy={3}
-					/>
-					<HierarchyCard
-						type="topic"
 						showHierarchy={2}
-					/>
-					<HierarchyCard
-						type="topic"
-						showHierarchy={1}
 					/>
 				</div>
 				<div className="flex flex-col gap-5">
 					<div className="text-xl font-bold">Suggested Topics</div>
 					<HierarchyCard
 						type="topic"
-						showHierarchy
-					/>
-					<HierarchyCard
-						type="topic"
-						showHierarchy={3}
-					/>
-					<HierarchyCard
-						type="topic"
 						showHierarchy={2}
 					/>
 					<HierarchyCard
 						type="topic"
-						showHierarchy={1}
+						showHierarchy={2}
 					/>
 				</div>
 			</div>

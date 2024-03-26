@@ -48,7 +48,7 @@ const Navbar = ({ logoOnly = false }) => {
 				</Link>
 				{logoOnly ? null : (
 					<div className="flex items-center justify-end gap-2">
-						<SearchMenu hideOnHome />
+						<SearchMenu />
 						<Button
 							variant="link"
 							asChild

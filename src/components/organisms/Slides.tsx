@@ -17,8 +17,9 @@ import ContentPagination from "./ContentPagination"
 
 const Slides = () => {
 	return (
-		<div className="flex h-[calc(100%-56px)] flex-1 flex-col">
-			<div className="flex-1 snap-y snap-mandatory space-y-4 overflow-y-auto px-4 pb-4 scrollbar-hide">
+		<div className="flex h-[calc(100%-56px)] flex-1">
+			<ContentPagination vertical />
+			<div className="flex-1 snap-y snap-mandatory space-y-4 overflow-y-auto pb-4 pl-1 pr-4 scrollbar-hide">
 				{Array.from({ length: 7 }, (_, i) => (
 					<Slide
 						key={i}
@@ -26,8 +27,6 @@ const Slides = () => {
 					/>
 				))}
 			</div>
-
-			<ContentPagination />
 		</div>
 	)
 }
