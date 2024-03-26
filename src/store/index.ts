@@ -16,7 +16,10 @@ const useAIStore = create(
 	devtools(redux(reducer, initialState), {
 		name: "useAIStore",
 		enabled:
-			typeof window !== "undefined" ||
+			(typeof window !== "undefined" &&
+				Boolean(
+					(window as any)["__REDUX_DEVTOOLS_EXTENSION_COMPOSE__"]
+				)) ||
 			process.env.VERCEL_ENV !== "production",
 	})
 )
