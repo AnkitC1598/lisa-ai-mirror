@@ -1,8 +1,10 @@
 import "@/app/globals.css"
 import { cn } from "@/lib/utils"
+import AuthProvider from "@/providers/authProvider"
 import NextThemeProvider from "@/providers/nextThemeProvider"
-import type { Metadata } from "next"
+import { Metadata } from "next"
 import { Inter } from "next/font/google"
+import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -23,7 +25,7 @@ const AppLayout: React.FC<Readonly<IAppLayout>> = ({ children }) => {
 		>
 			<body
 				className={cn(
-					// inter.className,
+					inter.className,
 					"flex h-screen w-screen justify-center overflow-hidden bg-gray-50 text-gray-900 transition-all duration-300 ease-in-out dark:bg-neutral-950 dark:text-gray-200"
 				)}
 			>
@@ -33,7 +35,9 @@ const AppLayout: React.FC<Readonly<IAppLayout>> = ({ children }) => {
 					enableSystem
 				>
 					<div className="flex w-full max-w-md flex-col border">
-						{children}
+						<Suspense fallback={<>Loading...</>}>
+							<AuthProvider>{children}</AuthProvider>
+						</Suspense>
 					</div>
 				</NextThemeProvider>
 			</body>
