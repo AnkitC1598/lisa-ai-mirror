@@ -1,6 +1,7 @@
 import { sleep } from "@/lib"
 import { cache } from "react"
 import ParallelTabbedLayout from "./ParallelTabbedLayout"
+import { AI } from "./action"
 
 interface ITopicContentLayout {
 	children: React.ReactNode
@@ -23,7 +24,7 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = async ({
 	await getTopicContent()
 
 	return (
-		<>
+		<AI>
 			<div className="flex h-full flex-col gap-4 overflow-hidden">
 				<div className="flex flex-col gap-2 p-4 pb-0">
 					<p className="line-clamp-1 text-sm">Breadcrumb</p>
@@ -33,7 +34,7 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = async ({
 					{...{ home: children, chat, practiceQuestions, resources }}
 				/>
 			</div>
-		</>
+		</AI>
 	)
 }
 
