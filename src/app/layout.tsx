@@ -11,6 +11,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
 	title: "lisa AI",
 	description: "lisa AI",
+	manifest: "/lisa-ai/manifest.json",
 }
 
 interface IAppLayout {
