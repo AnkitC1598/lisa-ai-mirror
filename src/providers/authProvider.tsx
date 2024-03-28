@@ -26,6 +26,8 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 				cookieService.setTokens({ basicAccessToken: launchCode })
 			else launchCode = cookieService.getBasicAccessToken()
 
+			console.log({ launchCode })
+
 			if (launchCode) {
 				let { exp = null } = jwtDecode(launchCode)
 				if (
@@ -50,14 +52,17 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 							setReady(true)
 						})
 						.catch((e: Error) => {
+							console.error(e)
 							cookieService.removeTokens()
 							window.location.href = "/auth"
 						})
 				} else {
+					console.error("launchCode expired")
 					cookieService.removeTokens()
 					window.location.href = "/auth"
 				}
 			} else {
+				console.error("no launchCode found")
 				cookieService.removeTokens()
 				window.location.href = "/auth"
 			}
