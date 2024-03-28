@@ -16,7 +16,10 @@ import { Button } from "../ui/button"
 import ContentPagination from "./ContentPagination"
 
 const Slides = ({ slides = [], quiz = [] }) => {
-	const finalMergedArray = [...slides, ...quiz]
+	const finalMergedArray = [...slides, ...quiz].sort(
+		// @ts-ignore
+		(a, b) => a.priority - b.priority
+	)
 	return (
 		<div className="flex h-[calc(100%-56px)] flex-1">
 			<ContentPagination vertical />

@@ -16,7 +16,7 @@ import {
 import Image from "next/image"
 import { useState } from "react"
 
-export const UserMessage = () => {
+export const UserMessage = ({ message = "" }) => {
 	return (
 		<>
 			<div className="flex flex-col gap-2 p-4 text-right">
@@ -33,13 +33,13 @@ export const UserMessage = () => {
 						</div>
 					</div>
 				</div>
-				<p>Message</p>
+				<p>{message}</p>
 			</div>
 		</>
 	)
 }
 
-export const AiMessage = () => {
+export const AiMessage = ({ message = "" }) => {
 	const [vote, setVote] = useState<string | null>(null)
 	const [copy, setCopy] = useState<string | null>(null)
 	const [audioState, setAudioState] = useState<string | null>(null)
@@ -47,10 +47,22 @@ export const AiMessage = () => {
 	const handleVote = (type: string) =>
 		setVote(prev => (prev === type ? null : type))
 
-	const handleAudio = () => {
+	const handleAudio = (text = "") => {
 		if (audioState !== null) return
+		const synth = window.speechSynthesis
+		const voices = synth.getVoices()
+		const utterance = new SpeechSynthesisUtterance(removeEmojis(text))
+		try {
+			// @ts-ignore
+			utterance.voice = voices.find(voice => voice.lang === "en-IN")
+		} catch (e) {
+			console.error(`🚀 ~ handleAudio ~ e:`, e)
+		}
+
+		synth.speak(utterance)
 		setAudioState("playing")
-		setTimeout(() => setAudioState(null), 1000)
+		// setTimeout(() => setAudioState(null), 1000)
+		utterance.onend = () => setAudioState(null)
 	}
 
 	const handleCopy = () => {
@@ -78,7 +90,7 @@ export const AiMessage = () => {
 					</div>
 					<span>1hr</span>
 				</div>
-				<p className="text-sm">Message</p>
+				<p className="text-sm">{message}</p>
 				<div className="flex items-center gap-2">
 					<Button
 						variant="outline"
@@ -117,7 +129,7 @@ export const AiMessage = () => {
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={handleAudio}
+						onClick={() => handleAudio(message)}
 					>
 						<SpeakerWaveIcon
 							className={cn(
@@ -130,4 +142,10 @@ export const AiMessage = () => {
 			</div>
 		</>
 	)
+}
+
+function removeEmojis(string: string) {
+	var regex =
+		/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g
+	return string.replace(regex, "")
 }
