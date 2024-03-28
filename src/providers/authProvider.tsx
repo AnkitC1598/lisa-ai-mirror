@@ -20,16 +20,15 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 	const [ready, setReady] = useState<boolean>(false)
 
 	useEffect(() => {
-		if (window.location.pathname !== "/auth") {
+		if (window.location.pathname !== "/auth" && !ready) {
 			let launchCode = searchParams.get("launchCode")
 			if (launchCode)
 				cookieService.setTokens({ basicAccessToken: launchCode })
 			else launchCode = cookieService.getBasicAccessToken()
 
-			console.log({ launchCode })
-
 			if (launchCode) {
 				let { exp = null } = jwtDecode(launchCode)
+
 				if (
 					exp === null ||
 					isAfter(fromUnixTime(exp), addMinutes(new Date(), 1))
@@ -48,8 +47,9 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 								accessToken,
 								refreshToken,
 							})
-							router.replace(pathname)
-							setReady(true)
+							if (searchParams.has("launchCode"))
+								router.replace(pathname)
+							else setReady(true)
 						})
 						.catch((e: Error) => {
 							console.error(e)
@@ -78,7 +78,7 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 
 		return () => window.removeEventListener("resize", setDocHeight)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [searchParams])
+	}, [])
 
 	return ready ? children : <>Loading...</>
 }

@@ -19,6 +19,11 @@ const nextConfig = {
 			},
 		]
 	},
+	experimental: {
+		serverActions: {
+			allowedOrigins: ['*.ghosters.tech', '*.lisaapp.in'],
+		},
+	},
 };
 
 export default nextConfig;
