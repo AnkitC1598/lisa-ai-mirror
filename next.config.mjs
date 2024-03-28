@@ -1,4 +1,5 @@
 import createJiti from "jiti";
+import nextPWA from "next-pwa";
 import { fileURLToPath } from "node:url";
 const jiti = createJiti(fileURLToPath(import.meta.url));
 
@@ -6,8 +7,14 @@ const jiti = createJiti(fileURLToPath(import.meta.url));
 jiti("./src/env/client");
 jiti("./src/env/server");
 
+
+
+const withPWA = nextPWA({
+	dest: 'public',
+})
+
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig = withPWA({
 	basePath: process.env.BASE_PATH || "",
 	async redirects() {
 		return [
@@ -19,6 +26,6 @@ const nextConfig = {
 			},
 		]
 	},
-};
+});
 
-export default nextConfig;
+export default nextConfig
