@@ -15,14 +15,14 @@ const TopicContent = () => {
 			{
 				id: Date.now(),
 				role: "user",
-				display: "explain diwali celebration",
+				display: "explain anatomy of an eye in titan eye +",
 			},
 		])
 		const getData = async () => {
 			try {
 				// Submit and get response message
 				const responseMessage = await submitUserMessage(
-					"explain diwali celebration"
+					"explain anatomy of an eye in titan eye +"
 				)
 				// @ts-ignore
 				setMessages(currentMessages => [

@@ -40,8 +40,10 @@ async function submitUserMessage(content: string) {
 				role: "system",
 				content: `
 		You are a young high energetic teacher, proficient in personalized microlearning explanation. 
-		You follow a flow of introducing the topic with a brief in-depth description(50-60 words limit also add relevant emojis for fun) and then gradually going in its depths along with a couple of real world examples(using deep information from user's context).
-		If the user requests explanation of a topic, call \`explain_topic\` to show the explanation UI with 10 highly personalized slides.`,
+		You follow a flow of introducing the topic with a brief in-depth description as body(Minimum 50 words also add relevant emojis for fun) and then gradually going in its depths along with a couple of real world examples(using deep information from user's context).
+		Also add quiz array with 2-3 slides to check the understanding of the user.
+		Add priority to each slide and quiz and bind the priorities accordingly across quiz and slides.
+		If the user requests explanation of a topic, call \`explain_topic\` to show the explanation UI with 10 highly personalized slides and 3 quiz.`,
 			},
 			{
 				role: "user",
@@ -59,13 +61,48 @@ async function submitUserMessage(content: string) {
 				description:
 					"Generate JSON with 10 highly personalized slides for a topic",
 				parameters: z.object({
+					quiz: z
+						.array(
+							z.object({
+								priority: z
+									.number()
+									.describe(
+										"The number of the question or quiz between both arrays slides and quiz"
+									),
+								question: z
+									.string()
+									.describe("The question of the quiz"),
+								options: z
+									.array(
+										z.object({
+											option: z
+												.string()
+												.describe(
+													"The option of the quiz"
+												),
+											isCorrect: z
+												.boolean()
+												.describe(
+													"Is the option correct"
+												),
+										})
+									)
+									.describe("Array of options"),
+							})
+						)
+						.describe("Array of quiz questions with options"),
 					slides: z
 						.array(
 							z.object({
+								priority: z
+									.number()
+									.describe(
+										"The number of the question or quiz between both arrays slides and quiz"
+									),
 								title: z
 									.string()
 									.describe("The title of the topic"),
-								description: z
+								body: z
 									.string()
 									.describe(
 										"The brief information on the topic personalized for the user with emojis and user context acknowledgment."
@@ -81,7 +118,7 @@ async function submitUserMessage(content: string) {
 				}),
 			},
 		],
-		temperature: 1,
+		temperature: 0,
 	})
 
 	completion.onTextContent((content: string, isFinal: boolean) => {
@@ -91,11 +128,11 @@ async function submitUserMessage(content: string) {
 			aiState.done([...aiState.get(), { role: "assistant", content }])
 		}
 	})
-	completion.onFunctionCall("explain_topic", async ({ slides }) => {
+	completion.onFunctionCall("explain_topic", async ({ slides, quiz }) => {
 		// reply.update(<SlidesSkeletonLoader />)
 
 		// await sleep(1000)
-		console.log(slides)
+		console.log(slides, quiz)
 
 		// await fetch("http://localhost:3000/api", {
 		// 	method: "POST",
@@ -105,8 +142,15 @@ async function submitUserMessage(content: string) {
 		// 		data: slides,
 		// 	}),
 		// })
-		// @ts-ignore
-		reply.done(<Slides slides={slides} />)
+
+		reply.done(
+			<Slides
+				// @ts-ignore
+				slides={slides}
+				// @ts-ignore
+				quiz={quiz}
+			/>
+		)
 
 		aiState.done([
 			...aiState.get(),

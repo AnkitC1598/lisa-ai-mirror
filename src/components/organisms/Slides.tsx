@@ -15,19 +15,34 @@ import { useInView } from "react-intersection-observer"
 import { Button } from "../ui/button"
 import ContentPagination from "./ContentPagination"
 
-const Slides = ({ slides = [] }) => {
+const Slides = ({ slides = [], quiz = [] }) => {
+	const finalMergedArray = [...slides, ...quiz]
 	return (
 		<div className="flex h-[calc(100%-56px)] flex-1">
 			<ContentPagination vertical />
 			<div className="flex-1 snap-y snap-mandatory space-y-4 overflow-y-auto pb-4 pl-1 pr-4 scrollbar-hide">
-				{slides.map(({ title = "", description = "" }, idx) => (
-					<Slide
-						key={title}
-						idx={idx}
-						title={title}
-						description={description}
-					/>
-				))}
+				{finalMergedArray.map(
+					(
+						{
+							title = "",
+							body = "",
+							question = "",
+							options = [],
+							priority = 0,
+						},
+						idx
+					) => (
+						<Slide
+							key={title}
+							idx={idx}
+							title={title}
+							body={body}
+							question={question}
+							options={options}
+							priority={priority}
+						/>
+					)
+				)}
 			</div>
 		</div>
 	)
@@ -56,11 +71,20 @@ export const SlidesSkeletonLoader = () => {
 
 interface ISlide {
 	idx: number
-	title: string
-	description: string
+	title?: string
+	body?: string
+	question?: string
+	options?: any[]
+	priority: number
 }
 
-const Slide: React.FC<ISlide> = ({ idx = 0, title = "", description = "" }) => {
+const Slide: React.FC<ISlide> = ({
+	idx = 0,
+	title = "",
+	body = "",
+	question = "",
+	options = [],
+}) => {
 	const [vote, setVote] = useState<string | null>(null)
 	const [audioState, setAudioState] = useState<string | null>(null)
 	const [inViewAt, setInViewAt] = useState<number | null>(null)
@@ -103,10 +127,26 @@ const Slide: React.FC<ISlide> = ({ idx = 0, title = "", description = "" }) => {
 				inView ? "py-4" : ""
 			)}
 		>
-			<span className="flex flex-1 flex-col gap-2">
-				<span className="font-semibold">{title}</span>
-				<p className="leading-8">{description}</p>
-			</span>
+			<div className="flex flex-1 flex-col gap-2">
+				<span className="font-semibold">{title || question}</span>
+				{options.length ? (
+					<div className="flex flex-col gap-2 py-4">
+						{options.map(option => (
+							<span
+								key={option.option}
+								className={cn(
+									"w-full cursor-pointer rounded-md border border-neutral-200 bg-neutral-200 p-2 hover:bg-neutral-300 dark:border-neutral-800 dark:bg-neutral-800 dark:hover:bg-neutral-700",
+									option.isCorrect ? "text-green-500" : ""
+								)}
+							>
+								{option.option}
+							</span>
+						))}
+					</div>
+				) : (
+					<p className="leading-8">{body}</p>
+				)}
+			</div>
 			<div className="flex items-center justify-between">
 				<div className="flex gap-4">
 					<Button
@@ -136,7 +176,7 @@ const Slide: React.FC<ISlide> = ({ idx = 0, title = "", description = "" }) => {
 					variant="outline"
 					size="icon"
 					disabled={audioState === "playing"}
-					onClick={() => handleAudio(title + "\n" + description)}
+					onClick={() => handleAudio(title + "\n" + body)}
 				>
 					<SpeakerWaveIcon
 						className={cn(
