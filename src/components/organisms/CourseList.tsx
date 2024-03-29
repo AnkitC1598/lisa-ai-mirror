@@ -1,6 +1,10 @@
 "use client"
 
+import icon from "@/app/favicon.ico"
 import { cn } from "@/lib/utils"
+import { ICourse } from "@/types/hierarchy"
+import Image from "next/image"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 import {
 	Carousel,
@@ -8,10 +12,9 @@ import {
 	CarouselContent,
 	CarouselItem,
 } from "../ui/carousel"
-import CourseCard from "./CourseCard"
 
 interface ICourseList {
-	courses: any[]
+	courses: ICourse[]
 }
 
 const CourseList: React.FC<ICourseList> = ({ courses }) => {
@@ -41,14 +44,32 @@ const CourseList: React.FC<ICourseList> = ({ courses }) => {
 					}}
 				>
 					<CarouselContent className="-ml-2 pb-2">
-						{Array.from({ length: 5 }).map((_, index) => (
-							<CarouselItem
-								key={index}
-								className="basis-11/12 pl-2"
-							>
-								<CourseCard />
-							</CarouselItem>
-						))}
+						{courses.map(({ cohort: course }) =>
+							course ? (
+								<CarouselItem
+									key={course._id}
+									className="basis-11/12 pl-2"
+								>
+									<Link
+										href={`/${course._id}`}
+										className="flex gap-4 rounded-md p-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-900 dark:ring-neutral-800"
+									>
+										<div className="relative h-14 w-14 shrink-0 rounded-md p-2 ring-1 ring-inset ring-neutral-200 dark:ring-neutral-800">
+											<div className="relative h-10 w-10 overflow-hidden rounded-md">
+												<Image
+													src={course.icon ?? icon}
+													alt="icon"
+													fill
+												/>
+											</div>
+										</div>
+										<p className="line-clamp-2 text-lg font-medium">
+											{course.title}
+										</p>
+									</Link>
+								</CarouselItem>
+							) : null
+						)}
 					</CarouselContent>
 				</Carousel>
 				<div className="flex items-center justify-center gap-2">
@@ -58,7 +79,7 @@ const CourseList: React.FC<ICourseList> = ({ courses }) => {
 							className={cn(
 								"h-1 w-1 rounded-full bg-neutral-300 dark:bg-neutral-800",
 								current === i + 1
-									? "h-2 w-2 bg-purple-300 dark:bg-purple-800"
+									? "h-2 w-2 bg-purple-400 dark:bg-purple-900"
 									: "hover:cursor-pointer"
 							)}
 							onClick={() => api?.scrollTo(i)}

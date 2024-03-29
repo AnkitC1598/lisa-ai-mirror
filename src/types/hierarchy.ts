@@ -35,3 +35,33 @@ export interface IForm {
 	text: string
 	lightText: string
 }
+
+export interface ICourse {
+	_id: string
+	uid: string
+	cohortId: string
+	orgId: string
+	status: string
+	attendance: {
+		cohort: number
+		terms: Record<string, number> | null
+		subjects: Record<string, number> | null
+		chapters: Record<string, number> | null
+	}
+	cohort: {
+		_id: string
+		title: string
+		uid: string
+		details: string | null
+		mode: string
+		coverImage: string | null
+		icon: string | null
+		type: Array<string>
+		duration: {
+			startDate: string
+			endDate: string
+		}
+		dateRestriction: boolean
+		contentCount: number
+	}
+}

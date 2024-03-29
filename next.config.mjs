@@ -29,6 +29,14 @@ const nextConfig = withPWA({
 			allowedOrigins: ["*.ghosters.tech", "*.lisaapp.in"],
 		},
 	},
+	images: {
+		remotePatterns: [
+			{
+				protocol: 'https',
+				hostname: 'npe-lisa-static.s3.ap-south-1.amazonaws.com',
+			},
+		],
+	},
 })
 
 export default nextConfig

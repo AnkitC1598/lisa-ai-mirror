@@ -53,7 +53,7 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 			<Link
 				href={`${typeToUse === "topic" ? "/topic" : pathname}/${routes[typeToUse]}`}
 				className={cn(
-					"relative flex w-full items-center justify-between gap-4 rounded-md bg-gray-50 p-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-950 dark:shadow-neutral-800 dark:ring-neutral-800",
+					"relative flex w-full items-center justify-between gap-4 rounded-md bg-gray-50 p-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-900 dark:ring-neutral-800",
 					{ "mt-6": showHierarchy }
 				)}
 			>
@@ -88,7 +88,7 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 							className={cn(
 								"h-4 w-4 shrink-0",
 								completed
-									? "fill-green-500"
+									? "fill-green-500 dark:fill-green-600"
 									: "fill-neutral-300 dark:fill-neutral-700"
 							)}
 						/>
