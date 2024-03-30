@@ -1,6 +1,5 @@
 import { getCourses } from "@/actions/hierarchy"
 import CourseList from "@/components/organisms/CourseList"
-import HierarchyCard from "@/components/organisms/HierarchyCard"
 
 const Home = async () => {
 	const courses = await getCourses()
@@ -12,7 +11,7 @@ const Home = async () => {
 					<div className="text-xl font-bold">Your Courses</div>
 					<CourseList courses={courses} />
 				</div>
-				<div className="flex flex-col gap-5">
+				{/* <div className="flex flex-col gap-5">
 					<div className="text-xl font-bold">Continue Learning</div>
 					<HierarchyCard
 						type="topic"
@@ -29,7 +28,7 @@ const Home = async () => {
 						type="topic"
 						showHierarchy={2}
 					/>
-				</div>
+				</div> */}
 			</div>
 		</>
 	)

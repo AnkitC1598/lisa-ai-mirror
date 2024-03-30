@@ -1,7 +1,6 @@
 "use client"
 
 import HierarchyConstants from "@/constants/Hierarchy"
-import useGetHierarchy from "@/hooks/useGetHierarchy"
 import { cn } from "@/lib/utils"
 import Peek from "@/svg/peek"
 import { THierarchyType } from "@/types/hierarchy"
@@ -19,25 +18,23 @@ const routes: Record<string, string> = {
 }
 
 interface IHierarchyCard {
-	type?: THierarchyType
+	type: THierarchyType
+	hierarchy: any
 	showHierarchy?: boolean | number
 }
 
 const HierarchyCard: React.FC<IHierarchyCard> = ({
-	type = null,
+	type,
+	hierarchy,
 	showHierarchy = false,
 }) => {
 	const pathname = usePathname()
 	const completed = !false
 	const bookMarked = true
 
-	const { currentView } = useGetHierarchy() as { currentView: THierarchyType }
+	if (!HierarchyConstants.hasOwnProperty(type)) return
 
-	const typeToUse = type !== null ? type : currentView
-
-	if (!HierarchyConstants.hasOwnProperty(typeToUse)) return
-
-	const { icon: Icon } = HierarchyConstants[typeToUse]
+	const { icon: Icon } = HierarchyConstants[type]
 	const IconComponent = Icon as React.ComponentType<ISVGIconProps>
 
 	// const handleBookmark = (
@@ -51,7 +48,7 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 	return (
 		<>
 			<Link
-				href={`${typeToUse === "topic" ? "/topic" : pathname}/${routes[typeToUse]}`}
+				href={`${type === "topic" ? "/topic" : pathname}/${hierarchy._id}`}
 				className={cn(
 					"relative flex w-full items-center justify-between gap-4 rounded-md bg-gray-50 p-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-900 dark:ring-neutral-800",
 					{ "mt-6": showHierarchy }
@@ -83,7 +80,7 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 					</div>
 				) : null}
 				<div className="z-0 flex items-center gap-4">
-					{typeToUse === "topic" ? (
+					{type === "topic" ? (
 						<CheckCircleIcon
 							className={cn(
 								"h-4 w-4 shrink-0",
@@ -95,9 +92,9 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 					) : IconComponent ? (
 						<IconComponent className="h-4 w-4 shrink-0" />
 					) : null}
-					<p className="line-clamp-1 text-sm">{typeToUse}</p>
+					<p className="line-clamp-1 text-sm">{hierarchy.title}</p>
 				</div>
-				{typeToUse === "topic" && bookMarked ? (
+				{type === "topic" && bookMarked ? (
 					<BookmarkIconSolid className="h-4 w-4 shrink-0 fill-yellow-300 dark:fill-yellow-400" />
 				) : null}
 			</Link>

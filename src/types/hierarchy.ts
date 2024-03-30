@@ -36,12 +36,30 @@ export interface IForm {
 	lightText: string
 }
 
+export interface IHierarchy {
+	prevLevel: ILevel
+	currentLevel: ILevel
+	ids: Record<string, string | null>
+	currentView: string
+	nextView: string | null
+	idx: number
+	hierarchyArr: string[]
+	slug: string | string[] | undefined
+	currentHierarchy: string | null
+}
+
+export interface ILevel {
+	idType: string | null
+	id: string | null
+}
+
 export interface ICourse {
 	_id: string
 	uid: string
 	cohortId: string
 	orgId: string
 	status: string
+	type: Array<string>
 	attendance: {
 		cohort: number
 		terms: Record<string, number> | null

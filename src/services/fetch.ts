@@ -41,6 +41,8 @@ const customFetch = async (
 
 	let res: Response = await fetch(`${baseUrl}${endpoint}`, options)
 
+	if (!res.ok) throw new Error("Failed to fetch endpoint")
+
 	if (res.status === 401) {
 		const newToken = await refreshToken()
 		if (newToken) {
