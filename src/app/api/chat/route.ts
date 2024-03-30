@@ -1,16 +1,11 @@
+import { BytesOutputParser } from "@langchain/core/output_parsers"
+import { PromptTemplate } from "@langchain/core/prompts"
+import { ChatOpenAI } from "@langchain/openai"
 import { StreamingTextResponse, Message as VercelChatMessage } from "ai"
 import { NextRequest } from "next/server"
 
-import { ChatOpenAI } from "langchain/chat_models/openai"
-import { PromptTemplate } from "langchain/prompts"
-import { BytesOutputParser } from "langchain/schema/output_parser"
-
 export const runtime = "edge"
 
-/**
- * Basic memory formatter that stringifies and passes
- * message history directly into the model.
- */
 const formatMessage = (message: VercelChatMessage) => {
 	return `${message.role}: ${message.content}`
 }
