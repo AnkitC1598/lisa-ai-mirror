@@ -2,6 +2,7 @@
 
 import { fetchClientWithToken } from "@/services/fetch"
 import { ICourse } from "@/types/hierarchy"
+import { Resource } from "@/types/topic"
 
 export const getCourses = async (): Promise<ICourse[]> => {
 	const resp = await fetchClientWithToken("/cohort", {
@@ -44,4 +45,21 @@ export const getHierarchyData = async ({
 	)
 
 	return resp.results.data
+}
+
+export const getResources = async ({
+	courseId,
+	topicId,
+}: {
+	courseId: string
+	topicId: string
+}): Promise<Resource[]> => {
+	const resp = await fetchClientWithToken(
+		`/ai/resources/${courseId}/${topicId}`,
+		{
+			method: "GET",
+		}
+	)
+
+	return resp.results.data.resources.web.results
 }

@@ -35,6 +35,10 @@ const nextConfig = withPWA({
 				protocol: 'https',
 				hostname: 'npe-lisa-static.s3.ap-south-1.amazonaws.com',
 			},
+			{
+				protocol: 'https',
+				hostname: 'imgs.search.brave.com',
+			},
 		],
 	},
 })

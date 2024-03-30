@@ -88,6 +88,7 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 					? hierarchyData.map((hierarchy: any) => (
 							<HierarchyCard
 								type={currentView}
+								cohortId={slug[0]}
 								hierarchy={hierarchy}
 								key={hierarchy._id}
 							/>
