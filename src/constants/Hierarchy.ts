@@ -5,6 +5,26 @@ import TopicIcon from "@/svg/topic"
 import { IHierarchyConstantData } from "@/types/hierarchy"
 
 const HierarchyConstants: IHierarchyConstantData = {
+	cohort: {
+		icon: TermIcon,
+		colors: {
+			card: {
+				border: "hover:border-pink-400 dark:hover:border-pink-800",
+				icon: "group-hover:text-pink-500",
+				bg: "bg-pink-100 dark:bg-pink-800",
+				text: "text-pink-700 dark:text-pink-50",
+			},
+			content: {
+				createIcon: "group-hover:text-pink-500",
+				dataIcon: "text-pink-200 dark:text-pink-500",
+			},
+			form: {
+				bg: "bg-pink-800",
+				text: "text-pink-50",
+				lightText: "text-pink-200",
+			},
+		},
+	},
 	term: {
 		icon: TermIcon,
 		colors: {
