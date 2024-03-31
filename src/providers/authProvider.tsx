@@ -1,8 +1,10 @@
 "use client"
 
 import { login } from "@/actions/auth"
+import { getUser } from "@/actions/user"
 import { clientEnv } from "@/env/client"
 import cookieService from "@/services/cookie"
+import useAIStore from "@/store"
 import { addMinutes, fromUnixTime, isAfter } from "date-fns"
 import { jwtDecode } from "jwt-decode"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
@@ -18,6 +20,8 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 	const router = useRouter()
 
 	const [ready, setReady] = useState<boolean>(false)
+
+	const dispatch = useAIStore(store => store.dispatch)
 
 	useEffect(() => {
 		if (window.location.pathname !== "/auth" && !ready) {
@@ -47,9 +51,27 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 								accessToken,
 								refreshToken,
 							})
-							if (searchParams.has("launchCode"))
-								router.replace(pathname)
-							else setReady(true)
+							getUser().then(user => {
+								dispatch({
+									type: "SET_USER",
+									payload: user,
+								})
+								const userOnboarded = true
+
+								if (searchParams.has("launchCode"))
+									if (
+										!userOnboarded &&
+										pathname !== "/onboarding"
+									)
+										router.replace("/onboarding")
+									else router.replace(pathname)
+								else if (
+									!userOnboarded &&
+									pathname !== "/onboarding"
+								)
+									router.replace("/onboarding")
+								setTimeout(() => setReady(true), 500)
+							})
 						})
 						.catch((e: Error) => {
 							console.error(e)
