@@ -14,15 +14,22 @@ import {
 	HandThumbUpIcon as HandThumbUpIconSolid,
 	SpeakerWaveIcon,
 } from "@heroicons/react/24/solid"
+import { formatDistance } from "date-fns"
 import Image from "next/image"
 import { useState } from "react"
 
-export const UserMessage = ({ message = "" }) => {
+// @ts-ignore
+export const UserMessage = ({ message }) => {
 	return (
 		<>
 			<div className="flex flex-col gap-2 p-4 text-right">
 				<div className="flex items-center justify-between text-sm text-gray-500">
-					<span>1hr</span>
+					<span>
+						{formatDistance(
+							new Date(message?.createdAt || null),
+							new Date()
+						)}
+					</span>
 					<div className="flex items-center gap-1">
 						<span>You</span>
 						<div className="relative h-5 w-5 overflow-hidden rounded-full">
@@ -34,13 +41,14 @@ export const UserMessage = ({ message = "" }) => {
 						</div>
 					</div>
 				</div>
-				<p>{message}</p>
+				<p>{message.content}</p>
 			</div>
 		</>
 	)
 }
 
-export const AiMessage = ({ message = "" }) => {
+// @ts-ignore
+export const AiMessage = ({ message }) => {
 	const [vote, setVote] = useState<string | null>(null)
 	const [copy, setCopy] = useState<string | null>(null)
 	const [audioState, setAudioState] = useState<string | null>(null)
@@ -62,9 +70,14 @@ export const AiMessage = ({ message = "" }) => {
 							<SparklesIcon className="h-2 w-2" />
 						</span>
 					</div>
-					<span>1hr</span>
+					<span>
+						{formatDistance(
+							new Date(message?.createdAt || null),
+							new Date()
+						)}
+					</span>
 				</div>
-				<p className="text-sm">{message}</p>
+				<p className="text-sm">{message.content}</p>
 				<div className="flex items-center gap-2">
 					<Button
 						variant="outline"
@@ -91,7 +104,9 @@ export const AiMessage = ({ message = "" }) => {
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() => handleCopy(message, copy, setCopy)}
+						onClick={() =>
+							handleCopy(message.content, copy, setCopy)
+						}
 					>
 						<ClipboardDocumentIcon
 							className={cn(
@@ -104,7 +119,11 @@ export const AiMessage = ({ message = "" }) => {
 						variant="outline"
 						size="icon"
 						onClick={() =>
-							handleAudio(message, audioState, setAudioState)
+							handleAudio(
+								message.content,
+								audioState,
+								setAudioState
+							)
 						}
 					>
 						<SpeakerWaveIcon

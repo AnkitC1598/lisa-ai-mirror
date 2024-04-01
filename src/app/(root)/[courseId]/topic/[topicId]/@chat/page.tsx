@@ -1,15 +1,38 @@
 "use client"
 
+import { getChats } from "@/actions/hierarchy"
 import { AiMessage, UserMessage } from "@/components/organisms/Message"
 import { Input } from "@/components/ui/input"
+import { fetchClientWithToken } from "@/services/fetch"
 import useAIStore from "@/store"
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid"
-import { nanoid } from "ai"
 import { useChat } from "ai/react"
+import { useEffect, useState } from "react"
 import ScrollAnchor from "./ScrollAnchor"
 
 const Chat = () => {
 	const currentTopic = useAIStore(store => store.currentTopic)
+	const [oldChats, setOldChats] = useState([])
+
+	useEffect(() => {
+		getChats({
+			courseId: currentTopic?.cohort?._id,
+			topicId: currentTopic?._id,
+		}).then(chats => {
+			let reverse = chats.reverse()
+			setOldChats(
+				// @ts-ignore
+				reverse.map(chat => {
+					return {
+						id: chat._id,
+						content: chat.body,
+						role: chat.isLisaAi ? "assistant" : "user",
+						createdAt: chat.createdAt,
+					}
+				})
+			)
+		})
+	}, [])
 
 	const { messages, input, handleInputChange, handleSubmit, isLoading } =
 		useChat({
@@ -19,34 +42,41 @@ const Chat = () => {
 			},
 			id: currentTopic?._id,
 			async onFinish(message) {
-				await new Promise(resolve => setTimeout(resolve, 1000))
-				console.log("Message", message)
+				await fetchClientWithToken(
+					`/ai/chat/${currentTopic?.cohort?._id}/${currentTopic?._id}`,
+					{
+						method: "POST",
+						body: JSON.stringify({
+							isLisaAi: true,
+							body: message.content,
+						}),
+					}
+				)
 			},
 			async onResponse(message) {
-				await new Promise(resolve => setTimeout(resolve, 1000))
-				console.log("INPUT PROMPT", message, {
-					role: "user",
-					content: input,
-				})
+				await fetchClientWithToken(
+					`/ai/chat/${currentTopic?.cohort?._id}/${currentTopic?._id}`,
+					{
+						method: "POST",
+						body: JSON.stringify({
+							isLisaAi: false,
+							body: input,
+						}),
+					}
+				)
 			},
-			initialMessages: [
-				{
-					id: nanoid(),
-					role: "assistant",
-					content: "Hello! How can I help you today?",
-				},
-			],
+			initialMessages: oldChats,
 		})
 	return (
 		<>
 			<div className="flex h-full flex-col gap-4">
 				<div className="scrollbar-both-edges flex flex-1 flex-col divide-y divide-neutral-200 overflow-y-auto scrollbar dark:divide-neutral-800">
-					{messages.map(m => {
+					{messages.map(message => {
 						const Message =
-							m.role === "user" ? UserMessage : AiMessage
+							message.role === "user" ? UserMessage : AiMessage
 						return (
-							<div key={m.id}>
-								<Message message={m.content} />
+							<div key={message.id}>
+								<Message message={message} />
 							</div>
 						)
 					})}

@@ -110,3 +110,20 @@ export const getResources = async ({
 
 	return resp.results.data.resources.web.results
 }
+
+export const getChats = async ({
+	courseId,
+	topicId,
+}: {
+	courseId: string | undefined
+	topicId: string | undefined
+}) => {
+	const resp = await fetchClientWithToken(
+		`/ai/chat/${courseId}/${topicId}?page=1&limit=10`,
+		{
+			method: "GET",
+		}
+	)
+
+	return resp.results.data
+}

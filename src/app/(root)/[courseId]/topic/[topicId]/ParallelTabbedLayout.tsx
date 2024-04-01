@@ -32,7 +32,6 @@ const ParallelTabbedLayout: React.FC<Readonly<IParallelTabbedLayout>> = ({
 }) => {
 	const dispatch = useAIStore(store => store.dispatch)
 	const currentTopic = useAIStore(store => store.currentTopic)
-	console.debug(`🚀 ~ currentTopic:`, currentTopic)
 
 	const searchParams = useSearchParams()
 	const tab: string = searchParams.get("tab") ?? "home"
