@@ -23,8 +23,9 @@ const config = {
 		},
 		extend: {
 			height: {
-				navScreen: "calc(100vh - 64px)",
-				bottomNavScreen: "calc(100vh - 220px)",
+				screen: "calc(var(--vh, 1vh) * 100)",
+				navScreen: "calc(calc(var(--vh, 1vh) * 100) - 64px)",
+				bottomNavScreen: "calc(calc(var(--vh, 1vh) * 100) - 220px)",
 			},
 			keyframes: {
 				"accordion-down": {

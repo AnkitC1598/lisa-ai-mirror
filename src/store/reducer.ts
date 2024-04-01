@@ -10,6 +10,10 @@ export const reducer: IReducer = (state, { type, payload }) => {
 			return produce(state, draft => {
 				for (let i in payload) (draft as any)[i] = payload[i]
 			})
+		case "SET_USER":
+			return produce(state, draft => {
+				draft.user = payload
+			})
 		default:
 			return state
 	}

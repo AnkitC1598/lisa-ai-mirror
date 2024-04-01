@@ -5,10 +5,11 @@ interface HTMLStyle {
 interface IPeek {
 	border: string
 	bg: string
-	style: HTMLStyle
+	style?: HTMLStyle
+	className?: string
 }
 
-const Peek: React.FC<IPeek> = ({ border, bg, style }) => {
+const Peek: React.FC<IPeek> = ({ border, bg, style, className }) => {
 	return (
 		<>
 			<svg
@@ -17,6 +18,7 @@ const Peek: React.FC<IPeek> = ({ border, bg, style }) => {
 				viewBox="0 0 141 32"
 				fill="none"
 				xmlns="http://www.w3.org/2000/svg"
+				className={className}
 				style={style}
 			>
 				<g filter="url(#filter0_dd_1455_4230)">

@@ -1,4 +1,5 @@
 import Navbar from "@/components/organisms/Navbar"
+import { Suspense } from "react"
 
 interface IRootLayout {
 	children: React.ReactNode
@@ -7,7 +8,9 @@ interface IRootLayout {
 const RootLayout: React.FC<Readonly<IRootLayout>> = ({ children }) => {
 	return (
 		<>
-			<Navbar />
+			<Suspense fallback={<>Getting Profile?</>}>
+				<Navbar />
+			</Suspense>
 			<main className="h-navScreen flex-1 overflow-hidden">
 				{children}
 			</main>

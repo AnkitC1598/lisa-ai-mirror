@@ -2,25 +2,9 @@
 
 import { getType } from "@/lib"
 import useAIStore from "@/store"
-import { useParams, usePathname } from "next/navigation"
+import { IHierarchy, ILevel } from "@/types/hierarchy"
+import { useParams } from "next/navigation"
 import { useMemo } from "react"
-
-interface IHierarchy {
-	prevLevel: ILevel
-	currentLevel: ILevel
-	ids: Record<string, string | null>
-	currentView: string
-	nextView: string | null
-	idx: number
-	hierarchyArr: string[]
-	slug: string | string[] | undefined
-	currentHierarchy: string | null
-}
-
-interface ILevel {
-	idType: string | null
-	id: string | null
-}
 
 const hierarchyTypes: Record<string, string[]> = {
 	ctsct: ["term", "subject", "chapter"],
@@ -30,7 +14,6 @@ const hierarchyTypes: Record<string, string[]> = {
 }
 
 const useGetHierarchy = (): IHierarchy => {
-	const pathname = usePathname()
 	const params = useParams<{ slug: string[] }>()
 	const { slug } = params
 	const currentHierarchy = useAIStore(store => store.currentHierarchy)
@@ -41,7 +24,7 @@ const useGetHierarchy = (): IHierarchy => {
 		const prevLevel: ILevel = { idType: null, id: null }
 		let idx: number = 0
 		let hierarchyArr: string[] = []
-		let currentView: string = "course"
+		let currentView: string = "cohort"
 		let nextView: string | null = null
 
 		if (currentHierarchy && getType(slug) === "Array" && slug.length) {

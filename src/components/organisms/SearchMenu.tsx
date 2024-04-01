@@ -1,8 +1,11 @@
 "use client"
 
+import { globalSearch } from "@/actions/search"
+import { IGlobalSearchResult } from "@/types/search"
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid"
 import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useDebouncedCallback } from "use-debounce"
 import { Button } from "../ui/button"
 import {
 	CommandDialog,
@@ -24,8 +27,39 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 	size = "small",
 	hideOnHome = false,
 }) => {
-	const [open, setOpen] = useState(false)
+	const [open, setOpen] = useState<boolean>(false)
+	const [query, setQuery] = useState<string | undefined>()
+	const [results, setResults] = useState<IGlobalSearchResult>({
+		topics: [],
+		others: [],
+	})
 	const pathname = usePathname()
+
+	const handleQuery = useDebouncedCallback(async (query: string) => {
+		setQuery(query)
+		const results = await globalSearch({ query })
+		setResults({
+			topics: results.topics,
+			others: Object.entries(results)
+				.filter((_, i) => Object.keys(results)[i] !== "topics")
+				.flatMap(([key, value]) =>
+					value.map((item: any) => ({
+						type: key.replace(/s\b/g, ""),
+						...item,
+					}))
+				),
+		})
+	}, 500)
+
+	useEffect(() => {
+		if (!open) {
+			setQuery(undefined)
+			setResults({
+				topics: [],
+				others: [],
+			})
+		}
+	}, [open])
 
 	if (hideOnHome && pathname === "/" && size === "small") return null
 
@@ -60,52 +94,56 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 				open={open}
 				onOpenChange={setOpen}
 			>
-				<CommandInput placeholder="Search any topic from your curriculum" />
+				<CommandInput
+					onValueChange={handleQuery}
+					placeholder="Search any topic from your curriculum"
+				/>
 				<CommandList>
-					<CommandEmpty>No results found.</CommandEmpty>
-					<CommandGroup heading="Topics">
-						<CommandItem
-							asChild
-							className="!p-0"
-						>
-							<HierarchyCard type="topic" />
-						</CommandItem>
-						<CommandItem
-							asChild
-							className="!p-0"
-							onSelect={console.log}
-						>
-							<HierarchyCard type="topic" />
-						</CommandItem>
-						<CommandItem
-							asChild
-							className="!p-0"
-							disabled
-						>
-							<HierarchyCard type="topic" />
-						</CommandItem>
-					</CommandGroup>
-					<CommandSeparator />
-					<CommandGroup heading="Others">
-						<CommandItem
-							asChild
-							className="!p-0"
-						>
-							<HierarchyCard type="chapter" />
-						</CommandItem>
-						<CommandItem
-							asChild
-							className="!p-0"
-						>
-							<HierarchyCard type="subject" />
-						</CommandItem>
-						<CommandItem
-							asChild
-							className="!p-0"
-						>
-							<HierarchyCard type="term" />
-						</CommandItem>
-					</CommandGroup>
+					{query &&
+						!results.topics.length &&
+						!results.others.length && (
+							<CommandEmpty>No results found.</CommandEmpty>
+						)}
+					{results.topics.length && query ? (
+						<CommandGroup heading="Topics">
+							{results.topics.map(topic => (
+								<CommandItem
+									key={topic._id}
+									asChild
+									value={"topic_" + topic._id}
+									className="!p-0"
+								>
+									<HierarchyCard
+										type="topic"
+										showHierarchy
+										peekIndex={50}
+										cohortId={topic.cohortId}
+										hierarchy={topic}
+									/>
+								</CommandItem>
+							))}
+						</CommandGroup>
+					) : null}
+					{query && results.topics.length && results.others.length ? (
+						<CommandSeparator alwaysRender />
+					) : null}
+					{results.others.length && query ? (
+						<CommandGroup heading="Others">
+							{results.others.map(other => (
+								<CommandItem
+									key={other.type + "_" + other._id}
+									value={other.type + "_" + other._id}
+									asChild
+									className="!p-0"
+								>
+									<HierarchyCard
+										type={other.type}
+										hierarchy={other}
+									/>
+								</CommandItem>
+							))}
+						</CommandGroup>
+					) : null}
 				</CommandList>
 			</CommandDialog>
 		</>

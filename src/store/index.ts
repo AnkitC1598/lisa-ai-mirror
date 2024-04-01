@@ -9,7 +9,7 @@ const initialState: IState = {
 	orgConfig: null,
 	orgPrompts: null,
 	breadCrumbs: [],
-	currentHierarchy: "ctsct",
+	currentHierarchy: null,
 }
 
 const useAIStore = create(
