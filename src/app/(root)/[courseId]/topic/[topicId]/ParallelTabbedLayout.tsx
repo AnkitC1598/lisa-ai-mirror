@@ -1,13 +1,21 @@
 "use client"
 
+import { getCourse, getTopicDetails } from "@/actions/hierarchy"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import useAIStore from "@/store"
 import {
 	Bars3BottomLeftIcon,
 	ChatBubbleLeftEllipsisIcon,
 	HomeIcon,
 	RectangleStackIcon,
 } from "@heroicons/react/16/solid"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import {
+	useParams,
+	usePathname,
+	useRouter,
+	useSearchParams,
+} from "next/navigation"
+import { useEffect } from "react"
 
 interface IParallelTabbedLayout {
 	home: React.ReactNode
@@ -22,10 +30,17 @@ const ParallelTabbedLayout: React.FC<Readonly<IParallelTabbedLayout>> = ({
 	practiceQuestions,
 	resources,
 }) => {
+	const dispatch = useAIStore(store => store.dispatch)
+	const currentTopic = useAIStore(store => store.currentTopic)
+
 	const searchParams = useSearchParams()
 	const tab: string = searchParams.get("tab") ?? "home"
 	const pathname = usePathname()
 	const { replace } = useRouter()
+	const { courseId, topicId } = useParams<{
+		courseId: string
+		topicId: string
+	}>()
 
 	const handleTabSwitch = (tab: string) => {
 		const params = new URLSearchParams(searchParams)
@@ -34,8 +49,47 @@ const ParallelTabbedLayout: React.FC<Readonly<IParallelTabbedLayout>> = ({
 
 		replace(`${pathname}?${params.toString()}`)
 	}
+
+	useEffect(() => {
+		getCourse({ cohortId: courseId })
+			.then(course => {
+				dispatch({
+					type: "SET_STATE",
+					payload: {
+						currentHierarchy: course.type.map(t => t[0]).join(""),
+					},
+				})
+			})
+			.then(() => {
+				getTopicDetails({ topicId }).then(resp => {
+					dispatch({
+						type: "SET_STATE",
+						payload: {
+							currentTopic: resp,
+						},
+					})
+				})
+			})
+
+		return () => {
+			dispatch({
+				type: "SET_STATE",
+				payload: {
+					currentHierarchy: null,
+					currentTopic: null,
+				},
+			})
+		}
+	}, [courseId, topicId, dispatch])
+
+	if (!currentTopic) return null
+
 	return (
 		<>
+			<div className="flex flex-col gap-1 p-4 pb-0">
+				<p className="line-clamp-1 text-sm">Breadcrumb</p>
+				<p className="text-lg font-semibold">{currentTopic.title}</p>
+			</div>
 			<Tabs
 				defaultValue={tab}
 				className="flex h-full flex-col-reverse overflow-hidden"

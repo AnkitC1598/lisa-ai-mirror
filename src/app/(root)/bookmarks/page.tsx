@@ -1,5 +1,5 @@
-import HierarchyCard from "@/components/organisms/HierarchyCard"
-import LinkPreview from "@/components/organisms/LinkPreview"
+// import HierarchyCard from "@/components/organisms/HierarchyCard"
+// import LinkPreview from "@/components/organisms/LinkPreview"
 import { sleep } from "@/lib"
 import { cache } from "react"
 
@@ -18,15 +18,15 @@ const getBookmarks = cache(
 	async ({ filter }: { filter: TBookmarkFilters | "all" }) => {
 		await sleep(1000)
 		return [
-			{
-				type: "topics",
-				component: () => (
-					<HierarchyCard
-						type="topic"
-						showHierarchy={3}
-					/>
-				),
-			},
+			// {
+			// 	type: "topics",
+			// 	component: () => (
+			// 		<HierarchyCard
+			// 			type="topic"
+			// 			showHierarchy={3}
+			// 		/>
+			// 	),
+			// },
 			// {
 			// 	type: "questions",
 			// 	component: () => (
@@ -38,9 +38,37 @@ const getBookmarks = cache(
 			// 		</Accordion>
 			// 	),
 			// },
+			// {
+			// 	type: "resources",
+			// 	component: () => <LinkPreview />,
+			// },
+			// {
+			// 	type: "topics",
+			// 	component: () => (
+			// 		<HierarchyCard
+			// 			type="topic"
+			// 			showHierarchy={3}
+			// 		/>
+			// 	),
+			// },
+			// {
+			// 	type: "questions",
+			// 	component: () => (
+			// 		<Accordion
+			// 			type="single"
+			// 			collapsible
+			// 		>
+			// 			<PracticeQuestion />
+			// 		</Accordion>
+			// 	),
+			// },
+			// {
+			// 	type: "resources",
+			// 	component: () => <LinkPreview />,
+			// },
 			{
-				type: "resources",
-				component: () => <LinkPreview />,
+				type: "topics",
+				component: () => <></>,
 			},
 		].filter(d => (filter === "all" ? true : d.type === filter))
 	}
