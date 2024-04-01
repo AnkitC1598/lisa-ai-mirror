@@ -10,7 +10,7 @@ const formatMessage = (message: VercelChatMessage) => {
 	return `${message.role}: ${message.content}`
 }
 
-const TEMPLATE = `You are lisaAi - a chatbot that strictly answers about the context boundary if it relates otherwise escapes to answer.
+const TEMPLATE = `You are lisaAi - a chatbot that strictly answers within the context boundary even if it deeply relates to topic otherwise escapes to answer.
 Current topic boundary: {topic_boundary}
 Current conversation:
 {chat_history}

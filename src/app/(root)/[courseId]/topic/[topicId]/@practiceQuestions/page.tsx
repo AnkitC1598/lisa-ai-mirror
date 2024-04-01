@@ -1,14 +1,20 @@
 "use client"
 
+import useAIStore from "@/store"
 import { useActions, useUIState } from "ai/rsc"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { AI } from "./action"
 
 const PracticeQuestions = () => {
+	const currentTopic = useAIStore(store => store.currentTopic)
 	const [messages, setMessages] = useUIState<typeof AI>()
 	const { generatePracticeQuestions } = useActions<typeof AI>()
 
-	const [isLoading, setIsLoading] = useState(true)
+	const [isLoading, setIsLoading] = useState(false)
+
+	const prompt = useMemo(() => {
+		return `Generate 10 Practice questions for: ${currentTopic?.title} in ${currentTopic?.cohort?.title}`
+	}, [currentTopic])
 
 	useEffect(() => {
 		setMessages(currentMessages => [
@@ -16,17 +22,14 @@ const PracticeQuestions = () => {
 			{
 				id: Date.now(),
 				role: "user",
-				display:
-					"Generate Practice questions for: What is Web Development? in english, which is a topic in HTML & CSS Zero to Hero (5 Days)",
+				display: prompt,
 			},
 		])
 		const getData = async () => {
 			setIsLoading(true)
 			try {
 				// Submit and get response message
-				const responseMessage = await generatePracticeQuestions(
-					"Generate Practice questions for: What is Web Development? in english, which is a topic in HTML & CSS Zero to Hero (5 Days)"
-				)
+				const responseMessage = await generatePracticeQuestions(prompt)
 				// @ts-ignore
 				setMessages(currentMessages => [
 					...currentMessages,

@@ -2,6 +2,7 @@ import { sleep } from "@/lib"
 import { cache } from "react"
 import { AI as QuestionsAI } from "./@practiceQuestions/action"
 import ParallelTabbedLayout from "./ParallelTabbedLayout"
+import { AI as SlidesAI } from "./action"
 
 interface ITopicContentLayout {
 	children: React.ReactNode
@@ -28,7 +29,7 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = async ({
 			<div className="flex h-full flex-col gap-4 overflow-hidden">
 				<ParallelTabbedLayout
 					{...{
-						home: <QuestionsAI>{children}</QuestionsAI>,
+						home: <SlidesAI>{children}</SlidesAI>,
 						chat,
 						practiceQuestions: (
 							<QuestionsAI>{practiceQuestions}</QuestionsAI>

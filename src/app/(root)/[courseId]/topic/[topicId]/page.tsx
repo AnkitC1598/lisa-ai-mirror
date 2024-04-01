@@ -1,14 +1,20 @@
 "use client"
 
 import ContentControls from "@/components/organisms/ContentControls"
+import useAIStore from "@/store"
 import { useActions, useUIState } from "ai/rsc"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { type AI } from "./action"
 
 const TopicContent = () => {
+	const currentTopic = useAIStore(store => store.currentTopic)
 	const [messages, setMessages] = useUIState<typeof AI>()
 	const { submitUserMessage } = useActions<typeof AI>()
-	const [isLoading, setIsLoading] = useState(true)
+	const [isLoading, setIsLoading] = useState(false)
+
+	const prompt = useMemo(() => {
+		return `explain topic ${currentTopic?.title} in ${currentTopic?.cohort?.title}`
+	}, [currentTopic])
 
 	useEffect(() => {
 		setMessages(currentMessages => [
@@ -16,16 +22,14 @@ const TopicContent = () => {
 			{
 				id: Date.now(),
 				role: "user",
-				display: "explain anatomy of an eye in titan eye +",
+				display: prompt,
 			},
 		])
 		const getData = async () => {
 			setIsLoading(true)
 			try {
 				// Submit and get response message
-				const responseMessage = await submitUserMessage(
-					"explain anatomy of an eye in titan eye +"
-				)
+				const responseMessage = await submitUserMessage(prompt)
 				// @ts-ignore
 				setMessages(currentMessages => [
 					...currentMessages,

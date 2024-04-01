@@ -48,6 +48,19 @@ const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
 	)
 }
 
+export const PracticeQuestionsSkeletonLoader = () => {
+	return (
+		<div className="flex flex-1 p-2">
+			<div className="flex h-full w-full p-2">
+				<div className="flex w-full flex-shrink-0 flex-col gap-2 rounded-lg bg-neutral-200 p-4 dark:bg-neutral-800">
+					<div className="h-[30px] w-auto rounded-md bg-neutral-300 text-transparent dark:bg-neutral-700 sm:w-[352px]"></div>
+					<div className="h-[42px] w-auto rounded-md bg-neutral-300 text-transparent dark:bg-neutral-700 sm:w-[352px]"></div>
+				</div>
+			</div>
+		</div>
+	)
+}
+
 interface IPracticeQuestionProps {
 	question: IPracticeQuestion
 	idx: number

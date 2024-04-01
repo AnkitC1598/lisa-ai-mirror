@@ -3,7 +3,9 @@ import "server-only"
 import { createAI, createStreamableUI, getMutableAIState } from "ai/rsc"
 import OpenAI from "openai"
 
-import PracticeQuestions from "@/components/organisms/PracticeQuestions"
+import PracticeQuestions, {
+	PracticeQuestionsSkeletonLoader,
+} from "@/components/organisms/PracticeQuestions"
 import { runOpenAICompletion } from "@/lib"
 import { z } from "zod"
 
@@ -23,7 +25,7 @@ async function generatePracticeQuestions(content: string) {
 		},
 	])
 
-	const reply = createStreamableUI("Loading...")
+	const reply = createStreamableUI(<PracticeQuestionsSkeletonLoader />)
 
 	const completion = runOpenAICompletion(openai, {
 		model: "gpt-4",

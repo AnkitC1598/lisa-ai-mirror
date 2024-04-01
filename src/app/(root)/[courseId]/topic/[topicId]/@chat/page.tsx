@@ -2,19 +2,22 @@
 
 import { AiMessage, UserMessage } from "@/components/organisms/Message"
 import { Input } from "@/components/ui/input"
+import useAIStore from "@/store"
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid"
 import { nanoid } from "ai"
 import { useChat } from "ai/react"
 import ScrollAnchor from "./ScrollAnchor"
 
 const Chat = () => {
+	const currentTopic = useAIStore(store => store.currentTopic)
+
 	const { messages, input, handleInputChange, handleSubmit, isLoading } =
 		useChat({
 			api: "/lisa-ai/api/chat",
 			body: {
-				topic_boundary: "Anatomy of an eye in titan eye + course",
+				topic_boundary: `${currentTopic?.title} in ${currentTopic?.cohort?.title}`,
 			},
-			id: "lisa-ai",
+			id: currentTopic?._id,
 			async onFinish(message) {
 				await new Promise(resolve => setTimeout(resolve, 1000))
 				console.log("Message", message)
@@ -26,21 +29,11 @@ const Chat = () => {
 					content: input,
 				})
 			},
-			generateId: () => {
-				let id = nanoid()
-				console.debug(`🚀 ~ Chat ~ id:`, id)
-				return id
-			},
 			initialMessages: [
 				{
 					id: nanoid(),
-					role: "user",
-					content: "explain anatomy of an eye in titan eye +",
-				},
-				{
-					id: nanoid(),
 					role: "assistant",
-					content: "Sure, let me look that up for you.",
+					content: "Hello! How can I help you today?",
 				},
 			],
 		})
