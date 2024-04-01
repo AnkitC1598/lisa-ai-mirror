@@ -1,4 +1,4 @@
-import { TCurrentHierarchy } from "./hierarchy"
+import { ITopic, TCurrentHierarchy } from "./hierarchy"
 import { IUser } from "./user"
 
 export interface IState {
@@ -8,6 +8,7 @@ export interface IState {
 	orgPrompts: Record<string, any> | null
 	breadcrumbs: Record<string, any>[] | []
 	currentHierarchy: TCurrentHierarchy | null
+	currentTopic: ITopic | null
 }
 
 export interface IAction {

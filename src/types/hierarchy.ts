@@ -59,7 +59,7 @@ export interface ICourse {
 	cohortId: string
 	orgId: string
 	status: string
-	type: Array<string>
+	type: string[]
 	attendance: {
 		cohort: number
 		terms: Record<string, number> | null
@@ -74,7 +74,33 @@ export interface ICourse {
 		mode: string
 		coverImage: string | null
 		icon: string | null
-		type: Array<string>
+		type: string[]
+		duration: {
+			startDate: string
+			endDate: string
+		}
+		dateRestriction: boolean
+		contentCount: number
+	}
+}
+
+export interface ITopic {
+	_id: string
+	createdAt: string
+	updatedAt: string
+	title: string
+	details: string | null
+	orgId: string
+	cohortId: string
+	cohort: {
+		_id: string
+		title: string
+		uid: string
+		details: string | null
+		mode: string
+		coverImage: string | null
+		icon: string | null
+		type: string[]
 		duration: {
 			startDate: string
 			endDate: string

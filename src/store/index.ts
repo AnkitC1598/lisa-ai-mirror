@@ -10,6 +10,7 @@ const initialState: IState = {
 	orgPrompts: null,
 	breadcrumbs: [],
 	currentHierarchy: null,
+	currentTopic: null,
 }
 
 const useAIStore = create(

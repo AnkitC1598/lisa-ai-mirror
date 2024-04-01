@@ -25,10 +25,6 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = async ({
 	return (
 		<>
 			<div className="flex h-full flex-col gap-4 overflow-hidden">
-				<div className="flex flex-col gap-2 p-4 pb-0">
-					<p className="line-clamp-1 text-sm">Breadcrumb</p>
-					<p className="text-lg font-semibold">Title</p>
-				</div>
 				<ParallelTabbedLayout
 					{...{ home: children, chat, practiceQuestions, resources }}
 				/>

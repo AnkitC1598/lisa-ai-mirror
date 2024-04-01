@@ -34,18 +34,13 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 	const { icon: Icon } = HierarchyConstants[type]
 	const IconComponent = Icon as React.ComponentType<ISVGIconProps>
 
-	// const handleBookmark = (
-	// 	e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-	// ) => {
-	// 	e.stopPropagation()
-	// 	e.preventDefault()
-	// 	setBookMarked(prev => !prev)
-	// }
+	let basePath = type === "topic" ? `${cohortId}/topic` : pathname
+	basePath = basePath.endsWith("/") ? basePath : `${basePath}/`
 
 	return (
 		<>
 			<Link
-				href={`${type === "topic" ? `${cohortId}/topic` : pathname}${hierarchy._id}`}
+				href={`${basePath}${hierarchy._id}`}
 				className={cn("relative w-full", {
 					"mt-6": showHierarchy,
 				})}

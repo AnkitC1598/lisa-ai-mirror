@@ -1,7 +1,7 @@
 "use server"
 
 import { fetchClientWithToken } from "@/services/fetch"
-import { ICourse } from "@/types/hierarchy"
+import { ICourse, ITopic } from "@/types/hierarchy"
 import { Resource } from "@/types/topic"
 
 export const getCourses = async (): Promise<ICourse[]> => {
@@ -43,6 +43,18 @@ export const getHierarchyData = async ({
 			method: "GET",
 		}
 	)
+
+	return resp.results.data
+}
+
+export const getTopicDetails = async ({
+	topicId,
+}: {
+	topicId: string
+}): Promise<ITopic> => {
+	const resp = await fetchClientWithToken(`/cohort/topic/${topicId}`, {
+		method: "GET",
+	})
 
 	return resp.results.data
 }
