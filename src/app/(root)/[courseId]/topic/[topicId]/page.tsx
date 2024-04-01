@@ -8,7 +8,7 @@ import { type AI } from "./action"
 const TopicContent = () => {
 	const [messages, setMessages] = useUIState<typeof AI>()
 	const { submitUserMessage } = useActions<typeof AI>()
-	const [isLoading, setIsLoading] = useState(false)
+	const [isLoading, setIsLoading] = useState(true)
 
 	useEffect(() => {
 		setMessages(currentMessages => [

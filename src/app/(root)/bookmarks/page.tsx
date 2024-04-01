@@ -1,7 +1,5 @@
 import HierarchyCard from "@/components/organisms/HierarchyCard"
 import LinkPreview from "@/components/organisms/LinkPreview"
-import PracticeQuestion from "@/components/organisms/PracticeQuestion"
-import { Accordion } from "@/components/ui/accordion"
 import { sleep } from "@/lib"
 import { cache } from "react"
 
@@ -29,17 +27,17 @@ const getBookmarks = cache(
 					/>
 				),
 			},
-			{
-				type: "questions",
-				component: () => (
-					<Accordion
-						type="single"
-						collapsible
-					>
-						<PracticeQuestion idx={1} />
-					</Accordion>
-				),
-			},
+			// {
+			// 	type: "questions",
+			// 	component: () => (
+			// 		<Accordion
+			// 			type="single"
+			// 			collapsible
+			// 		>
+			// 			<PracticeQuestion idx={1} />
+			// 		</Accordion>
+			// 	),
+			// },
 			{
 				type: "resources",
 				component: () => <LinkPreview />,

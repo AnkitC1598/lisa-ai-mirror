@@ -1,12 +1,14 @@
 "use client"
 
 import {
+	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { IPracticeQuestion } from "@/types/topic"
 import {
 	BookmarkIcon as BookmarkIconOutline,
 	HandThumbDownIcon as HandThumbDownIconOutline,
@@ -20,10 +22,41 @@ import {
 } from "@heroicons/react/24/solid"
 import { useState } from "react"
 
-interface IPracticeQuestion {
+interface IPracticeQuestions {
+	questions: IPracticeQuestion[]
+}
+
+const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
+	return (
+		<>
+			<div className="px-4">
+				<Accordion
+					type="single"
+					collapsible
+					className="space-y-4"
+				>
+					{questions.map((question, idx) => (
+						<PracticeQuestion
+							key={question.question}
+							question={question}
+							idx={idx + 1}
+						/>
+					))}
+				</Accordion>
+			</div>
+		</>
+	)
+}
+
+interface IPracticeQuestionProps {
+	question: IPracticeQuestion
 	idx: number
 }
-const PracticeQuestion: React.FC<IPracticeQuestion> = ({ idx }) => {
+
+const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
+	question,
+	idx,
+}) => {
 	const [vote, setVote] = useState<string | null>(null)
 	const [audioState, setAudioState] = useState<string | null>(null)
 	const [bookmarked, setBookmarked] = useState<boolean>(false)
@@ -46,20 +79,16 @@ const PracticeQuestion: React.FC<IPracticeQuestion> = ({ idx }) => {
 				className="rounded-md px-4 shadow ring-1 ring-inset ring-neutral-200 dark:shadow-neutral-800 dark:ring-neutral-800"
 			>
 				<AccordionTrigger>
-					<div className="flex flex-col items-start gap-1 text-sm">
-						<span>Question {String(idx).padStart(2, "0")}</span>
-						<span className="text-gray-500">Question {idx}</span>
+					<div className="flex flex-col items-start justify-start gap-1 text-sm">
+						<div>Question {String(idx).padStart(2, "0")}</div>
+						<div className="text-left text-gray-500">
+							{question.question}
+						</div>
 					</div>
 				</AccordionTrigger>
 				<AccordionContent>
 					<span>Ans.</span>
-					<span className="text-gray-500">
-						Lorem ipsum dolor sit amet consectetur adipisicing elit.
-						Aspernatur esse iste suscipit libero beatae delectus
-						repellendus a minima sapiente nam, voluptatum sequi
-						nobis, error repellat aperiam, debitis reiciendis quidem
-						neque.
-					</span>
+					<span className="text-gray-500">{question.answer}</span>
 					<div className="flex items-center justify-between">
 						<div className="flex gap-4">
 							<Button
@@ -118,4 +147,4 @@ const PracticeQuestion: React.FC<IPracticeQuestion> = ({ idx }) => {
 	)
 }
 
-export default PracticeQuestion
+export default PracticeQuestions

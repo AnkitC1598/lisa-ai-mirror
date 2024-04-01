@@ -97,21 +97,29 @@ const Slide: React.FC<ISlide> = ({
 		setVote(prev => (prev === type ? null : type))
 
 	const handleAudio = (text = "") => {
-		if (audioState !== null) return
 		const synth = window.speechSynthesis
 		const voices = synth.getVoices()
-		const utterance = new SpeechSynthesisUtterance(removeEmojis(text))
-		try {
-			// @ts-ignore
-			utterance.voice = voices.find(voice => voice.lang === "en-IN")
-		} catch (e) {
-			utterance.voice = voices[0]
+		if (audioState !== null) {
+			if (synth.speaking && audioState === "playing") {
+				synth.pause()
+				setAudioState("paused")
+			} else {
+				synth.resume()
+				setAudioState("playing")
+			}
+		} else {
+			const utterance = new SpeechSynthesisUtterance(removeEmojis(text))
+			try {
+				// @ts-ignore
+				utterance.voice = voices.find(voice => voice.lang === "en-IN")
+			} catch (e) {
+				utterance.voice = voices[0]
+			}
+			synth.speak(utterance)
+			setAudioState("playing")
+			// setTimeout(() => setAudioState(null), 1000)
+			utterance.onend = () => setAudioState(null)
 		}
-
-		synth.speak(utterance)
-		setAudioState("playing")
-		// setTimeout(() => setAudioState(null), 1000)
-		utterance.onend = () => setAudioState(null)
 	}
 
 	useEffect(() => {
@@ -178,13 +186,16 @@ const Slide: React.FC<ISlide> = ({
 				<Button
 					variant="outline"
 					size="icon"
-					disabled={audioState === "playing"}
 					onClick={() => handleAudio(title + "\n" + body)}
 				>
 					<SpeakerWaveIcon
 						className={cn(
 							"h-4 w-4",
-							audioState === "playing" ? "fill-blue-500" : ""
+							audioState === "playing"
+								? "fill-green-500"
+								: audioState === "paused"
+									? "fill-blue-500"
+									: ""
 						)}
 					/>
 				</Button>

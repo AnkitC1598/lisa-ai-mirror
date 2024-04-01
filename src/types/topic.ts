@@ -29,3 +29,8 @@ export type Resource = {
 		  }
 		| undefined
 }
+
+export interface IPracticeQuestion {
+	question: string
+	answer: string
+}
