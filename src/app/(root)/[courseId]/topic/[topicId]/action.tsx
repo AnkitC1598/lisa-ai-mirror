@@ -5,13 +5,18 @@ import OpenAI from "openai"
 
 import Slides, { SlidesSkeletonLoader } from "@/components/organisms/Slides"
 import { runOpenAICompletion } from "@/lib"
+import { fetchClientWithToken } from "@/services/fetch"
 import { z } from "zod"
 
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY || "",
 })
 
-async function submitUserMessage(content: string) {
+async function submitUserMessage({
+	content = "",
+	cohortId = "",
+	topicId = "",
+}) {
 	"use server"
 
 	const aiState = getMutableAIState<typeof AI>()
@@ -64,6 +69,9 @@ If the user requests explanation of a topic, call \`explain_topic\` to show the 
 					quiz: z
 						.array(
 							z.object({
+								type: z
+									.enum(["quiz"])
+									.describe("The type of slide"),
 								priority: z
 									.number()
 									.describe(
@@ -72,10 +80,10 @@ If the user requests explanation of a topic, call \`explain_topic\` to show the 
 								question: z
 									.string()
 									.describe("The question of the quiz"),
-								options: z
+								answers: z
 									.array(
 										z.object({
-											option: z
+											body: z
 												.string()
 												.describe(
 													"The option of the quiz"
@@ -94,6 +102,9 @@ If the user requests explanation of a topic, call \`explain_topic\` to show the 
 					slides: z
 						.array(
 							z.object({
+								type: z
+									.enum(["text"])
+									.describe("The type of slide"),
 								priority: z
 									.number()
 									.describe(
@@ -132,32 +143,27 @@ If the user requests explanation of a topic, call \`explain_topic\` to show the 
 		// reply.update(<SlidesSkeletonLoader />)
 
 		// await sleep(1000)
-		console.log(slides, quiz)
-
-		// await fetch("http://localhost:3000/api", {
-		// 	method: "POST",
-		// 	headers: { "Content-Type": "application/json" },
-		// 	body: JSON.stringify({
-		// 		title: "Fetch POST Request Example",
-		// 		data: slides,
-		// 	}),
-		// })
-
-		reply.done(
-			<Slides
-				// @ts-ignore
-				slides={slides}
-				// @ts-ignore
-				quiz={quiz}
-			/>
+		// console.log(slides, quiz)
+		const finalSlides = [...slides, ...quiz].sort(
+			(a, b) => a.priority - b.priority
 		)
+
+		await fetchClientWithToken(`/ai/slides/${cohortId}/${topicId}`, {
+			method: "POST",
+			body: JSON.stringify({
+				slides: finalSlides,
+			}),
+		})
+
+		// @ts-ignore
+		reply.done(<Slides slides={finalSlides} />)
 
 		aiState.done([
 			...aiState.get(),
 			{
 				role: "function",
 				name: "explain_topic",
-				content: JSON.stringify(slides),
+				content: JSON.stringify(finalSlides),
 			},
 		])
 	})

@@ -59,6 +59,41 @@ export const getTopicDetails = async ({
 	return resp.results.data
 }
 
+export const getSlides = async ({
+	courseId,
+	topicId,
+}: {
+	courseId: string | undefined
+	topicId: string | undefined
+}): Promise<Resource[]> => {
+	const resp = await fetchClientWithToken(
+		`/ai/slides/${courseId}/${topicId}`,
+		{
+			method: "GET",
+		}
+	)
+
+	return resp.results.data
+}
+
+export const getTranslations = async ({
+	courseId,
+	topicId,
+	langCode,
+}: {
+	courseId: string
+	topicId: string
+	langCode: string
+}): Promise<any> => {
+	const resp = await fetchClientWithToken(
+		`/ai/slides/translate/${topicId}/${courseId}/${langCode}`,
+		{
+			method: "GET",
+		}
+	)
+	return resp.results.data
+}
+
 export const getResources = async ({
 	courseId,
 	topicId,

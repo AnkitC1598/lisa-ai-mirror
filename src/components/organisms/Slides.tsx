@@ -16,23 +16,20 @@ import { useInView } from "react-intersection-observer"
 import { Button } from "../ui/button"
 import ContentPagination from "./ContentPagination"
 
-const Slides = ({ slides = [], quiz = [] }) => {
-	const finalMergedArray = [...slides, ...quiz].sort(
-		// @ts-ignore
-		(a, b) => a.priority - b.priority
-	)
+const Slides = ({ slides = [] }) => {
 	return (
 		<div className="flex h-[calc(100%-56px)] flex-1">
 			<ContentPagination vertical />
 			<div className="flex-1 snap-y snap-mandatory space-y-4 overflow-y-auto pb-4 pl-1 pr-4 scrollbar-hide">
-				{finalMergedArray.map(
+				{slides.map(
 					(
 						{
 							title = "",
 							body = "",
 							question = "",
-							options = [],
+							answers = [],
 							priority = 0,
+							type = "text",
 						},
 						idx
 					) => (
@@ -42,8 +39,9 @@ const Slides = ({ slides = [], quiz = [] }) => {
 							title={title}
 							body={body}
 							question={question}
-							options={options}
+							answers={answers}
 							priority={priority}
+							type={type}
 						/>
 					)
 				)}
@@ -78,8 +76,9 @@ interface ISlide {
 	title?: string
 	body?: string
 	question?: string
-	options?: any[]
+	answers?: any[]
 	priority: number
+	type: string
 }
 
 const Slide: React.FC<ISlide> = ({
@@ -87,7 +86,9 @@ const Slide: React.FC<ISlide> = ({
 	title = "",
 	body = "",
 	question = "",
-	options = [],
+	answers = [],
+	priority = 0,
+	type = "text",
 }) => {
 	const [vote, setVote] = useState<string | null>(null)
 	const [audioState, setAudioState] = useState<string | null>(null)
@@ -103,14 +104,14 @@ const Slide: React.FC<ISlide> = ({
 		}
 	}, [idx, inView, inViewAt])
 
-	const handleQuizOption = (option: any) => {
-		options.forEach((opt: any) => {
-			const element = document.getElementById(opt.option)
+	const handleQuizOption = (answer: any) => {
+		answers.forEach((ans: any) => {
+			const element = document.getElementById(ans.body)
 			if (element) {
 				element.style.backgroundColor = "transparent"
-				if ((option.isCorrect && option === opt) || opt.isCorrect)
+				if ((answer.isCorrect && answer === ans) || ans.isCorrect)
 					element.style.backgroundColor = "green"
-				else if (!option.isCorrect && option === opt)
+				else if (!answer.isCorrect && answer === ans)
 					element.style.backgroundColor = "red"
 			}
 		})
@@ -125,19 +126,19 @@ const Slide: React.FC<ISlide> = ({
 		>
 			<div className="flex flex-1 flex-col gap-2">
 				<span className="font-semibold">{title || question}</span>
-				{options.length ? (
+				{answers.length && type === "quiz" ? (
 					<div className="flex flex-col gap-2 py-4">
-						{options.map(option => (
+						{answers.map(answer => (
 							<span
-								id={option.option}
-								key={option.option}
-								onClick={() => handleQuizOption(option)}
+								id={answer.body}
+								key={answer.body}
+								onClick={() => handleQuizOption(answer)}
 								className={cn(
 									"w-full cursor-pointer rounded-md border border-neutral-200 bg-neutral-200 p-2 transition-all duration-500 hover:bg-neutral-300 dark:border-neutral-800 dark:bg-neutral-800 dark:hover:bg-neutral-700"
 									// option.isCorrect ? "text-green-500" : ""
 								)}
 							>
-								{option.option}
+								{answer.body}
 							</span>
 						))}
 					</div>
@@ -175,7 +176,11 @@ const Slide: React.FC<ISlide> = ({
 					size="icon"
 					onClick={() =>
 						handleAudio(
-							title + "\n" + body,
+							type === "quiz"
+								? question +
+										"\n" +
+										answers.map(a => a.body).join("\n")
+								: title + "\n" + body,
 							audioState,
 							setAudioState
 						)
