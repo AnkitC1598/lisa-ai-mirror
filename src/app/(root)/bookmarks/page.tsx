@@ -1,5 +1,5 @@
-import HierarchyCard from "@/components/organisms/HierarchyCard"
-import LinkPreview from "@/components/organisms/LinkPreview"
+// import HierarchyCard from "@/components/organisms/HierarchyCard"
+// import LinkPreview from "@/components/organisms/LinkPreview"
 import PracticeQuestion from "@/components/organisms/PracticeQuestion"
 import { Accordion } from "@/components/ui/accordion"
 import { sleep } from "@/lib"
@@ -20,15 +20,15 @@ const getBookmarks = cache(
 	async ({ filter }: { filter: TBookmarkFilters | "all" }) => {
 		await sleep(1000)
 		return [
-			{
-				type: "topics",
-				component: () => (
-					<HierarchyCard
-						type="topic"
-						showHierarchy={3}
-					/>
-				),
-			},
+			// {
+			// 	type: "topics",
+			// 	component: () => (
+			// 		<HierarchyCard
+			// 			type="topic"
+			// 			showHierarchy={3}
+			// 		/>
+			// 	),
+			// },
 			{
 				type: "questions",
 				component: () => (
@@ -40,10 +40,10 @@ const getBookmarks = cache(
 					</Accordion>
 				),
 			},
-			{
-				type: "resources",
-				component: () => <LinkPreview />,
-			},
+			// {
+			// 	type: "resources",
+			// 	component: () => <LinkPreview />,
+			// },
 		].filter(d => (filter === "all" ? true : d.type === filter))
 	}
 )

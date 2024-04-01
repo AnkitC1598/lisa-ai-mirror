@@ -8,7 +8,7 @@ const initialState: IState = {
 	orgInfo: null,
 	orgConfig: null,
 	orgPrompts: null,
-	breadCrumbs: [],
+	breadcrumbs: [],
 	currentHierarchy: null,
 }
 

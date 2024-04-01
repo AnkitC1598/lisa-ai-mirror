@@ -31,22 +31,6 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 		currentView: THierarchyType
 	}
 
-	// useEffect(() => {
-	// 	console.log("page", { query })
-	// }, [query])
-
-	// useEffect(() => {
-	// 	console.log("page", { currentView })
-	// }, [currentView])
-
-	// useEffect(() => {
-	// 	console.log("page", { cohortId: slug[0] })
-	// }, [slug])
-
-	// useEffect(() => {
-	// 	console.log("page", currentLevel)
-	// }, [currentLevel])
-
 	useEffect(() => {
 		getHierarchyData({
 			query,
@@ -55,8 +39,6 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 			...currentLevel,
 		}).then(resp => setHierarchyData(resp.children))
 	}, [slug, currentView, currentLevel, query])
-
-	console.log(hierarchyData)
 
 	return (
 		<>
