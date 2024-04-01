@@ -6,8 +6,15 @@ import { BookmarkIcon as BookmarkIconSolid } from "@heroicons/react/24/solid"
 import { useState } from "react"
 import LanguageSwitcher from "./LanguageSwitcher"
 
-// @ts-ignore
-const ContentControls = ({ language, setLanguage }) => {
+interface IContentControls {
+	language: string
+	setLanguage: React.Dispatch<React.SetStateAction<string>>
+}
+
+const ContentControls: React.FC<IContentControls> = ({
+	language,
+	setLanguage,
+}) => {
 	const [bookmarked, setBookmarked] = useState<boolean>(false)
 
 	const handleBookmark = () => {

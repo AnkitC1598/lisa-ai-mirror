@@ -2,7 +2,7 @@
 
 import { fetchClientWithToken } from "@/services/fetch"
 import { ICourse, ITopic } from "@/types/hierarchy"
-import { Resource } from "@/types/topic"
+import { IChatResponse, ISlides, Resource } from "@/types/topic"
 
 export const getCourses = async (): Promise<ICourse[]> => {
 	const resp = await fetchClientWithToken("/cohort", {
@@ -63,9 +63,9 @@ export const getSlides = async ({
 	courseId,
 	topicId,
 }: {
-	courseId: string | undefined
-	topicId: string | undefined
-}): Promise<Resource[]> => {
+	courseId: string
+	topicId: string
+}): Promise<ISlides> => {
 	const resp = await fetchClientWithToken(
 		`/ai/slides/${courseId}/${topicId}`,
 		{
@@ -115,9 +115,9 @@ export const getChats = async ({
 	courseId,
 	topicId,
 }: {
-	courseId: string | undefined
-	topicId: string | undefined
-}) => {
+	courseId: string
+	topicId: string
+}): Promise<IChatResponse[]> => {
 	const resp = await fetchClientWithToken(
 		`/ai/chat/${courseId}/${topicId}?page=1&limit=10`,
 		{

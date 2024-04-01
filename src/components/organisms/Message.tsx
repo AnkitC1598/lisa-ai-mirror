@@ -14,19 +14,23 @@ import {
 	HandThumbUpIcon as HandThumbUpIconSolid,
 	SpeakerWaveIcon,
 } from "@heroicons/react/24/solid"
+import { Message } from "ai/react"
 import { formatDistance } from "date-fns"
 import Image from "next/image"
 import { useState } from "react"
 
-// @ts-ignore
-export const UserMessage = ({ message }) => {
+interface IMessage {
+	message: Message & { createdAt?: Date | string | number }
+}
+
+export const UserMessage: React.FC<IMessage> = ({ message }) => {
 	return (
 		<>
 			<div className="flex flex-col gap-2 p-4 text-right">
 				<div className="flex items-center justify-between text-sm text-gray-500">
 					<span>
 						{formatDistance(
-							new Date(message?.createdAt || null),
+							new Date(message.createdAt ?? new Date()),
 							new Date()
 						)}
 					</span>
@@ -47,8 +51,7 @@ export const UserMessage = ({ message }) => {
 	)
 }
 
-// @ts-ignore
-export const AiMessage = ({ message }) => {
+export const AiMessage: React.FC<IMessage> = ({ message }) => {
 	const [vote, setVote] = useState<string | null>(null)
 	const [copy, setCopy] = useState<string | null>(null)
 	const [audioState, setAudioState] = useState<string | null>(null)
@@ -72,7 +75,7 @@ export const AiMessage = ({ message }) => {
 					</div>
 					<span>
 						{formatDistance(
-							new Date(message?.createdAt || null),
+							new Date(message.createdAt ?? new Date()),
 							new Date()
 						)}
 					</span>

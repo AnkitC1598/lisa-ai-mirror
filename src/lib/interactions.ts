@@ -17,12 +17,11 @@ export const handleAudio = (
 		}
 	} else {
 		const utterance = new SpeechSynthesisUtterance(removeEmojis(text))
-		try {
-			// @ts-ignore
-			utterance.voice = voices.find(voice => voice.lang === "en-IN")
-		} catch (e) {
-			utterance.voice = voices[0]
-		}
+		const enInVoice = voices.find(voice => voice.lang === "en-IN")
+
+		if (enInVoice !== undefined) utterance.voice = enInVoice
+		else utterance.voice = voices[0]
+
 		synth.speak(utterance)
 		setAudioState("playing")
 		// setTimeout(() => setAudioState(null), 1000)

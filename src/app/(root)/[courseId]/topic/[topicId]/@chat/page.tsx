@@ -5,6 +5,7 @@ import { AiMessage, UserMessage } from "@/components/organisms/Message"
 import { Input } from "@/components/ui/input"
 import { fetchClientWithToken } from "@/services/fetch"
 import useAIStore from "@/store"
+import { IChat } from "@/types/topic"
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid"
 import { useChat } from "ai/react"
 import { useEffect, useState } from "react"
@@ -12,17 +13,17 @@ import ScrollAnchor from "./ScrollAnchor"
 
 const Chat = () => {
 	const currentTopic = useAIStore(store => store.currentTopic)
-	const [oldChats, setOldChats] = useState([])
+	const [oldChats, setOldChats] = useState<IChat[] | []>([])
 
 	useEffect(() => {
+		if (!currentTopic) return
+
 		getChats({
-			courseId: currentTopic?.cohort?._id,
-			topicId: currentTopic?._id,
+			courseId: currentTopic.cohort._id,
+			topicId: currentTopic._id,
 		}).then(chats => {
-			let reverse = chats.reverse()
 			setOldChats(
-				// @ts-ignore
-				reverse.map(chat => {
+				chats.reverse().map(chat => {
 					return {
 						id: chat._id,
 						content: chat.body,
@@ -32,7 +33,7 @@ const Chat = () => {
 				})
 			)
 		})
-	}, [])
+	}, [currentTopic])
 
 	const { messages, input, handleInputChange, handleSubmit, isLoading } =
 		useChat({
@@ -72,11 +73,11 @@ const Chat = () => {
 			<div className="flex h-full flex-col gap-4">
 				<div className="scrollbar-both-edges flex flex-1 flex-col divide-y divide-neutral-200 overflow-y-auto scrollbar dark:divide-neutral-800">
 					{messages.map(message => {
-						const Message =
+						const MessageComponent =
 							message.role === "user" ? UserMessage : AiMessage
 						return (
 							<div key={message.id}>
-								<Message message={message} />
+								<MessageComponent message={message} />
 							</div>
 						)
 					})}

@@ -16,7 +16,11 @@ import { useInView } from "react-intersection-observer"
 import { Button } from "../ui/button"
 import ContentPagination from "./ContentPagination"
 
-const Slides = ({ slides = [] }) => {
+interface ISlidesProps {
+	slides: ISlide[]
+}
+
+const Slides: React.FC<ISlidesProps> = ({ slides = [] }) => {
 	return (
 		<div className="flex h-[calc(100%-56px)] flex-1">
 			<ContentPagination vertical />
@@ -72,7 +76,7 @@ export const SlidesSkeletonLoader = () => {
 }
 
 interface ISlide {
-	idx: number
+	idx?: number
 	title?: string
 	body?: string
 	question?: string

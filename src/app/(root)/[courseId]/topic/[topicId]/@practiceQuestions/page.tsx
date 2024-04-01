@@ -30,10 +30,13 @@ const PracticeQuestions = () => {
 			try {
 				// Submit and get response message
 				const responseMessage = await generatePracticeQuestions(prompt)
-				// @ts-ignore
 				setMessages(currentMessages => [
 					...currentMessages,
-					responseMessage,
+					{
+						id: responseMessage.id,
+						display: responseMessage.display,
+						role: responseMessage.role as "user" | "assistant",
+					},
 				])
 				setIsLoading(false)
 			} catch (error) {
