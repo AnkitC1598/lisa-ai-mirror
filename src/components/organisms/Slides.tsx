@@ -1,5 +1,6 @@
 "use client"
 
+import { handleAudio, handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import {
 	HandThumbDownIcon as HandThumbDownIconOutline,
@@ -93,35 +94,6 @@ const Slide: React.FC<ISlide> = ({
 	const [inViewAt, setInViewAt] = useState<number | null>(null)
 	const { ref, inView } = useInView()
 
-	const handleVote = (type: string) =>
-		setVote(prev => (prev === type ? null : type))
-
-	const handleAudio = (text = "") => {
-		const synth = window.speechSynthesis
-		const voices = synth.getVoices()
-		if (audioState !== null) {
-			if (synth.speaking && audioState === "playing") {
-				synth.pause()
-				setAudioState("paused")
-			} else {
-				synth.resume()
-				setAudioState("playing")
-			}
-		} else {
-			const utterance = new SpeechSynthesisUtterance(removeEmojis(text))
-			try {
-				// @ts-ignore
-				utterance.voice = voices.find(voice => voice.lang === "en-IN")
-			} catch (e) {
-				utterance.voice = voices[0]
-			}
-			synth.speak(utterance)
-			setAudioState("playing")
-			// setTimeout(() => setAudioState(null), 1000)
-			utterance.onend = () => setAudioState(null)
-		}
-	}
-
 	useEffect(() => {
 		if (inView && inViewAt === null) setInViewAt(new Date().getTime())
 		if (!inView && inViewAt !== null) {
@@ -130,6 +102,19 @@ const Slide: React.FC<ISlide> = ({
 			setInViewAt(null)
 		}
 	}, [idx, inView, inViewAt])
+
+	const handleQuizOption = (option: any) => {
+		options.forEach((opt: any) => {
+			const element = document.getElementById(opt.option)
+			if (element) {
+				element.style.backgroundColor = "transparent"
+				if ((option.isCorrect && option === opt) || opt.isCorrect)
+					element.style.backgroundColor = "green"
+				else if (!option.isCorrect && option === opt)
+					element.style.backgroundColor = "red"
+			}
+		})
+	}
 
 	return (
 		<div
@@ -144,10 +129,12 @@ const Slide: React.FC<ISlide> = ({
 					<div className="flex flex-col gap-2 py-4">
 						{options.map(option => (
 							<span
+								id={option.option}
 								key={option.option}
+								onClick={() => handleQuizOption(option)}
 								className={cn(
-									"w-full cursor-pointer rounded-md border border-neutral-200 bg-neutral-200 p-2 hover:bg-neutral-300 dark:border-neutral-800 dark:bg-neutral-800 dark:hover:bg-neutral-700",
-									option.isCorrect ? "text-green-500" : ""
+									"w-full cursor-pointer rounded-md border border-neutral-200 bg-neutral-200 p-2 transition-all duration-500 hover:bg-neutral-300 dark:border-neutral-800 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+									// option.isCorrect ? "text-green-500" : ""
 								)}
 							>
 								{option.option}
@@ -163,7 +150,7 @@ const Slide: React.FC<ISlide> = ({
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() => handleVote("up")}
+						onClick={() => handleVote("up", vote, setVote)}
 					>
 						{vote === "up" ? (
 							<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
@@ -174,7 +161,7 @@ const Slide: React.FC<ISlide> = ({
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() => handleVote("down")}
+						onClick={() => handleVote("down", vote, setVote)}
 					>
 						{vote === "down" ? (
 							<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
@@ -186,7 +173,13 @@ const Slide: React.FC<ISlide> = ({
 				<Button
 					variant="outline"
 					size="icon"
-					onClick={() => handleAudio(title + "\n" + body)}
+					onClick={() =>
+						handleAudio(
+							title + "\n" + body,
+							audioState,
+							setAudioState
+						)
+					}
 				>
 					<SpeakerWaveIcon
 						className={cn(
@@ -208,10 +201,4 @@ const Slide: React.FC<ISlide> = ({
 			</span>
 		</div>
 	)
-}
-
-function removeEmojis(string: string) {
-	var regex =
-		/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g
-	return string.replace(regex, "")
 }

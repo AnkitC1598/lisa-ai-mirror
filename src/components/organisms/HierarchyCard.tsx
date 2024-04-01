@@ -34,7 +34,7 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 	const { icon: Icon } = HierarchyConstants[type]
 	const IconComponent = Icon as React.ComponentType<ISVGIconProps>
 
-	let basePath = type === "topic" ? `${cohortId}/topic` : pathname
+	let basePath = type === "topic" ? `/${cohortId}/topic` : pathname
 	basePath = basePath.endsWith("/") ? basePath : `${basePath}/`
 
 	return (

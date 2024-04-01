@@ -7,6 +7,7 @@ import {
 	AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
+import { handleAudio, handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import { IPracticeQuestion } from "@/types/topic"
 import {
@@ -74,15 +75,6 @@ const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 	const [audioState, setAudioState] = useState<string | null>(null)
 	const [bookmarked, setBookmarked] = useState<boolean>(false)
 
-	const handleVote = (type: string) =>
-		setVote(prev => (prev === type ? null : type))
-
-	const handleAudio = () => {
-		if (audioState !== null) return
-		setAudioState("playing")
-		setTimeout(() => setAudioState(null), 1000)
-	}
-
 	const handleBookmark = () => setBookmarked(prev => !prev)
 
 	return (
@@ -107,7 +99,7 @@ const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 							<Button
 								variant="outline"
 								size="icon"
-								onClick={() => handleVote("up")}
+								onClick={() => handleVote("up", vote, setVote)}
 							>
 								{vote === "up" ? (
 									<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
@@ -118,7 +110,9 @@ const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 							<Button
 								variant="outline"
 								size="icon"
-								onClick={() => handleVote("down")}
+								onClick={() =>
+									handleVote("down", vote, setVote)
+								}
 							>
 								{vote === "down" ? (
 									<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
@@ -129,7 +123,15 @@ const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 							<Button
 								variant="outline"
 								size="icon"
-								onClick={handleAudio}
+								onClick={() =>
+									handleAudio(
+										question.question +
+											"\n" +
+											question.answer,
+										audioState,
+										setAudioState
+									)
+								}
 							>
 								<SpeakerWaveIcon
 									className={cn(
