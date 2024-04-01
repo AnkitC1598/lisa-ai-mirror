@@ -1,12 +1,14 @@
-import { TCurrentHierarchy } from "./hierarchy"
+import { ITopic, TCurrentHierarchy } from "./hierarchy"
+import { IUser } from "./user"
 
 export interface IState {
-	user: Record<string, any> | null
+	user: IUser | null
 	orgInfo: Record<string, any> | null
 	orgConfig: Record<string, any> | null
 	orgPrompts: Record<string, any> | null
-	breadCrumbs: Record<string, any>[] | []
-	currentHierarchy: TCurrentHierarchy
+	breadcrumbs: Record<string, any>[] | []
+	currentHierarchy: TCurrentHierarchy | null
+	currentTopic: ITopic | null
 }
 
 export interface IAction {

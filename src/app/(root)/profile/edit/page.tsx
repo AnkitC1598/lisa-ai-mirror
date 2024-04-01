@@ -13,14 +13,27 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { profileSchema } from "@/schema/profile"
+import useAIStore from "@/store"
+import { IFormUser } from "@/types/user"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { format } from "date-fns"
 import Head from "next/head"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
+type AsyncDefaultValues<TFieldValues> = (
+	payload?: unknown
+) => Promise<TFieldValues>
+
 const EditProfile = () => {
+	const user = useAIStore(store => store.user) as IFormUser
+
 	const form = useForm<z.infer<typeof profileSchema>>({
 		resolver: zodResolver(profileSchema),
+		defaultValues: {
+			...user,
+			dob: format(new Date(user.dob), "yyyy-MM-dd"),
+		},
 	})
 
 	function onSubmit(values: z.infer<typeof profileSchema>) {
