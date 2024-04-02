@@ -136,7 +136,8 @@ const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 								<SpeakerWaveIcon
 									className={cn(
 										"h-4 w-4",
-										audioState === "playing"
+										audioState === "playing" ||
+											audioState === "paused"
 											? "fill-blue-500"
 											: ""
 									)}

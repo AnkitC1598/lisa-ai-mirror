@@ -1,7 +1,10 @@
+// @ts-nocheck
 "use client"
 
+import { answerQuiz } from "@/actions/hierarchy"
 import { handleAudio, handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
+import useAIStore from "@/store"
 import {
 	HandThumbDownIcon as HandThumbDownIconOutline,
 	HandThumbUpIcon as HandThumbUpIconOutline,
@@ -11,7 +14,7 @@ import {
 	HandThumbUpIcon as HandThumbUpIconSolid,
 	SpeakerWaveIcon,
 } from "@heroicons/react/24/solid"
-import { useEffect, useState } from "react"
+import React, { SetStateAction, useEffect, useState } from "react"
 import { useInView } from "react-intersection-observer"
 import { Button } from "../ui/button"
 import ContentPagination from "./ContentPagination"
@@ -20,14 +23,63 @@ interface ISlidesProps {
 	slides: ISlide[]
 }
 
-const Slides: React.FC<ISlidesProps> = ({ slides = [] }) => {
+const Slides: React.FC<ISlidesProps> = ({ slides = {} }) => {
+	const currentTopic = useAIStore(store => store.currentTopic)
+	// @ts-ignore
+	const [slideState, setSlideState] = useState({
+		current: 0,
+		finished: [
+			...slides.slides
+				.map((s, i) => (s?.userAnswer ? i : null))
+				.filter(Boolean),
+		],
+	})
+
+	const handleQuizOption = (answer: any, idx: number, answers: []) => {
+		// @ts-ignore
+		setSlideState(prev => ({
+			...prev,
+			finished: [...prev.finished, idx],
+		}))
+		answers.forEach((ans: any) => {
+			const element = document.getElementById(ans.body)
+			if (element) {
+				element.style.backgroundColor = "transparent"
+				if ((answer.isCorrect && answer === ans) || ans.isCorrect)
+					element.style.backgroundColor = "green"
+				else if (!answer.isCorrect && answer === ans)
+					element.style.backgroundColor = "red"
+			}
+		})
+		answerQuiz({
+			courseId: currentTopic.cohort._id,
+			topicId: currentTopic._id,
+			langCode: slides.language,
+			questionId: slides.slides[idx].id,
+			answerId: answer.id,
+		})
+	}
+
 	return (
 		<div className="flex h-[calc(100%-56px)] flex-1">
-			<ContentPagination vertical />
+			<ContentPagination
+				vertical
+				slideState={slideState}
+				total={slides.slides.length}
+			/>
 			<div className="flex-1 snap-y snap-mandatory space-y-4 overflow-y-auto pb-4 pl-1 pr-4 scrollbar-hide">
-				{slides.map(
+				{slides.slides.map(
 					(
-						{ title, body, question, answers, priority, type },
+						{
+							title,
+							body,
+							question,
+							answers,
+							priority,
+							type,
+							userAnswer,
+							correctAnswer,
+						},
 						idx
 					) => (
 						<Slide
@@ -39,6 +91,10 @@ const Slides: React.FC<ISlidesProps> = ({ slides = [] }) => {
 							answers={answers}
 							priority={priority}
 							type={type}
+							userAnswer={userAnswer}
+							setSlideState={setSlideState}
+							handleQuizOption={handleQuizOption}
+							correctAnswer={correctAnswer}
 						/>
 					)
 				)}
@@ -76,6 +132,10 @@ interface ISlide {
 	answers?: any[]
 	priority: number
 	type: string
+	setSlideState: React.Dispatch<SetStateAction<any>>
+	handleQuizOption: (answer: any, idx: number, answers: any[]) => void
+	userAnswer?: string | null
+	correctAnswer?: string | null
 }
 
 const Slide: React.FC<ISlide> = ({
@@ -86,6 +146,10 @@ const Slide: React.FC<ISlide> = ({
 	answers = [],
 	priority = 0,
 	type = "text",
+	setSlideState,
+	handleQuizOption,
+	userAnswer = null,
+	correctAnswer = null,
 }) => {
 	const [vote, setVote] = useState<string | null>(null)
 	const [audioState, setAudioState] = useState<string | null>(null)
@@ -93,29 +157,29 @@ const Slide: React.FC<ISlide> = ({
 	const { ref, inView } = useInView()
 
 	useEffect(() => {
-		if (inView && inViewAt === null) setInViewAt(new Date().getTime())
+		if (inView && inViewAt === null) {
+			setInViewAt(new Date().getTime())
+			// @ts-ignore
+			setSlideState(prev => ({
+				...prev,
+				current: idx,
+			}))
+		}
 		if (!inView && inViewAt !== null) {
 			const diff = Math.abs(new Date().getTime() - inViewAt)
 			console.log(`${idx} stayed for ${diff / 1000}`)
 			setInViewAt(null)
+			// @ts-ignore
+			setSlideState(prev => ({
+				...prev,
+				finished: [...prev.finished, idx],
+			}))
 		}
-	}, [idx, inView, inViewAt])
-
-	const handleQuizOption = (answer: any) => {
-		answers.forEach((ans: any) => {
-			const element = document.getElementById(ans.body)
-			if (element) {
-				element.style.backgroundColor = "transparent"
-				if ((answer.isCorrect && answer === ans) || ans.isCorrect)
-					element.style.backgroundColor = "green"
-				else if (!answer.isCorrect && answer === ans)
-					element.style.backgroundColor = "red"
-			}
-		})
-	}
+	}, [idx, inView, inViewAt, setSlideState])
 
 	return (
 		<div
+			id={`slide-${idx}`}
 			className={cn(
 				"relative flex h-full w-full snap-center snap-always flex-col justify-center rounded-md px-4 shadow-md ring-1 ring-inset ring-neutral-200 scrollbar-hide dark:shadow-neutral-800 dark:ring-neutral-800",
 				inView ? "py-4" : ""
@@ -124,20 +188,45 @@ const Slide: React.FC<ISlide> = ({
 			<div className="flex flex-1 flex-col gap-2">
 				<span className="font-semibold">{title || question}</span>
 				{answers.length && type === "quiz" ? (
-					<div className="flex flex-col gap-2 py-4">
+					<div className="flex h-full flex-col gap-2 py-4">
 						{answers.map(answer => (
-							<span
+							<button
+								disabled={!!userAnswer}
 								id={answer.body}
 								key={answer.body}
-								onClick={() => handleQuizOption(answer)}
+								onClick={() =>
+									handleQuizOption(answer, idx, answers)
+								}
 								className={cn(
-									"w-full cursor-pointer rounded-md border border-neutral-200 bg-neutral-200 p-2 transition-all duration-500 hover:bg-neutral-300 dark:border-neutral-800 dark:bg-neutral-800 dark:hover:bg-neutral-700"
-									// option.isCorrect ? "text-green-500" : ""
+									"w-full cursor-pointer rounded-md border border-neutral-200 bg-neutral-200 p-2 transition-all duration-500 hover:bg-neutral-300 disabled:cursor-not-allowed dark:border-neutral-800 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+									// userAnswer
+									// 	? answer.id === correctAnswer
+									// 		? "bg-green-500"
+									// 		: userAnswer === answer.id
+									// 			? "bg-red-500"
+									// 			: ""
+									// 	: ""
 								)}
+								style={
+									userAnswer
+										? answer.id === correctAnswer
+											? { backgroundColor: "green" }
+											: userAnswer === answer.id
+												? { backgroundColor: "red" }
+												: {}
+										: {}
+								}
 							>
 								{answer.body}
-							</span>
+							</button>
 						))}
+						{type === "quiz" && userAnswer ? (
+							<div className="flex w-full flex-1 items-center justify-center">
+								{userAnswer === correctAnswer
+									? "Congratulations"
+									: "Sorry"}
+							</div>
+						) : null}
 					</div>
 				) : (
 					<p className="leading-8">{body}</p>
@@ -148,7 +237,14 @@ const Slide: React.FC<ISlide> = ({
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() => handleVote("up", vote, setVote)}
+						onClick={() => {
+							handleVote("up", vote, setVote)
+							// @ts-ignore
+							setSlideState(prev => ({
+								...prev,
+								finished: [...prev.finished, idx],
+							}))
+						}}
 					>
 						{vote === "up" ? (
 							<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
@@ -159,7 +255,14 @@ const Slide: React.FC<ISlide> = ({
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() => handleVote("down", vote, setVote)}
+						onClick={() => {
+							handleVote("down", vote, setVote)
+							// @ts-ignore
+							setSlideState(prev => ({
+								...prev,
+								finished: [...prev.finished, idx],
+							}))
+						}}
 					>
 						{vote === "down" ? (
 							<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
@@ -186,11 +289,9 @@ const Slide: React.FC<ISlide> = ({
 					<SpeakerWaveIcon
 						className={cn(
 							"h-4 w-4",
-							audioState === "playing"
-								? "fill-green-500"
-								: audioState === "paused"
-									? "fill-blue-500"
-									: ""
+							audioState === "playing" || audioState === "paused"
+								? "fill-blue-500"
+								: ""
 						)}
 					/>
 				</Button>

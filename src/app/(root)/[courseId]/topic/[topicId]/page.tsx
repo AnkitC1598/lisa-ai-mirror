@@ -74,7 +74,8 @@ const TopicContent = () => {
 				setLanguage={setLanguage}
 			/>
 			{slidesData ? (
-				<Slides slides={slidesData.slides[language || "en"].slides} />
+				// @ts-ignore
+				<Slides slides={slidesData.slides[language || "en"]} />
 			) : messages.length ? (
 				messages
 					.filter(t => t.role === "assistant")

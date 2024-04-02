@@ -132,7 +132,10 @@ export const AiMessage: React.FC<IMessage> = ({ message }) => {
 						<SpeakerWaveIcon
 							className={cn(
 								"h-4 w-4",
-								audioState === "playing" ? "fill-blue-500" : ""
+								audioState === "playing" ||
+									audioState === "paused"
+									? "fill-blue-500"
+									: ""
 							)}
 						/>
 					</Button>

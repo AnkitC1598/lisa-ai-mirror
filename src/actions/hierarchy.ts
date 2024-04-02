@@ -99,6 +99,22 @@ export const getTranslations = async ({
 	return resp.results.data
 }
 
+export const answerQuiz = async ({
+	courseId = "",
+	topicId = "",
+	langCode = "",
+	questionId = "",
+	answerId = "",
+}) => {
+	const resp = await fetchClientWithToken(
+		`/ai/slides/quiz/answer/${courseId}/${topicId}/${langCode}/${questionId}/${answerId}`,
+		{
+			method: "PUT",
+		}
+	)
+	return resp
+}
+
 export const getResources = async ({
 	courseId,
 	topicId,

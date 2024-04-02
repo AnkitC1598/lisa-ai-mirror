@@ -144,14 +144,25 @@ If the user requests explanation of a topic, call \`explain_topic\` to show the 
 			(a, b) => a.priority - b.priority
 		)
 
-		await fetchClientWithToken(`/ai/slides/${cohortId}/${topicId}`, {
-			method: "POST",
-			body: JSON.stringify({
-				slides: finalSlides,
-			}),
-		})
-
-		reply.done(<Slides slides={finalSlides} />)
+		let resp = await fetchClientWithToken(
+			`/ai/slides/${cohortId}/${topicId}`,
+			{
+				method: "POST",
+				body: JSON.stringify({
+					slides: finalSlides,
+				}),
+			}
+		)
+		// @ts-ignore
+		reply.done(
+			<Slides
+				slides={
+					resp?.results?.data?.slides?.["en"] ?? {
+						slides: finalSlides,
+					}
+				}
+			/>
+		)
 
 		aiState.done([
 			...aiState.get(),
