@@ -1,4 +1,5 @@
 export type Resource = {
+	id: string
 	title: string
 	url: string
 	is_source_local: boolean

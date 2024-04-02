@@ -96,7 +96,7 @@ interface IPracticeQuestionProps {
 	) => void
 }
 
-const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
+export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 	question,
 	idx,
 	handleFeedback,
