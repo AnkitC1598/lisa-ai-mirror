@@ -1,7 +1,7 @@
 "use server"
 
 import { fetchClientWithToken } from "@/services/fetch"
-import { IUser } from "@/types/user"
+import { IUser, IUserOnboarding } from "@/types/user"
 
 export const getUser = async (): Promise<IUser> => {
 	const resp = await fetchClientWithToken("/user/profile", {
@@ -9,4 +9,11 @@ export const getUser = async (): Promise<IUser> => {
 	})
 
 	return resp.results.data
+}
+
+export const onboardUser = async ({ body }: { body: IUserOnboarding }) => {
+	await fetchClientWithToken("/user/onboard", {
+		method: "PUT",
+		body: JSON.stringify(body),
+	})
 }

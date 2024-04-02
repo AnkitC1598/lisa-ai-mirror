@@ -56,7 +56,7 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 									type: "SET_USER",
 									payload: user,
 								})
-								const userOnboarded = true
+								const userOnboarded = user.interestsAdded
 
 								if (searchParams.has("launchCode"))
 									if (

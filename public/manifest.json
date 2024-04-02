@@ -1,7 +1,7 @@
 {
 	"name": "lisa AI",
 	"short_name": "lisa AI",
-	"start_url": "/",
+	"start_url": "/lisa-ai",
 	"display": "standalone",
 	"description": "lisa AI powered microlearning app",
 	"lang": "en",
@@ -13,7 +13,7 @@
 	"shortcuts": [
 		{
 			"name": "lisa AI",
-			"url": "/",
+			"url": "/lisa-ai",
 			"description": "lisa AI"
 		}
 	],

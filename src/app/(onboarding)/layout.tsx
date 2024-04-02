@@ -10,7 +10,7 @@ const OnboardingLayout: React.FC<Readonly<IOnboardingLayout>> = ({
 	return (
 		<>
 			<Navbar logoOnly />
-			<main className="h-navScreen flex-1 overflow-hidden p-4">
+			<main className="h-navScreen flex-1 overflow-hidden">
 				{children}
 			</main>
 		</>

@@ -32,6 +32,7 @@
 		"cmdk": "^1.0.0",
 		"date-fns": "^3.6.0",
 		"embla-carousel-react": "^8.0.0",
+		"framer-motion": "^11.0.24",
 		"immer": "^10.0.4",
 		"langchain": "^0.1.30",
 		"js-cookie": "^3.0.5",
