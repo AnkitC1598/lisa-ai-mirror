@@ -8,13 +8,20 @@ import { useParams } from "next/navigation"
 import { useState } from "react"
 import LanguageSwitcher from "./LanguageSwitcher"
 
-const ContentControls = () => {
+interface IContentControls {
+	language: string
+	setLanguage: React.Dispatch<React.SetStateAction<string>>
+}
+
+const ContentControls: React.FC<IContentControls> = ({
+	language,
+	setLanguage,
+}) => {
 	const { courseId: cohortId, topicId } = useParams<{
 		courseId: string
 		topicId: string
 	}>()
 	const [bookmarked, setBookmarked] = useState<boolean>(false)
-	const [language, setLanguage] = useState<string>("en")
 
 	const handleBookmark = () => {
 		setBookmarked(prev => !prev)

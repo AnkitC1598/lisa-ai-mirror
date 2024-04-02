@@ -1,24 +1,41 @@
 import { cn } from "@/lib/utils"
 
-const ContentPagination = ({ vertical = false }) => {
+interface IContentPagination {
+	vertical?: boolean
+	slideState: {
+		currentPage: number
+		finished: [] | number[]
+	}
+	total: number
+}
+
+const ContentPagination: React.FC<IContentPagination> = ({
+	vertical = false,
+	slideState = {},
+	total = 0,
+}) => {
 	return (
 		<>
 			<div
 				className={cn(
 					"flex flex-nowrap gap-2 p-4",
-					vertical ? "flex-col justify-center p-1 pr-0" : ""
+					vertical ? "flex-col justify-center p-2 pr-1" : ""
 				)}
 			>
-				{Array.from({ length: 10 }, (_, i) => i + 1).map(i => (
+				{Array.from({ length: total }, (_, i) => i).map(i => (
 					<div
 						key={i}
 						className={cn(
-							"flex rounded-full bg-green-200 ring-1 ring-inset ring-green-300 dark:bg-green-600/50 dark:ring-green-500",
-							vertical ? "h-2 w-1" : "h-2 flex-1"
+							"flex rounded-full ring-2 ring-inset ring-neutral-500/10 dark:ring-neutral-400/20",
+							vertical ? "w-2 flex-1" : "h-2 flex-1",
+							slideState.current === i
+								? "ring-green-300 dark:ring-green-900"
+								: "",
+							slideState.finished.includes(i)
+								? "bg-green-600 dark:bg-green-400"
+								: ""
 						)}
-					>
-						<div className="flex h-full w-full items-center justify-center rounded-full bg-green-600 font-medium leading-none text-slate-200 dark:bg-green-400 dark:text-slate-900" />
-					</div>
+					></div>
 				))}
 			</div>
 		</>

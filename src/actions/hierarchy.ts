@@ -2,7 +2,12 @@
 
 import { fetchClientWithToken } from "@/services/fetch"
 import { ICourse, ITopic } from "@/types/hierarchy"
-import { Resource } from "@/types/topic"
+import {
+	IChatResponse,
+	IPracticeQuestion,
+	ISlides,
+	Resource,
+} from "@/types/topic"
 
 export const getCourses = async (): Promise<ICourse[]> => {
 	const resp = await fetchClientWithToken("/cohort", {
@@ -59,6 +64,57 @@ export const getTopicDetails = async ({
 	return resp.results.data
 }
 
+export const getSlides = async ({
+	courseId,
+	topicId,
+}: {
+	courseId: string
+	topicId: string
+}): Promise<ISlides> => {
+	const resp = await fetchClientWithToken(
+		`/ai/slides/${courseId}/${topicId}`,
+		{
+			method: "GET",
+		}
+	)
+
+	return resp.results.data
+}
+
+export const getTranslations = async ({
+	courseId,
+	topicId,
+	langCode,
+}: {
+	courseId: string
+	topicId: string
+	langCode: string
+}): Promise<any> => {
+	const resp = await fetchClientWithToken(
+		`/ai/slides/translate/${topicId}/${courseId}/${langCode}`,
+		{
+			method: "GET",
+		}
+	)
+	return resp.results.data
+}
+
+export const answerQuiz = async ({
+	courseId = "",
+	topicId = "",
+	langCode = "",
+	questionId = "",
+	answerId = "",
+}) => {
+	const resp = await fetchClientWithToken(
+		`/ai/slides/quiz/answer/${courseId}/${topicId}/${langCode}/${questionId}/${answerId}`,
+		{
+			method: "PUT",
+		}
+	)
+	return resp
+}
+
 export const getResources = async ({
 	courseId,
 	topicId,
@@ -74,4 +130,59 @@ export const getResources = async ({
 	)
 
 	return resp.results.data.resources
+}
+
+export const getQuestions = async ({
+	courseId,
+	topicId,
+}: {
+	courseId: string
+	topicId: string
+}): Promise<{
+	questions: IPracticeQuestion[]
+} | null> => {
+	const resp = await fetchClientWithToken(
+		`/ai/questions/${courseId}/${topicId}`,
+		{
+			method: "GET",
+		}
+	)
+
+	return resp.results.data
+}
+
+export const getChats = async ({
+	courseId,
+	topicId,
+}: {
+	courseId: string
+	topicId: string
+}): Promise<IChatResponse[]> => {
+	const resp = await fetchClientWithToken(
+		`/ai/chat/${courseId}/${topicId}?page=1&limit=10`,
+		{
+			method: "GET",
+		}
+	)
+
+	return resp.results.data
+}
+
+export const translateSlides = async ({
+	courseId,
+	topicId,
+	langCode,
+}: {
+	courseId: string
+	topicId: string
+	langCode: string
+}): Promise<ISlides> => {
+	const resp = await fetchClientWithToken(
+		`/ai/slides/translate/${topicId}/${courseId}/${langCode}`,
+		{
+			method: "PUT",
+		}
+	)
+
+	return resp.results.data
 }

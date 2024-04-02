@@ -2,6 +2,7 @@
 
 import logo from "@/app/favicon.ico"
 import { Button } from "@/components/ui/button"
+import { handleAudio, handleCopy } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import { ClipboardDocumentIcon, SparklesIcon } from "@heroicons/react/16/solid"
 import {
@@ -13,15 +14,29 @@ import {
 	HandThumbUpIcon as HandThumbUpIconSolid,
 	SpeakerWaveIcon,
 } from "@heroicons/react/24/solid"
+import { Message } from "ai/react"
+import { formatDistance } from "date-fns"
 import Image from "next/image"
 import { useState } from "react"
 
-export const UserMessage = () => {
+interface IMessage {
+	message: Message & {
+		createdAt?: Date | string | number
+	}
+	handleFeedback?: () => void
+}
+
+export const UserMessage: React.FC<IMessage> = ({ message }) => {
 	return (
 		<>
 			<div className="flex flex-col gap-2 p-4 text-right">
 				<div className="flex items-center justify-between text-sm text-gray-500">
-					<span>1hr</span>
+					<span>
+						{formatDistance(
+							new Date(message.createdAt ?? new Date()),
+							new Date()
+						)}
+					</span>
 					<div className="flex items-center gap-1">
 						<span>You</span>
 						<div className="relative h-5 w-5 overflow-hidden rounded-full">
@@ -33,31 +48,16 @@ export const UserMessage = () => {
 						</div>
 					</div>
 				</div>
-				<p>Message</p>
+				<p>{message.content}</p>
 			</div>
 		</>
 	)
 }
 
-export const AiMessage = () => {
+export const AiMessage: React.FC<IMessage> = ({ message, handleFeedback }) => {
 	const [vote, setVote] = useState<string | null>(null)
 	const [copy, setCopy] = useState<string | null>(null)
 	const [audioState, setAudioState] = useState<string | null>(null)
-
-	const handleVote = (type: string) =>
-		setVote(prev => (prev === type ? null : type))
-
-	const handleAudio = () => {
-		if (audioState !== null) return
-		setAudioState("playing")
-		setTimeout(() => setAudioState(null), 1000)
-	}
-
-	const handleCopy = () => {
-		if (copy !== null) return
-		setCopy("copying")
-		setTimeout(() => setCopy(null), 1000)
-	}
 
 	return (
 		<>
@@ -76,16 +76,24 @@ export const AiMessage = () => {
 							<SparklesIcon className="h-2 w-2" />
 						</span>
 					</div>
-					<span>1hr</span>
+					<span>
+						{formatDistance(
+							new Date(message.createdAt ?? new Date()),
+							new Date()
+						)}
+					</span>
 				</div>
-				<p className="text-sm">Message</p>
+				<p className="text-sm">{message.content}</p>
 				<div className="flex items-center gap-2">
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() => handleVote("up")}
+						onClick={() =>
+							// @ts-ignore
+							handleFeedback(message.id, "like", vote, setVote)
+						}
 					>
-						{vote === "up" ? (
+						{vote === "like" ? (
 							<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
 						) : (
 							<HandThumbUpIconOutline className="h-4 w-4" />
@@ -94,9 +102,12 @@ export const AiMessage = () => {
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() => handleVote("down")}
+						onClick={() =>
+							// @ts-ignore
+							handleFeedback(message.id, "dislike", vote, setVote)
+						}
 					>
-						{vote === "down" ? (
+						{vote === "dislike" ? (
 							<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
 						) : (
 							<HandThumbDownIconOutline className="h-4 w-4" />
@@ -105,7 +116,9 @@ export const AiMessage = () => {
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={handleCopy}
+						onClick={() =>
+							handleCopy(message.content, copy, setCopy)
+						}
 					>
 						<ClipboardDocumentIcon
 							className={cn(
@@ -117,12 +130,21 @@ export const AiMessage = () => {
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={handleAudio}
+						onClick={() =>
+							handleAudio(
+								message.content,
+								audioState,
+								setAudioState
+							)
+						}
 					>
 						<SpeakerWaveIcon
 							className={cn(
 								"h-4 w-4",
-								audioState === "playing" ? "fill-blue-500" : ""
+								audioState === "playing" ||
+									audioState === "paused"
+									? "fill-blue-500"
+									: ""
 							)}
 						/>
 					</Button>
