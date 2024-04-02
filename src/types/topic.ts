@@ -61,6 +61,7 @@ interface ISlideSet {
 export interface ISlide {
 	id?: string
 	type: string
+	title?: string
 	body?: string
 	question?: string
 	priority: number

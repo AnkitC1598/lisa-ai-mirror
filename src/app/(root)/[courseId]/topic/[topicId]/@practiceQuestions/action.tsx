@@ -7,13 +7,18 @@ import PracticeQuestions, {
 	PracticeQuestionsSkeletonLoader,
 } from "@/components/organisms/PracticeQuestions"
 import { runOpenAICompletion } from "@/lib"
+import { fetchClientWithToken } from "@/services/fetch"
 import { z } from "zod"
 
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY || "",
 })
 
-async function generatePracticeQuestions(content: string) {
+async function generatePracticeQuestions({
+	content = "",
+	cohortId = "",
+	topicId = "",
+}) {
 	"use server"
 
 	const aiState = getMutableAIState<typeof AI>()
@@ -80,19 +85,12 @@ async function generatePracticeQuestions(content: string) {
 		}
 	})
 	completion.onFunctionCall("generate_questions", async ({ questions }) => {
-		// reply.update(<SlidesSkeletonLoader />)
-
-		// await sleep(1000)
-		console.log(questions)
-
-		// await fetch("http://localhost:3000/api", {
-		// 	method: "POST",
-		// 	headers: { "Content-Type": "application/json" },
-		// 	body: JSON.stringify({
-		// 		title: "Fetch POST Request Example",
-		// 		data: slides,
-		// 	}),
-		// })
+		await fetchClientWithToken(`/ai/questions/${cohortId}/${topicId}`, {
+			method: "POST",
+			body: JSON.stringify({
+				questions: questions,
+			}),
+		})
 
 		reply.done(<PracticeQuestions questions={questions} />)
 

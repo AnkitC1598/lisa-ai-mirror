@@ -1,22 +1,36 @@
 "use client"
 
+import { getQuestions } from "@/actions/hierarchy"
+import { default as QuestionsArray } from "@/components/organisms/PracticeQuestions"
 import useAIStore from "@/store"
+import { IPracticeQuestion } from "@/types/topic"
 import { useActions, useUIState } from "ai/rsc"
 import { useEffect, useMemo, useState } from "react"
 import { AI } from "./action"
 
 const PracticeQuestions = () => {
 	const currentTopic = useAIStore(store => store.currentTopic)
+	const [practiceQuestions, setPracticeQuestions] = useState<{
+		questions: IPracticeQuestion[]
+	} | null>(null)
 	const [messages, setMessages] = useUIState<typeof AI>()
 	const { generatePracticeQuestions } = useActions<typeof AI>()
 
 	const [isLoading, setIsLoading] = useState(false)
-
 	const prompt = useMemo(() => {
 		return `Generate 10 Practice questions for: ${currentTopic?.title} in ${currentTopic?.cohort?.title}`
 	}, [currentTopic])
 
 	useEffect(() => {
+		if (!currentTopic) return
+
+		getQuestions({
+			courseId: currentTopic.cohort._id,
+			topicId: currentTopic._id,
+		}).then(data => setPracticeQuestions(data))
+
+		if (practiceQuestions) return
+
 		setMessages(currentMessages => [
 			...currentMessages,
 			{
@@ -29,7 +43,11 @@ const PracticeQuestions = () => {
 			setIsLoading(true)
 			try {
 				// Submit and get response message
-				const responseMessage = await generatePracticeQuestions(prompt)
+				const responseMessage = await generatePracticeQuestions({
+					content: prompt,
+					cohortId: currentTopic?.cohort?._id,
+					topicId: currentTopic?._id,
+				})
 				setMessages(currentMessages => [
 					...currentMessages,
 					{
@@ -45,19 +63,20 @@ const PracticeQuestions = () => {
 				setIsLoading(false)
 			}
 		}
-		if (!messages.length && !isLoading) getData()
+
+		if (!isLoading) getData()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [setMessages, generatePracticeQuestions])
+	}, [currentTopic])
 
 	return (
 		<>
-			<div className="px-4">
-				{messages.length
-					? messages
-							.filter(t => t.role === "assistant")
-							.map(message => message.display)
-					: null}
-			</div>
+			{practiceQuestions ? (
+				<QuestionsArray questions={practiceQuestions.questions} />
+			) : messages.length ? (
+				messages
+					.filter(t => t.role === "assistant")
+					.map(message => message.display)
+			) : null}
 		</>
 	)
 }

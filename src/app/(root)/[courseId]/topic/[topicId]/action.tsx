@@ -140,10 +140,6 @@ If the user requests explanation of a topic, call \`explain_topic\` to show the 
 		}
 	})
 	completion.onFunctionCall("explain_topic", async ({ slides, quiz }) => {
-		// reply.update(<SlidesSkeletonLoader />)
-
-		// await sleep(1000)
-		// console.log(slides, quiz)
 		const finalSlides = [...slides, ...quiz].sort(
 			(a, b) => a.priority - b.priority
 		)

@@ -27,14 +27,7 @@ const Slides: React.FC<ISlidesProps> = ({ slides = [] }) => {
 			<div className="flex-1 snap-y snap-mandatory space-y-4 overflow-y-auto pb-4 pl-1 pr-4 scrollbar-hide">
 				{slides.map(
 					(
-						{
-							title = "",
-							body = "",
-							question = "",
-							answers = [],
-							priority = 0,
-							type = "text",
-						},
+						{ title, body, question, answers, priority, type },
 						idx
 					) => (
 						<Slide

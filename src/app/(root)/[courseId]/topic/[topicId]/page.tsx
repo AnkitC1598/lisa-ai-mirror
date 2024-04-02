@@ -24,6 +24,7 @@ const TopicContent = () => {
 
 	useEffect(() => {
 		if (!currentTopic) return
+
 		getSlides({
 			courseId: currentTopic.cohort._id,
 			topicId: currentTopic._id,
@@ -64,7 +65,7 @@ const TopicContent = () => {
 		}
 		if (!messages.length && !isLoading) getData()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [setMessages, submitUserMessage])
+	}, [currentTopic])
 
 	return (
 		<div className="flex h-full flex-col gap-4">
