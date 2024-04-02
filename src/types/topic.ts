@@ -31,6 +31,7 @@ export type Resource = {
 }
 
 export interface IPracticeQuestion {
+	id?: string
 	question: string
 	answer: string
 }

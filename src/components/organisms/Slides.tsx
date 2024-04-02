@@ -60,6 +60,25 @@ const Slides: React.FC<ISlidesProps> = ({ slides = {} }) => {
 		})
 	}
 
+	const handleFeedback = (idx, slideId, feedback, vote, setVote) => {
+		setSlideState(prev => ({
+			...prev,
+			finished: [...prev.finished, idx],
+		}))
+		handleVote({
+			type: "slide",
+			courseId: currentTopic.cohort._id,
+			topicId: currentTopic._id,
+			id: slideId,
+			vote,
+			setVote,
+			body: {
+				langCode: slides.language,
+				feedback: feedback,
+			},
+		})
+	}
+
 	return (
 		<div className="flex h-[calc(100%-56px)] flex-1">
 			<ContentPagination
@@ -71,6 +90,7 @@ const Slides: React.FC<ISlidesProps> = ({ slides = {} }) => {
 				{slides.slides.map(
 					(
 						{
+							id,
 							title,
 							body,
 							question,
@@ -83,6 +103,7 @@ const Slides: React.FC<ISlidesProps> = ({ slides = {} }) => {
 						idx
 					) => (
 						<Slide
+							id={id}
 							key={title}
 							idx={idx}
 							title={title}
@@ -95,6 +116,7 @@ const Slides: React.FC<ISlidesProps> = ({ slides = {} }) => {
 							setSlideState={setSlideState}
 							handleQuizOption={handleQuizOption}
 							correctAnswer={correctAnswer}
+							handleFeedback={handleFeedback}
 						/>
 					)
 				)}
@@ -125,6 +147,7 @@ export const SlidesSkeletonLoader = () => {
 }
 
 interface ISlide {
+	id?: string
 	idx?: number
 	title?: string
 	body?: string
@@ -136,9 +159,17 @@ interface ISlide {
 	handleQuizOption: (answer: any, idx: number, answers: any[]) => void
 	userAnswer?: string | null
 	correctAnswer?: string | null
+	handleFeedback?: (
+		idx: number,
+		slideId: string,
+		feedback: string,
+		vote: string,
+		setVote: React.Dispatch<SetStateAction<string | null>>
+	) => void
 }
 
 const Slide: React.FC<ISlide> = ({
+	id = "",
 	idx = 0,
 	title = "",
 	body = "",
@@ -148,6 +179,7 @@ const Slide: React.FC<ISlide> = ({
 	type = "text",
 	setSlideState,
 	handleQuizOption,
+	handleFeedback,
 	userAnswer = null,
 	correctAnswer = null,
 }) => {
@@ -238,15 +270,11 @@ const Slide: React.FC<ISlide> = ({
 						variant="outline"
 						size="icon"
 						onClick={() => {
-							handleVote("up", vote, setVote)
+							handleFeedback(idx, id, "like", vote, setVote)
 							// @ts-ignore
-							setSlideState(prev => ({
-								...prev,
-								finished: [...prev.finished, idx],
-							}))
 						}}
 					>
-						{vote === "up" ? (
+						{vote === "like" ? (
 							<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
 						) : (
 							<HandThumbUpIconOutline className="h-4 w-4" />
@@ -255,16 +283,11 @@ const Slide: React.FC<ISlide> = ({
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() => {
-							handleVote("down", vote, setVote)
-							// @ts-ignore
-							setSlideState(prev => ({
-								...prev,
-								finished: [...prev.finished, idx],
-							}))
-						}}
+						onClick={() =>
+							handleFeedback(idx, id, "dislike", vote, setVote)
+						}
 					>
-						{vote === "down" ? (
+						{vote === "dislike" ? (
 							<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
 						) : (
 							<HandThumbDownIconOutline className="h-4 w-4" />

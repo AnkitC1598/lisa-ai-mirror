@@ -85,14 +85,25 @@ async function generatePracticeQuestions({
 		}
 	})
 	completion.onFunctionCall("generate_questions", async ({ questions }) => {
-		await fetchClientWithToken(`/ai/questions/${cohortId}/${topicId}`, {
-			method: "POST",
-			body: JSON.stringify({
-				questions: questions,
-			}),
-		})
+		const resp = await fetchClientWithToken(
+			`/ai/questions/${cohortId}/${topicId}`,
+			{
+				method: "POST",
+				body: JSON.stringify({
+					questions,
+				}),
+			}
+		)
 
-		reply.done(<PracticeQuestions questions={questions} />)
+		reply.done(
+			<PracticeQuestions
+				questions={
+					resp?.results?.data ?? {
+						questions,
+					}
+				}
+			/>
+		)
 
 		aiState.done([
 			...aiState.get(),

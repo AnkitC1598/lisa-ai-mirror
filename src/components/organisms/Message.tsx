@@ -2,7 +2,7 @@
 
 import logo from "@/app/favicon.ico"
 import { Button } from "@/components/ui/button"
-import { handleAudio, handleCopy, handleVote } from "@/lib/interactions"
+import { handleAudio, handleCopy } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import { ClipboardDocumentIcon, SparklesIcon } from "@heroicons/react/16/solid"
 import {
@@ -20,7 +20,10 @@ import Image from "next/image"
 import { useState } from "react"
 
 interface IMessage {
-	message: Message & { createdAt?: Date | string | number }
+	message: Message & {
+		createdAt?: Date | string | number
+	}
+	handleFeedback?: () => void
 }
 
 export const UserMessage: React.FC<IMessage> = ({ message }) => {
@@ -51,7 +54,7 @@ export const UserMessage: React.FC<IMessage> = ({ message }) => {
 	)
 }
 
-export const AiMessage: React.FC<IMessage> = ({ message }) => {
+export const AiMessage: React.FC<IMessage> = ({ message, handleFeedback }) => {
 	const [vote, setVote] = useState<string | null>(null)
 	const [copy, setCopy] = useState<string | null>(null)
 	const [audioState, setAudioState] = useState<string | null>(null)
@@ -85,9 +88,12 @@ export const AiMessage: React.FC<IMessage> = ({ message }) => {
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() => handleVote("up", vote, setVote)}
+						onClick={() =>
+							// @ts-ignore
+							handleFeedback(message.id, "like", vote, setVote)
+						}
 					>
-						{vote === "up" ? (
+						{vote === "like" ? (
 							<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
 						) : (
 							<HandThumbUpIconOutline className="h-4 w-4" />
@@ -96,9 +102,12 @@ export const AiMessage: React.FC<IMessage> = ({ message }) => {
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() => handleVote("down", vote, setVote)}
+						onClick={() =>
+							// @ts-ignore
+							handleFeedback(message.id, "dislike", vote, setVote)
+						}
 					>
-						{vote === "down" ? (
+						{vote === "dislike" ? (
 							<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
 						) : (
 							<HandThumbDownIconOutline className="h-4 w-4" />

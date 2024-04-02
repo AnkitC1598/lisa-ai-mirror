@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { handleAudio, handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
+import useAIStore from "@/store"
 import { IPracticeQuestion } from "@/types/topic"
 import {
 	BookmarkIcon as BookmarkIconOutline,
@@ -28,6 +29,27 @@ interface IPracticeQuestions {
 }
 
 const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
+	const currentTopic = useAIStore(store => store.currentTopic)
+
+	const handleFeedback = (
+		feedback: string,
+		questionId: string,
+		vote: string,
+		setVote: any
+	) => {
+		handleVote({
+			type: "quiz",
+			body: {
+				feedback,
+			},
+			vote,
+			setVote,
+			courseId: currentTopic?.cohort._id,
+			topicId: currentTopic?._id,
+			id: questionId,
+		})
+	}
+
 	return (
 		<>
 			<div className="px-4">
@@ -41,6 +63,7 @@ const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
 							key={question.question}
 							question={question}
 							idx={idx + 1}
+							handleFeedback={handleFeedback}
 						/>
 					))}
 				</Accordion>
@@ -65,11 +88,18 @@ export const PracticeQuestionsSkeletonLoader = () => {
 interface IPracticeQuestionProps {
 	question: IPracticeQuestion
 	idx: number
+	handleFeedback: (
+		feedback: string,
+		questionId: string,
+		vote: string,
+		setVote: any
+	) => void
 }
 
 const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 	question,
 	idx,
+	handleFeedback,
 }) => {
 	const [vote, setVote] = useState<string | null>(null)
 	const [audioState, setAudioState] = useState<string | null>(null)
@@ -99,9 +129,18 @@ const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 							<Button
 								variant="outline"
 								size="icon"
-								onClick={() => handleVote("up", vote, setVote)}
+								// @ts-ignore
+								onClick={() =>
+									handleFeedback(
+										"like",
+										// @ts-ignore
+										question.id,
+										vote,
+										setVote
+									)
+								}
 							>
-								{vote === "up" ? (
+								{vote === "like" ? (
 									<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
 								) : (
 									<HandThumbUpIconOutline className="h-4 w-4" />
@@ -111,10 +150,18 @@ const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 								variant="outline"
 								size="icon"
 								onClick={() =>
-									handleVote("down", vote, setVote)
+									// @ts-ignore
+									handleFeedback(
+										"dislike",
+
+										// @ts-ignore
+										question.id,
+										vote,
+										setVote
+									)
 								}
 							>
-								{vote === "down" ? (
+								{vote === "dislike" ? (
 									<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
 								) : (
 									<HandThumbDownIconOutline className="h-4 w-4" />

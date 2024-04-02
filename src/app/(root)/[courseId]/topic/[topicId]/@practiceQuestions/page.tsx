@@ -27,7 +27,9 @@ const PracticeQuestions = () => {
 		getQuestions({
 			courseId: currentTopic.cohort._id,
 			topicId: currentTopic._id,
-		}).then(data => setPracticeQuestions(data))
+		}).then(data => {
+			setPracticeQuestions(data)
+		})
 
 		if (practiceQuestions) return
 

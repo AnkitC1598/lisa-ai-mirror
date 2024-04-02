@@ -129,7 +129,7 @@ export const getResources = async ({
 		}
 	)
 
-	return resp.results.data.resources.web.results
+	return resp.results.data.resources
 }
 
 export const getQuestions = async ({

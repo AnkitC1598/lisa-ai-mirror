@@ -1,4 +1,24 @@
+import { fetchClientWithToken } from "@/services/fetch"
 import { removeEmojis } from "."
+
+// Create a switch case for the feedback type
+const getFeedbackApi = (
+	type: string,
+	courseId: string,
+	topicId: string,
+	id: string
+) => {
+	switch (type) {
+		case "slide":
+			return `/ai/slides/slide/feedback/${courseId}/${topicId}/${id}`
+		case "chat":
+			return `/ai/chat/feedback/${courseId}/${topicId}/${id}`
+		case "quiz":
+			return `/ai/quiz/feedback/${courseId}/${topicId}/${id}`
+		default:
+			return ""
+	}
+}
 
 export const handleAudio = (
 	text: string,
@@ -29,13 +49,21 @@ export const handleAudio = (
 	}
 }
 
-export const handleVote = (
-	type: string,
-	vote: string | null,
-	setVote: (audioState: string | null) => void
-) => {
-	console.log(type, vote)
-	setVote(type)
+export const handleVote = async ({
+	type = "",
+	vote = "",
+	setVote = () => {},
+	courseId = "",
+	topicId = "",
+	id = "",
+	body = {},
+}) => {
+	await fetchClientWithToken(getFeedbackApi(type, courseId, topicId, id), {
+		method: "PUT",
+		body: JSON.stringify(body),
+	})
+	// @ts-ignore
+	setVote(body.feedback)
 }
 
 export const handleBookmark = () => {
