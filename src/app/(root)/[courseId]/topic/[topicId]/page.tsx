@@ -30,7 +30,7 @@ const TopicContent = () => {
 		getSlides({
 			courseId: currentTopic.cohort._id,
 			topicId: currentTopic._id,
-		}).then(data => setSlidesData(data.slides))
+		}).then(data => setSlidesData(data?.slides ?? null))
 
 		if (slidesData) return
 		setMessages(currentMessages => [
