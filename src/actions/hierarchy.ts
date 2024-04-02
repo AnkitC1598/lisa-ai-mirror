@@ -167,3 +167,22 @@ export const getChats = async ({
 
 	return resp.results.data
 }
+
+export const translateSlides = async ({
+	courseId,
+	topicId,
+	langCode,
+}: {
+	courseId: string
+	topicId: string
+	langCode: string
+}): Promise<ISlides> => {
+	const resp = await fetchClientWithToken(
+		`/ai/slides/translate/${topicId}/${courseId}/${langCode}`,
+		{
+			method: "PUT",
+		}
+	)
+
+	return resp.results.data
+}

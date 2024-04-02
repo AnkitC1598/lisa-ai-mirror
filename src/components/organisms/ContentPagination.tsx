@@ -1,6 +1,15 @@
 import { cn } from "@/lib/utils"
 
-const ContentPagination = ({
+interface IContentPagination {
+	vertical?: boolean
+	slideState: {
+		currentPage: number
+		finished: [] | number[]
+	}
+	total: number
+}
+
+const ContentPagination: React.FC<IContentPagination> = ({
 	vertical = false,
 	slideState = {},
 	total = 0,

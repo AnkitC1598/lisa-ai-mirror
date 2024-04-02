@@ -1,10 +1,10 @@
 "use client"
 
-import { getSlides } from "@/actions/hierarchy"
+import { getSlides, translateSlides } from "@/actions/hierarchy"
 import ContentControls from "@/components/organisms/ContentControls"
-import Slides from "@/components/organisms/Slides"
+import Slides, { SlidesSkeletonLoader } from "@/components/organisms/Slides"
 import useAIStore from "@/store"
-import { ISlides } from "@/types/topic"
+import { ISlideSet } from "@/types/topic"
 import { useActions, useUIState } from "ai/rsc"
 import { useEffect, useMemo, useState } from "react"
 import { type AI } from "./action"
@@ -13,7 +13,9 @@ const TopicContent = () => {
 	const currentTopic = useAIStore(store => store.currentTopic)
 	const [messages, setMessages] = useUIState<typeof AI>()
 	const { submitUserMessage } = useActions<typeof AI>()
-	const [slidesData, setSlidesData] = useState<ISlides | null>(null)
+	const [slidesData, setSlidesData] = useState<{
+		[key: string]: ISlideSet
+	} | null>(null)
 	const [isLoading, setIsLoading] = useState(false)
 	const [language, setLanguage] = useState<string>("en")
 
@@ -28,7 +30,7 @@ const TopicContent = () => {
 		getSlides({
 			courseId: currentTopic.cohort._id,
 			topicId: currentTopic._id,
-		}).then(data => setSlidesData(data))
+		}).then(data => setSlidesData(data.slides))
 
 		if (slidesData) return
 		setMessages(currentMessages => [
@@ -67,6 +69,24 @@ const TopicContent = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currentTopic])
 
+	useEffect(() => {
+		if (
+			!slidesData ||
+			!messages.length ||
+			isLoading ||
+			slidesData[language] ||
+			!currentTopic
+		)
+			return
+
+		translateSlides({
+			courseId: currentTopic.cohort._id,
+			topicId: currentTopic._id,
+			langCode: language,
+		}).then(resp => setSlidesData(resp.slides))
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [language, currentTopic])
+
 	return (
 		<div className="flex h-full flex-col gap-4">
 			<ContentControls
@@ -74,8 +94,12 @@ const TopicContent = () => {
 				setLanguage={setLanguage}
 			/>
 			{slidesData ? (
-				// @ts-ignore
-				<Slides slides={slidesData.slides[language || "en"]} />
+				slidesData[language] ? (
+					// @ts-ignore
+					<Slides slides={slidesData[language]} />
+				) : (
+					<SlidesSkeletonLoader />
+				)
 			) : messages.length ? (
 				messages
 					.filter(t => t.role === "assistant")

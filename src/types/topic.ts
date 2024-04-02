@@ -53,7 +53,7 @@ interface ITopic {
 	priority: number
 }
 
-interface ISlideSet {
+export interface ISlideSet {
 	createdAt: string
 	language: string
 	slides: ISlide[]
