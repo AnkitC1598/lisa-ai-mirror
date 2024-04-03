@@ -1,6 +1,9 @@
 "use client"
 
+import { answerQuiz } from "@/actions/hierarchy"
+import { handleAudio, handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
+import { ISlide } from "@/types/topic"
 import {
 	HandThumbDownIcon as HandThumbDownIconOutline,
 	HandThumbUpIcon as HandThumbUpIconOutline,
@@ -10,39 +13,121 @@ import {
 	HandThumbUpIcon as HandThumbUpIconSolid,
 	SpeakerWaveIcon,
 } from "@heroicons/react/24/solid"
-import { useEffect, useState } from "react"
+import { useParams } from "next/navigation"
+import React, { SetStateAction, useEffect, useState } from "react"
 import { useInView } from "react-intersection-observer"
 import { Button } from "../ui/button"
 import ContentPagination from "./ContentPagination"
 
-const Slides = ({ slides = [], quiz = [] }) => {
-	const finalMergedArray = [...slides, ...quiz].sort(
-		// @ts-ignore
-		(a, b) => a.priority - b.priority
-	)
+interface ISlidesProps {
+	slides: {
+		slides: ISlide[]
+		language?: string
+	}
+}
+
+export interface ISlideState {
+	current: number
+	finished: number[]
+}
+
+const Slides: React.FC<ISlidesProps> = ({ slides }) => {
+	const [slideState, setSlideState] = useState<ISlideState>({
+		current: 0,
+		finished: [
+			...slides.slides
+				.map((s, i) => (s?.userAnswer ? i : -1))
+				.filter(v => v > -1),
+		],
+	})
+	const { courseId, topicId } = useParams<{
+		courseId: string
+		topicId: string
+	}>()
+
+	const handleQuizOption = (answer: any, idx: number, answers: []) => {
+		setSlideState(prev => ({
+			...prev,
+			finished: [...prev.finished, idx],
+		}))
+		answers.forEach((ans: any) => {
+			const element = document.getElementById(ans.body)
+			if (element) {
+				element.style.backgroundColor = "transparent"
+				if ((answer.isCorrect && answer === ans) || ans.isCorrect)
+					element.style.backgroundColor = "green"
+				else if (!answer.isCorrect && answer === ans)
+					element.style.backgroundColor = "red"
+			}
+		})
+		answerQuiz({
+			courseId: courseId,
+			topicId,
+			langCode: slides.language,
+			questionId: slides.slides[idx].id,
+			answerId: answer.id,
+		})
+	}
+
+	// @ts-ignore
+	const handleFeedback = (idx, slideId, feedback, vote, setVote) => {
+		setSlideState(prev => ({
+			...prev,
+			finished: [...prev.finished, idx],
+		}))
+		handleVote({
+			type: "slide",
+			courseId: courseId,
+			topicId,
+			id: slideId,
+			vote,
+			setVote,
+			body: {
+				langCode: slides.language,
+				feedback: feedback,
+			},
+		})
+	}
+
 	return (
 		<div className="flex h-[calc(100%-56px)] flex-1">
-			<ContentPagination vertical />
+			<ContentPagination
+				vertical
+				slideState={slideState}
+				total={slides.slides.length}
+			/>
 			<div className="flex-1 snap-y snap-mandatory space-y-4 overflow-y-auto pb-4 pl-1 pr-4 scrollbar-hide">
-				{finalMergedArray.map(
+				{slides.slides.map(
 					(
 						{
-							title = "",
-							body = "",
-							question = "",
-							options = [],
-							priority = 0,
+							id,
+							title,
+							body,
+							question,
+							answers,
+							priority,
+							type,
+							userAnswer,
+							correctAnswer,
 						},
 						idx
 					) => (
 						<Slide
-							key={title}
+							id={id}
+							key={id}
 							idx={idx}
 							title={title}
 							body={body}
 							question={question}
-							options={options}
+							answers={answers}
 							priority={priority}
+							type={type}
+							userAnswer={userAnswer}
+							setSlideState={setSlideState}
+							// @ts-ignore
+							handleQuizOption={handleQuizOption}
+							correctAnswer={correctAnswer}
+							handleFeedback={handleFeedback}
 						/>
 					)
 				)}
@@ -72,59 +157,70 @@ export const SlidesSkeletonLoader = () => {
 	)
 }
 
-interface ISlide {
-	idx: number
+interface ISlideProps {
+	id?: string
+	idx?: number
 	title?: string
 	body?: string
 	question?: string
-	options?: any[]
+	answers?: any[]
 	priority: number
+	type: string
+	setSlideState: React.Dispatch<SetStateAction<ISlideState>>
+	handleQuizOption: (answer: any, idx: number, answers: any[]) => void
+	userAnswer?: string | null
+	correctAnswer?: string | null
+	handleFeedback?: (
+		idx: number,
+		slideId: string,
+		feedback: string,
+		vote: string,
+		setVote: React.Dispatch<SetStateAction<string | null>>
+	) => void
 }
 
-const Slide: React.FC<ISlide> = ({
+const Slide: React.FC<ISlideProps> = ({
+	id = "",
 	idx = 0,
 	title = "",
 	body = "",
 	question = "",
-	options = [],
+	answers = [],
+	priority = 0,
+	type = "text",
+	setSlideState,
+	handleQuizOption,
+	handleFeedback,
+	userAnswer = null,
+	correctAnswer = null,
 }) => {
 	const [vote, setVote] = useState<string | null>(null)
 	const [audioState, setAudioState] = useState<string | null>(null)
 	const [inViewAt, setInViewAt] = useState<number | null>(null)
 	const { ref, inView } = useInView()
 
-	const handleVote = (type: string) =>
-		setVote(prev => (prev === type ? null : type))
-
-	const handleAudio = (text = "") => {
-		if (audioState !== null) return
-		const synth = window.speechSynthesis
-		const voices = synth.getVoices()
-		const utterance = new SpeechSynthesisUtterance(removeEmojis(text))
-		try {
-			// @ts-ignore
-			utterance.voice = voices.find(voice => voice.lang === "en-IN")
-		} catch (e) {
-			utterance.voice = voices[0]
-		}
-
-		synth.speak(utterance)
-		setAudioState("playing")
-		// setTimeout(() => setAudioState(null), 1000)
-		utterance.onend = () => setAudioState(null)
-	}
-
 	useEffect(() => {
-		if (inView && inViewAt === null) setInViewAt(new Date().getTime())
+		if (inView && inViewAt === null) {
+			setInViewAt(new Date().getTime())
+			setSlideState(prev => ({
+				...prev,
+				current: idx,
+			}))
+		}
 		if (!inView && inViewAt !== null) {
 			const diff = Math.abs(new Date().getTime() - inViewAt)
 			console.log(`${idx} stayed for ${diff / 1000}`)
 			setInViewAt(null)
+			setSlideState(prev => ({
+				...prev,
+				finished: [...prev.finished, idx],
+			}))
 		}
-	}, [idx, inView, inViewAt])
+	}, [idx, inView, inViewAt, setSlideState])
 
 	return (
 		<div
+			id={`slide-${idx}`}
 			className={cn(
 				"relative flex h-full w-full snap-center snap-always flex-col justify-center rounded-md px-4 shadow-md ring-1 ring-inset ring-neutral-200 scrollbar-hide dark:shadow-neutral-800 dark:ring-neutral-800",
 				inView ? "py-4" : ""
@@ -132,19 +228,46 @@ const Slide: React.FC<ISlide> = ({
 		>
 			<div className="flex flex-1 flex-col gap-2">
 				<span className="font-semibold">{title || question}</span>
-				{options.length ? (
-					<div className="flex flex-col gap-2 py-4">
-						{options.map(option => (
-							<span
-								key={option.option}
+				{answers.length && type === "quiz" ? (
+					<div className="flex h-full flex-col gap-2 py-4">
+						{answers.map(answer => (
+							<button
+								disabled={!!userAnswer}
+								id={answer.body}
+								key={answer.id ?? answer.body}
+								onClick={() =>
+									handleQuizOption(answer, idx, answers)
+								}
 								className={cn(
-									"w-full cursor-pointer rounded-md border border-neutral-200 bg-neutral-200 p-2 hover:bg-neutral-300 dark:border-neutral-800 dark:bg-neutral-800 dark:hover:bg-neutral-700",
-									option.isCorrect ? "text-green-500" : ""
+									"w-full cursor-pointer rounded-md border border-neutral-200 bg-neutral-200 p-2 transition-all duration-500 hover:bg-neutral-300 disabled:cursor-not-allowed dark:border-neutral-800 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+									// userAnswer
+									// 	? answer.id === correctAnswer
+									// 		? "bg-green-500"
+									// 		: userAnswer === answer.id
+									// 			? "bg-red-500"
+									// 			: ""
+									// 	: ""
 								)}
+								style={
+									userAnswer
+										? answer.id === correctAnswer
+											? { backgroundColor: "green" }
+											: userAnswer === answer.id
+												? { backgroundColor: "red" }
+												: {}
+										: {}
+								}
 							>
-								{option.option}
-							</span>
+								{answer.body}
+							</button>
 						))}
+						{type === "quiz" && userAnswer ? (
+							<div className="flex w-full flex-1 items-center justify-center">
+								{userAnswer === correctAnswer
+									? "Congratulations"
+									: "Sorry"}
+							</div>
+						) : null}
 					</div>
 				) : (
 					<p className="leading-8">{body}</p>
@@ -155,9 +278,12 @@ const Slide: React.FC<ISlide> = ({
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() => handleVote("up")}
+						onClick={() => {
+							// @ts-ignore
+							handleFeedback(idx, id, "like", vote, setVote)
+						}}
 					>
-						{vote === "up" ? (
+						{vote === "like" ? (
 							<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
 						) : (
 							<HandThumbUpIconOutline className="h-4 w-4" />
@@ -166,9 +292,12 @@ const Slide: React.FC<ISlide> = ({
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() => handleVote("down")}
+						onClick={() =>
+							// @ts-ignore
+							handleFeedback(idx, id, "dislike", vote, setVote)
+						}
 					>
-						{vote === "down" ? (
+						{vote === "dislike" ? (
 							<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
 						) : (
 							<HandThumbDownIconOutline className="h-4 w-4" />
@@ -178,13 +307,24 @@ const Slide: React.FC<ISlide> = ({
 				<Button
 					variant="outline"
 					size="icon"
-					disabled={audioState === "playing"}
-					onClick={() => handleAudio(title + "\n" + body)}
+					onClick={() =>
+						handleAudio(
+							type === "quiz"
+								? question +
+										"\n" +
+										answers.map(a => a.body).join("\n")
+								: title + "\n" + body,
+							audioState,
+							setAudioState
+						)
+					}
 				>
 					<SpeakerWaveIcon
 						className={cn(
 							"h-4 w-4",
-							audioState === "playing" ? "fill-blue-500" : ""
+							audioState === "playing" || audioState === "paused"
+								? "fill-blue-500"
+								: ""
 						)}
 					/>
 				</Button>
@@ -197,10 +337,4 @@ const Slide: React.FC<ISlide> = ({
 			</span>
 		</div>
 	)
-}
-
-function removeEmojis(string: string) {
-	var regex =
-		/(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g
-	return string.replace(regex, "")
 }

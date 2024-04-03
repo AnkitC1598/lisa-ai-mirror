@@ -5,7 +5,7 @@ import { SparklesIcon } from "@heroicons/react/16/solid"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "../ui/button"
-import Back from "./Back"
+import NavbarPrimaryActions from "./NavbarPrimaryActions"
 import SearchMenu from "./SearchMenu"
 
 interface INavbar {
@@ -23,7 +23,7 @@ const Navbar: React.FC<INavbar> = async ({ logoOnly = false }) => {
 					logoOnly ? "grid-cols-1" : "grid-cols-3"
 				)}
 			>
-				{logoOnly ? null : <Back />}
+				{logoOnly ? null : <NavbarPrimaryActions />}
 				<Link
 					href="/"
 					className="flex items-center justify-center gap-1"

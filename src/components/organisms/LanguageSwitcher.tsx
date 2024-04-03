@@ -18,16 +18,26 @@ import { cn } from "@/lib/utils"
 import { CheckIcon, LanguageIcon } from "@heroicons/react/16/solid"
 import { useState } from "react"
 
-const languages = [
+const Languages = [
 	{ label: "English", value: "en" },
-	{ label: "French", value: "fr" },
-	{ label: "German", value: "de" },
-	{ label: "Spanish", value: "es" },
-	{ label: "Portuguese", value: "pt" },
-	{ label: "Russian", value: "ru" },
-	{ label: "Japanese", value: "ja" },
-	{ label: "Korean", value: "ko" },
+	{ label: "Hindi", value: "hi" },
+	{ label: "Marathi", value: "mr" },
+	{ label: "Gujarati", value: "gu" },
+	{ label: "Telugu", value: "te" },
+	{ label: "Malayalam", value: "ml" },
+	{ label: "Bengali", value: "bn" },
+	{ label: "Tamil", value: "ta" },
+	{ label: "Punjabi", value: "pa" },
+	{ label: "Odia", value: "or" },
+	{ label: "Assamese", value: "as" },
+	{ label: "Manipuri", value: "mn" },
 	{ label: "Chinese", value: "zh" },
+	{ label: "Spanish", value: "es" },
+	{ label: "French", value: "fr" },
+	{ label: "Arabic", value: "ar" },
+	{ label: "Russian", value: "ru" },
+	{ label: "German", value: "de" },
+	{ label: "Japanese", value: "ja" },
 ] as const
 
 interface ILanguageSwitcher {
@@ -62,16 +72,12 @@ const LanguageSwitcher: React.FC<ILanguageSwitcher> = ({ value, setValue }) => {
 					<CommandList>
 						<CommandEmpty>No language found.</CommandEmpty>
 						<CommandGroup>
-							{languages.map(language => (
+							{Languages.map(language => (
 								<CommandItem
 									key={language.value}
 									value={language.value}
 									onSelect={currentValue => {
-										setValue(
-											currentValue === value
-												? ""
-												: currentValue
-										)
+										setValue(currentValue)
 										setOpen(false)
 									}}
 								>

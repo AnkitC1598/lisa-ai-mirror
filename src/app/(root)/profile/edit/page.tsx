@@ -1,6 +1,7 @@
 "use client"
 
-import OnboardingQuestion from "@/components/organisms/OnboardingQuestion"
+import logo from "@/app/favicon.ico"
+import OnboardingOption from "@/components/organisms/OnboardingOption"
 import { Button } from "@/components/ui/button"
 import {
 	Form,
@@ -12,18 +13,16 @@ import {
 	FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Preferences } from "@/constants/Preferences"
 import { profileSchema } from "@/schema/profile"
 import useAIStore from "@/store"
 import { IFormUser } from "@/types/user"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
 import Head from "next/head"
+import Image from "next/image"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
-type AsyncDefaultValues<TFieldValues> = (
-	payload?: unknown
-) => Promise<TFieldValues>
 
 const EditProfile = () => {
 	const user = useAIStore(store => store.user) as IFormUser
@@ -54,9 +53,22 @@ const EditProfile = () => {
 				/>
 			</Head>
 			<div className="flex h-full flex-col overflow-y-auto scrollbar">
-				<div className="relative aspect-[8/3] w-full shrink-0 overflow-hidden bg-purple-50 dark:bg-purple-950/30"></div>
+				<div className="relative aspect-[8/3] w-full shrink-0 overflow-hidden bg-purple-50 dark:bg-purple-950/30">
+					<Image
+						src={user.coverImage ?? logo}
+						alt={user.firstname}
+						fill
+						objectFit="contain"
+					/>
+				</div>
 				<div className="flex flex-col gap-4 divide-y divide-neutral-200 p-4 dark:divide-neutral-800">
-					<div className="z-10 -mt-16 flex h-24 w-24 overflow-hidden rounded-md border-4 border-white bg-white dark:bg-neutral-800"></div>
+					<div className="relative z-10 -mt-16 flex h-24 w-24 overflow-hidden rounded-md border-4 border-white bg-white dark:bg-neutral-800">
+						<Image
+							src={user.profileImage}
+							alt={user.firstname}
+							fill
+						/>
+					</div>
 					<Form {...form}>
 						<form
 							onSubmit={form.handleSubmit(onSubmit)}
@@ -343,13 +355,37 @@ const EditProfile = () => {
 								<span className="text-sm font-medium text-gray-700 dark:text-gray-300">
 									Preferences
 								</span>
-								<OnboardingQuestion className="text-sm font-medium text-gray-600 dark:text-gray-400" />
-								<OnboardingQuestion className="text-sm font-medium text-gray-600 dark:text-gray-400" />
-								<OnboardingQuestion className="text-sm font-medium text-gray-600 dark:text-gray-400" />
-								<OnboardingQuestion className="text-sm font-medium text-gray-600 dark:text-gray-400" />
-								<OnboardingQuestion className="text-sm font-medium text-gray-600 dark:text-gray-400" />
-								<OnboardingQuestion className="text-sm font-medium text-gray-600 dark:text-gray-400" />
-								<OnboardingQuestion className="text-sm font-medium text-gray-600 dark:text-gray-400" />
+								{Preferences.map(({ title, key, options }) => (
+									<FormField
+										key={key}
+										control={form.control}
+										name={`interests.${key}`}
+										render={({ field }) => (
+											<FormItem className="flex flex-col">
+												<FormLabel className="text-sm font-medium text-gray-600 dark:text-gray-400">
+													{title}
+												</FormLabel>
+												<FormControl>
+													<div className="flex flex-wrap gap-4">
+														{options.map(option => (
+															<OnboardingOption
+																key={`${option.value}_${option.label}`}
+																option={option}
+																value={
+																	field.value
+																}
+																onChange={
+																	field.onChange
+																}
+															/>
+														))}
+													</div>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								))}
 							</div>
 							<div className="pt-4">
 								<Button

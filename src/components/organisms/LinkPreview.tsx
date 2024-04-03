@@ -1,9 +1,14 @@
 "use client"
 
+import {
+	addResourceBookmark,
+	removeResourceBookmark,
+} from "@/actions/bookmarks"
 import { Resource } from "@/types/topic"
 import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/24/outline"
 import { BookmarkIcon as BookmarkIconSolid } from "@heroicons/react/24/solid"
 import Image from "next/image"
+import { useParams } from "next/navigation"
 import { useState } from "react"
 import { Button } from "../ui/button"
 
@@ -18,14 +23,35 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 	orientation = "portrait",
 	resource,
 }) => {
-	const [bookMarked, setBookMarked] = useState<boolean>(false)
+	const [bookmarked, setBookmarked] = useState<boolean>(false)
+	const { courseId: cohortId, topicId } = useParams<{
+		courseId: string
+		topicId: string
+	}>()
 
 	const handleBookmark = (
 		e: React.MouseEvent<HTMLButtonElement, MouseEvent>
 	) => {
 		e.stopPropagation()
 		e.preventDefault()
-		setBookMarked(prev => !prev)
+		setBookmarked(prev => !prev)
+		if (bookmarked) {
+			removeResourceBookmark({
+				cohortId,
+				topicId,
+				resourceId: resource.id,
+			}).then(code => {
+				if (code === 200) setBookmarked(false)
+			})
+		} else {
+			addResourceBookmark({
+				cohortId,
+				topicId,
+				body: resource,
+			}).then(code => {
+				if (code === 200) setBookmarked(true)
+			})
+		}
 	}
 	return (
 		<>
@@ -76,7 +102,7 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 							onClick={handleBookmark}
 							className="relative shrink-0"
 						>
-							{bookMarked ? (
+							{bookmarked ? (
 								<BookmarkIconSolid className="h-4 w-4 shrink-0 dark:fill-yellow-400" />
 							) : (
 								<BookmarkIconOutline className="h-4 w-4 shrink-0" />

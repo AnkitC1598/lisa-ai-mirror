@@ -1,7 +1,8 @@
 import { getUser } from "@/actions/user"
 import logo from "@/app/favicon.ico"
-import { Option } from "@/components/organisms/OnboardingQuestion"
+import OnboardingOption from "@/components/organisms/OnboardingOption"
 import { Button } from "@/components/ui/button"
+import { Preferences } from "@/constants/Preferences"
 import { LockClosedIcon } from "@heroicons/react/16/solid"
 import {
 	GitHubLogoIcon,
@@ -142,84 +143,36 @@ const Profile = async () => {
 						<span className="text-sm font-medium text-gray-700 dark:text-gray-300">
 							Preferences
 						</span>
-						<div className="flex flex-col gap-1">
-							<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-								Favorite Hobby
-							</span>
-							<div className="flex flex-wrap gap-4">
-								{Array.from({ length: 3 }).map((_, i) => (
-									<Option
-										key={i}
-										selected
-									/>
-								))}
+						{Preferences.map(preference => (
+							<div
+								key={preference.key}
+								className="flex flex-col gap-1"
+							>
+								<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+									{preference.title}
+								</span>
+								<div className="flex flex-wrap gap-4">
+									{preference.options
+										.filter(option =>
+											user.interests[
+												preference.key
+											].includes(option.value)
+										)
+										.map(option => (
+											<OnboardingOption
+												key={`${option.value}_${option.label}`}
+												option={option}
+												value={
+													user.interests[
+														preference.key
+													]
+												}
+												disabled
+											/>
+										))}
+								</div>
 							</div>
-						</div>
-						<div className="flex flex-col gap-1">
-							<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-								Creativity Interests
-							</span>
-							<div className="flex flex-wrap gap-4">
-								{Array.from({ length: 9 }).map((_, i) => (
-									<Option
-										key={i}
-										selected
-									/>
-								))}
-							</div>
-						</div>
-						<div className="flex flex-col gap-1">
-							<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-								Your favorite music genre is ...
-							</span>
-							<div className="flex flex-wrap gap-4">
-								{Array.from({ length: 3 }).map((_, i) => (
-									<Option
-										key={i}
-										selected
-									/>
-								))}
-							</div>
-						</div>
-						<div className="flex flex-col gap-1">
-							<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-								Food cuisine preferences
-							</span>
-							<div className="flex flex-wrap gap-4">
-								{Array.from({ length: 1 }).map((_, i) => (
-									<Option
-										key={i}
-										selected
-									/>
-								))}
-							</div>
-						</div>
-						<div className="flex flex-col gap-1">
-							<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-								Movie genre
-							</span>
-							<div className="flex flex-wrap gap-4">
-								{Array.from({ length: 7 }).map((_, i) => (
-									<Option
-										key={i}
-										selected
-									/>
-								))}
-							</div>
-						</div>
-						<div className="flex flex-col gap-1">
-							<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-								Profession
-							</span>
-							<div className="flex flex-wrap gap-4">
-								{Array.from({ length: 2 }).map((_, i) => (
-									<Option
-										key={i}
-										selected
-									/>
-								))}
-							</div>
-						</div>
+						))}
 					</div>
 					<div className="flex flex-col gap-1 pt-4">
 						<span className="text-sm font-medium text-gray-600 dark:text-gray-400">

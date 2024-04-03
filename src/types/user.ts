@@ -1,6 +1,28 @@
-export interface IFormUser {
+export interface IUserOnboarding {
+	gender: string
+	yob: number
+	location: {
+		country: string
+		city: string
+	}
+	interests: {
+		creativity: string[]
+		goingOut: string[]
+		stayingIn: string[]
+		filmTv: string[]
+		reading: string[]
+		music: string[]
+		foodDrinking: string[]
+		traveling: string[]
+		pets: string[]
+		valuesTraits: string[]
+	}
+}
+
+export interface IFormUser extends IUserOnboarding {
 	firstname: string
 	lastname: string
+	dob: string
 	email: string
 	mobile: {
 		countryCode: string
@@ -10,12 +32,6 @@ export interface IFormUser {
 	description: string
 	profileImage: string
 	coverImage: string
-	gender: string
-	dob: string
-	location: {
-		country: string
-		city: string
-	}
 	socials: {
 		github: string
 		instagram: string
@@ -39,6 +55,7 @@ export interface IUser extends IFormUser {
 	specialization: any | null
 	strongSubject: any | null
 	status: string
+	interestsAdded: boolean
 	preferences: {
 		hobbies: any[]
 		musicGenre: any[]
