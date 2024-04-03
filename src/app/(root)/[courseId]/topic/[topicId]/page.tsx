@@ -36,13 +36,13 @@ const TopicContent = () => {
 		}).then(data => {
 			setSlidesData(data?.slides ?? null)
 
-			if (slidesData || data?.slides !== null) return
+			if (slidesData || data?.slides) return
 
 			const getData = async () => {
-				if (!prompt)
-					throw new Error(
-						"Cannot find prompt to generate explanation"
-					)
+				// if (!prompt)
+				// 	throw new Error(
+				// 		"Cannot find prompt to generate explanation"
+				// 	)
 
 				setIsLoading(true)
 				try {
@@ -60,14 +60,21 @@ const TopicContent = () => {
 							role: responseMessage.role as "user" | "assistant",
 						},
 					])
-					setIsLoading(false)
 				} catch (error) {
 					// You may want to show a toast or trigger an error state.
 					console.error(error)
+				} finally {
 					setIsLoading(false)
 				}
 			}
-			if (!messages.length && !isLoading && !slidesData && prompt) {
+
+			if (
+				!messages.length &&
+				!isLoading &&
+				!slidesData &&
+				prompt &&
+				!data?.slides
+			) {
 				setMessages([
 					{
 						id: Date.now(),
@@ -82,15 +89,8 @@ const TopicContent = () => {
 	}, [currentTopic])
 
 	useEffect(() => {
-		if (
-			!slidesData ||
-			!messages.length ||
-			isLoading ||
-			slidesData[language] ||
-			!currentTopic
-		)
+		if (!slidesData || isLoading || slidesData?.[language] || !currentTopic)
 			return
-
 		translateSlides({
 			courseId: currentTopic.cohort._id,
 			topicId: currentTopic._id,

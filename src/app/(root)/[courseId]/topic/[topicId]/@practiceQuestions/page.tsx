@@ -39,10 +39,10 @@ const PracticeQuestions = () => {
 
 			if (data?.questions) return
 			const getData = async () => {
-				if (!prompt)
-					throw new Error(
-						"Cannot find prompt to generate practice questions"
-					)
+				// if (!prompt)
+				// 	throw new Error(
+				// 		"Cannot find prompt to generate practice questions"
+				// 	)
 
 				setIsLoading(true)
 				try {
