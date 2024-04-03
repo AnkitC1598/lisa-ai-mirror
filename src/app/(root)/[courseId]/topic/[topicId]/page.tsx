@@ -6,6 +6,7 @@ import Slides, { SlidesSkeletonLoader } from "@/components/organisms/Slides"
 import useAIStore from "@/store"
 import { ISlideSet } from "@/types/topic"
 import { useActions, useUIState } from "ai/rsc"
+import { useParams } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
 import { type AI } from "./action"
 
@@ -16,8 +17,12 @@ const TopicContent = () => {
 	const [slidesData, setSlidesData] = useState<{
 		[key: string]: ISlideSet
 	} | null>(null)
-	const [isLoading, setIsLoading] = useState(false)
+	const [isLoading, setIsLoading] = useState<boolean>(false)
 	const [language, setLanguage] = useState<string>("en")
+	const { courseId: cohortId, topicId } = useParams<{
+		courseId: string
+		topicId: string
+	}>()
 
 	const prompt = useMemo(() => {
 		if (!currentTopic) return undefined
@@ -25,23 +30,27 @@ const TopicContent = () => {
 	}, [currentTopic])
 
 	useEffect(() => {
-		if (!currentTopic) return
 		getSlides({
-			courseId: currentTopic.cohort._id,
-			topicId: currentTopic._id,
+			courseId: cohortId,
+			topicId,
 		}).then(data => {
 			setSlidesData(data?.slides ?? null)
 
 			if (slidesData || data?.slides !== null) return
 
 			const getData = async () => {
+				if (!prompt)
+					throw new Error(
+						"Cannot find prompt to generate explanation"
+					)
+
 				setIsLoading(true)
 				try {
 					// Submit and get response message
 					const responseMessage = await submitUserMessage({
 						content: prompt,
-						cohortId: currentTopic?.cohort?._id,
-						topicId: currentTopic?._id,
+						cohortId,
+						topicId,
 					})
 					setMessages(currentMessages => [
 						...currentMessages,
@@ -98,7 +107,6 @@ const TopicContent = () => {
 			/>
 			{slidesData ? (
 				slidesData[language] ? (
-					// @ts-ignore
 					<Slides slides={slidesData[language]} />
 				) : (
 					<SlidesSkeletonLoader />

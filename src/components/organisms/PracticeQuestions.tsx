@@ -9,7 +9,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { handleAudio, handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
-import useAIStore from "@/store"
 import { IPracticeQuestion } from "@/types/topic"
 import {
 	BookmarkIcon as BookmarkIconOutline,
@@ -22,6 +21,7 @@ import {
 	HandThumbUpIcon as HandThumbUpIconSolid,
 	SpeakerWaveIcon,
 } from "@heroicons/react/24/solid"
+import { useParams } from "next/navigation"
 import { useState } from "react"
 
 interface IPracticeQuestions {
@@ -29,7 +29,10 @@ interface IPracticeQuestions {
 }
 
 const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
-	const currentTopic = useAIStore(store => store.currentTopic)
+	const { courseId, topicId } = useParams<{
+		courseId: string
+		topicId: string
+	}>()
 
 	const handleFeedback = (
 		feedback: string,
@@ -44,8 +47,8 @@ const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
 			},
 			vote,
 			setVote,
-			courseId: currentTopic?.cohort._id,
-			topicId: currentTopic?._id,
+			courseId,
+			topicId,
 			id: questionId,
 		})
 	}

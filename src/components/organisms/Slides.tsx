@@ -1,10 +1,9 @@
-// @ts-nocheck
 "use client"
 
 import { answerQuiz } from "@/actions/hierarchy"
 import { handleAudio, handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
-import useAIStore from "@/store"
+import { ISlide } from "@/types/topic"
 import {
 	HandThumbDownIcon as HandThumbDownIconOutline,
 	HandThumbUpIcon as HandThumbUpIconOutline,
@@ -14,29 +13,39 @@ import {
 	HandThumbUpIcon as HandThumbUpIconSolid,
 	SpeakerWaveIcon,
 } from "@heroicons/react/24/solid"
+import { useParams } from "next/navigation"
 import React, { SetStateAction, useEffect, useState } from "react"
 import { useInView } from "react-intersection-observer"
 import { Button } from "../ui/button"
 import ContentPagination from "./ContentPagination"
 
 interface ISlidesProps {
-	slides: ISlide[]
+	slides: {
+		slides: ISlide[]
+		language?: string
+	}
 }
 
-const Slides: React.FC<ISlidesProps> = ({ slides = {} }) => {
-	const currentTopic = useAIStore(store => store.currentTopic)
-	// @ts-ignore
-	const [slideState, setSlideState] = useState({
+export interface ISlideState {
+	current: number
+	finished: number[]
+}
+
+const Slides: React.FC<ISlidesProps> = ({ slides }) => {
+	const [slideState, setSlideState] = useState<ISlideState>({
 		current: 0,
 		finished: [
 			...slides.slides
-				.map((s, i) => (s?.userAnswer ? i : null))
-				.filter(Boolean),
+				.map((s, i) => (s?.userAnswer ? i : -1))
+				.filter(v => v > -1),
 		],
 	})
+	const { courseId, topicId } = useParams<{
+		courseId: string
+		topicId: string
+	}>()
 
 	const handleQuizOption = (answer: any, idx: number, answers: []) => {
-		// @ts-ignore
 		setSlideState(prev => ({
 			...prev,
 			finished: [...prev.finished, idx],
@@ -52,14 +61,15 @@ const Slides: React.FC<ISlidesProps> = ({ slides = {} }) => {
 			}
 		})
 		answerQuiz({
-			courseId: currentTopic.cohort._id,
-			topicId: currentTopic._id,
+			courseId: courseId,
+			topicId,
 			langCode: slides.language,
 			questionId: slides.slides[idx].id,
 			answerId: answer.id,
 		})
 	}
 
+	// @ts-ignore
 	const handleFeedback = (idx, slideId, feedback, vote, setVote) => {
 		setSlideState(prev => ({
 			...prev,
@@ -67,8 +77,8 @@ const Slides: React.FC<ISlidesProps> = ({ slides = {} }) => {
 		}))
 		handleVote({
 			type: "slide",
-			courseId: currentTopic.cohort._id,
-			topicId: currentTopic._id,
+			courseId: courseId,
+			topicId,
 			id: slideId,
 			vote,
 			setVote,
@@ -114,6 +124,7 @@ const Slides: React.FC<ISlidesProps> = ({ slides = {} }) => {
 							type={type}
 							userAnswer={userAnswer}
 							setSlideState={setSlideState}
+							// @ts-ignore
 							handleQuizOption={handleQuizOption}
 							correctAnswer={correctAnswer}
 							handleFeedback={handleFeedback}
@@ -146,7 +157,7 @@ export const SlidesSkeletonLoader = () => {
 	)
 }
 
-interface ISlide {
+interface ISlideProps {
 	id?: string
 	idx?: number
 	title?: string
@@ -155,7 +166,7 @@ interface ISlide {
 	answers?: any[]
 	priority: number
 	type: string
-	setSlideState: React.Dispatch<SetStateAction<any>>
+	setSlideState: React.Dispatch<SetStateAction<ISlideState>>
 	handleQuizOption: (answer: any, idx: number, answers: any[]) => void
 	userAnswer?: string | null
 	correctAnswer?: string | null
@@ -168,7 +179,7 @@ interface ISlide {
 	) => void
 }
 
-const Slide: React.FC<ISlide> = ({
+const Slide: React.FC<ISlideProps> = ({
 	id = "",
 	idx = 0,
 	title = "",
@@ -191,7 +202,6 @@ const Slide: React.FC<ISlide> = ({
 	useEffect(() => {
 		if (inView && inViewAt === null) {
 			setInViewAt(new Date().getTime())
-			// @ts-ignore
 			setSlideState(prev => ({
 				...prev,
 				current: idx,
@@ -201,7 +211,6 @@ const Slide: React.FC<ISlide> = ({
 			const diff = Math.abs(new Date().getTime() - inViewAt)
 			console.log(`${idx} stayed for ${diff / 1000}`)
 			setInViewAt(null)
-			// @ts-ignore
 			setSlideState(prev => ({
 				...prev,
 				finished: [...prev.finished, idx],
@@ -270,8 +279,8 @@ const Slide: React.FC<ISlide> = ({
 						variant="outline"
 						size="icon"
 						onClick={() => {
-							handleFeedback(idx, id, "like", vote, setVote)
 							// @ts-ignore
+							handleFeedback(idx, id, "like", vote, setVote)
 						}}
 					>
 						{vote === "like" ? (
@@ -284,6 +293,7 @@ const Slide: React.FC<ISlide> = ({
 						variant="outline"
 						size="icon"
 						onClick={() =>
+							// @ts-ignore
 							handleFeedback(idx, id, "dislike", vote, setVote)
 						}
 					>

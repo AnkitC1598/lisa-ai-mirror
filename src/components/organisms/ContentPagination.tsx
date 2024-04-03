@@ -3,15 +3,15 @@ import { cn } from "@/lib/utils"
 interface IContentPagination {
 	vertical?: boolean
 	slideState: {
-		currentPage: number
-		finished: [] | number[]
+		current: number
+		finished: number[]
 	}
 	total: number
 }
 
 const ContentPagination: React.FC<IContentPagination> = ({
 	vertical = false,
-	slideState = {},
+	slideState,
 	total = 0,
 }) => {
 	return (
@@ -22,7 +22,7 @@ const ContentPagination: React.FC<IContentPagination> = ({
 					vertical ? "flex-col justify-center p-2 pr-1" : ""
 				)}
 			>
-				{Array.from({ length: total }, (_, i) => i).map(i => (
+				{Array.from({ length: total }).map((_, i) => (
 					<div
 						key={i}
 						className={cn(

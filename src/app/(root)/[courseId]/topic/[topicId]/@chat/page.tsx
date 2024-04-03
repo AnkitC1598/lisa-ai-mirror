@@ -9,19 +9,22 @@ import useAIStore from "@/store"
 import { IChat } from "@/types/topic"
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid"
 import { useChat } from "ai/react"
+import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import ScrollAnchor from "./ScrollAnchor"
 
 const Chat = () => {
 	const currentTopic = useAIStore(store => store.currentTopic)
 	const [oldChats, setOldChats] = useState<IChat[] | []>([])
+	const { courseId, topicId } = useParams<{
+		courseId: string
+		topicId: string
+	}>()
 
 	useEffect(() => {
-		if (!currentTopic) return
-
 		getChats({
-			courseId: currentTopic.cohort._id,
-			topicId: currentTopic._id,
+			courseId,
+			topicId,
 		}).then(chats => {
 			setOldChats(
 				chats.reverse().map(chat => {
@@ -34,7 +37,7 @@ const Chat = () => {
 				})
 			)
 		})
-	}, [currentTopic])
+	}, [courseId, currentTopic, topicId])
 
 	const { messages, input, handleInputChange, handleSubmit, isLoading } =
 		useChat({
@@ -42,30 +45,24 @@ const Chat = () => {
 			body: {
 				topic_boundary: `${currentTopic?.title} in ${currentTopic?.cohort?.title}`,
 			},
-			id: currentTopic?._id,
+			id: topicId,
 			async onFinish(message) {
-				await fetchClientWithToken(
-					`/ai/chat/${currentTopic?.cohort?._id}/${currentTopic?._id}`,
-					{
-						method: "POST",
-						body: JSON.stringify({
-							isLisaAi: true,
-							body: message.content,
-						}),
-					}
-				)
+				await fetchClientWithToken(`/ai/chat/${courseId}/${topicId}`, {
+					method: "POST",
+					body: JSON.stringify({
+						isLisaAi: true,
+						body: message.content,
+					}),
+				})
 			},
 			async onResponse(message) {
-				await fetchClientWithToken(
-					`/ai/chat/${currentTopic?.cohort?._id}/${currentTopic?._id}`,
-					{
-						method: "POST",
-						body: JSON.stringify({
-							isLisaAi: false,
-							body: input,
-						}),
-					}
-				)
+				await fetchClientWithToken(`/ai/chat/${courseId}/${topicId}`, {
+					method: "POST",
+					body: JSON.stringify({
+						isLisaAi: false,
+						body: input,
+					}),
+				})
 			},
 			initialMessages: oldChats,
 		})
@@ -78,8 +75,8 @@ const Chat = () => {
 	) => {
 		handleVote({
 			type: "chat",
-			courseId: currentTopic?.cohort._id,
-			topicId: currentTopic?._id,
+			courseId: courseId,
+			topicId,
 			id: messageId,
 			vote,
 			setVote,
