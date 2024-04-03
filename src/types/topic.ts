@@ -35,6 +35,7 @@ export interface IPracticeQuestion {
 	id?: string
 	question: string
 	answer: string
+	bookmarked?: boolean
 }
 
 export interface ISlides {

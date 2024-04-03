@@ -26,46 +26,49 @@ const TopicContent = () => {
 
 	useEffect(() => {
 		if (!currentTopic) return
-
 		getSlides({
 			courseId: currentTopic.cohort._id,
 			topicId: currentTopic._id,
-		}).then(data => setSlidesData(data?.slides ?? null))
+		}).then(data => {
+			setSlidesData(data?.slides ?? null)
 
-		if (slidesData) return
-		setMessages(currentMessages => [
-			...currentMessages,
-			{
-				id: Date.now(),
-				role: "user",
-				display: prompt,
-			},
-		])
-		const getData = async () => {
-			setIsLoading(true)
-			try {
-				// Submit and get response message
-				const responseMessage = await submitUserMessage({
-					content: prompt,
-					cohortId: currentTopic?.cohort?._id,
-					topicId: currentTopic?._id,
-				})
-				setMessages(currentMessages => [
-					...currentMessages,
+			if (slidesData || data?.slides !== null) return
+
+			const getData = async () => {
+				setIsLoading(true)
+				try {
+					// Submit and get response message
+					const responseMessage = await submitUserMessage({
+						content: prompt,
+						cohortId: currentTopic?.cohort?._id,
+						topicId: currentTopic?._id,
+					})
+					setMessages(currentMessages => [
+						...currentMessages,
+						{
+							id: responseMessage.id,
+							display: responseMessage.display,
+							role: responseMessage.role as "user" | "assistant",
+						},
+					])
+					setIsLoading(false)
+				} catch (error) {
+					// You may want to show a toast or trigger an error state.
+					console.error(error)
+					setIsLoading(false)
+				}
+			}
+			if (!messages.length && !isLoading && !slidesData && prompt) {
+				setMessages([
 					{
-						id: responseMessage.id,
-						display: responseMessage.display,
-						role: responseMessage.role as "user" | "assistant",
+						id: Date.now(),
+						role: "user",
+						display: prompt,
 					},
 				])
-				setIsLoading(false)
-			} catch (error) {
-				// You may want to show a toast or trigger an error state.
-				console.error(error)
-				setIsLoading(false)
+				getData()
 			}
-		}
-		if (!messages.length && !isLoading) getData()
+		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currentTopic])
 

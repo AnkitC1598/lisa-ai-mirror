@@ -60,7 +60,7 @@ const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
 				>
 					{questions.map((question, idx) => (
 						<PracticeQuestion
-							key={question.question}
+							key={question.id ?? question.question}
 							question={question}
 							idx={idx + 1}
 							handleFeedback={handleFeedback}
@@ -103,7 +103,9 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 }) => {
 	const [vote, setVote] = useState<string | null>(null)
 	const [audioState, setAudioState] = useState<string | null>(null)
-	const [bookmarked, setBookmarked] = useState<boolean>(false)
+	const [bookmarked, setBookmarked] = useState<boolean>(
+		question.bookmarked ?? false
+	)
 
 	const handleBookmark = () => setBookmarked(prev => !prev)
 

@@ -94,13 +94,14 @@ async function generatePracticeQuestions({
 				}),
 			}
 		)
-
 		reply.done(
 			<PracticeQuestions
 				questions={
-					resp?.results?.data ?? {
-						questions,
-					}
+					resp?.results?.data?.questions
+						? resp.results.data
+						: {
+								questions,
+							}
 				}
 			/>
 		)

@@ -104,7 +104,7 @@ const Slides: React.FC<ISlidesProps> = ({ slides = {} }) => {
 					) => (
 						<Slide
 							id={id}
-							key={title}
+							key={id}
 							idx={idx}
 							title={title}
 							body={body}
@@ -225,7 +225,7 @@ const Slide: React.FC<ISlide> = ({
 							<button
 								disabled={!!userAnswer}
 								id={answer.body}
-								key={answer.body}
+								key={answer.id ?? answer.body}
 								onClick={() =>
 									handleQuizOption(answer, idx, answers)
 								}
