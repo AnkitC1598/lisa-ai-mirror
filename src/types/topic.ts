@@ -73,7 +73,7 @@ export interface ISlide {
 	correctAnswer?: string
 }
 
-interface IAnswer {
+export interface IAnswer {
 	id: string
 	body: string
 	isCorrect: boolean

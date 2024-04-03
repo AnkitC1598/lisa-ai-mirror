@@ -1,39 +1,48 @@
 import { fetchClientWithToken } from "@/services/fetch"
+import { SetState } from "@/types"
 import { removeEmojis } from "."
 
-// Create a switch case for the feedback type
-const getFeedbackApi = (
-	type: string,
-	courseId: string,
-	topicId: string,
+const getFeedbackApi = ({
+	type,
+	courseId,
+	topicId,
+	id,
+}: {
+	type: string
+	courseId: string
+	topicId: string
 	id: string
-) => {
+}) => {
 	switch (type) {
 		case "slide":
 			return `/ai/slides/slide/feedback/${courseId}/${topicId}/${id}`
 		case "chat":
 			return `/ai/chat/feedback/${courseId}/${topicId}/${id}`
-		case "quiz":
-			return `/ai/quiz/feedback/${courseId}/${topicId}/${id}`
+		case "question":
+			return `/ai/questions/feedback/${courseId}/${topicId}/${id}`
 		default:
 			return ""
 	}
 }
 
-export const handleAudio = (
-	text: string,
-	audioState: string | null,
-	setAudioState: (audioState: string | null) => void
-) => {
+export const handleAudio = ({
+	text,
+	audioState,
+	setAudioState,
+}: {
+	text: string
+	audioState: number
+	setAudioState: SetState<number>
+}) => {
 	const synth = window.speechSynthesis
 	const voices = synth.getVoices()
 	if (audioState !== null) {
-		if (synth.speaking && audioState === "playing") {
+		if (synth.speaking && audioState === 1) {
 			synth.pause()
-			setAudioState("paused")
+			setAudioState(0)
 		} else {
 			synth.resume()
-			setAudioState("playing")
+			setAudioState(1)
 		}
 	} else {
 		const utterance = new SpeechSynthesisUtterance(removeEmojis(text))
@@ -43,39 +52,45 @@ export const handleAudio = (
 		else utterance.voice = voices[0]
 
 		synth.speak(utterance)
-		setAudioState("playing")
+		setAudioState(1)
 		// setTimeout(() => setAudioState(null), 1000)
-		utterance.onend = () => setAudioState(null)
+		utterance.onend = () => setAudioState(0)
 	}
 }
 
 export const handleVote = async ({
-	type = "",
-	vote = "",
-	setVote = () => {},
-	courseId = "",
-	topicId = "",
-	id = "",
-	body = {},
+	resetVote,
+	body,
+	meta,
+}: {
+	resetVote: Function
+	body: { langCode?: string; feedback: string }
+	meta: {
+		courseId: string
+		topicId: string
+		id: string
+		type: string
+	}
 }) => {
-	await fetchClientWithToken(getFeedbackApi(type, courseId, topicId, id), {
+	const resp = await fetchClientWithToken(getFeedbackApi(meta), {
 		method: "PUT",
 		body: JSON.stringify(body),
 	})
-	// @ts-ignore
-	setVote(body.feedback)
+	if (resp.code !== 200) resetVote()
 }
 
 export const handleBookmark = () => {
 	console.log("bookmark")
 }
 
-export const handleCopy = (
-	text: string,
-	copy: string | null,
-	setCopy: (copy: string | null) => void
-) => {
-	setCopy("copying")
+export const handleCopy = ({
+	text,
+	setCopy,
+}: {
+	text: string
+	setCopy: SetState<number>
+}) => {
+	setCopy(1)
 	navigator.clipboard.writeText(text)
-	setTimeout(() => setCopy(null), 1000)
+	setTimeout(() => setCopy(0), 1000)
 }

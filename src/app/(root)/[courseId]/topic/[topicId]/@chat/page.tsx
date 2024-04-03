@@ -3,7 +3,6 @@
 import { getChats } from "@/actions/hierarchy"
 import { AiMessage, UserMessage } from "@/components/organisms/Message"
 import { Input } from "@/components/ui/input"
-import { handleVote } from "@/lib/interactions"
 import { fetchClientWithToken } from "@/services/fetch"
 import useAIStore from "@/store"
 import { IChat } from "@/types/topic"
@@ -67,25 +66,6 @@ const Chat = () => {
 			initialMessages: oldChats,
 		})
 
-	const handleFeedback = (
-		messageId: string,
-		feedback: string,
-		vote: string,
-		setVote: () => void
-	) => {
-		handleVote({
-			type: "chat",
-			courseId: courseId,
-			topicId,
-			id: messageId,
-			vote,
-			setVote,
-			body: {
-				feedback,
-			},
-		})
-	}
-
 	return (
 		<>
 			<div className="flex h-full flex-col gap-4">
@@ -94,13 +74,11 @@ const Chat = () => {
 						const MessageComponent =
 							message.role === "user" ? UserMessage : AiMessage
 						return (
-							<div key={message.id}>
-								<MessageComponent
-									message={message}
-									// @ts-ignore
-									handleFeedback={handleFeedback}
-								/>
-							</div>
+							<MessageComponent
+								key={message.id}
+								message={message}
+								params={{ courseId, topicId }}
+							/>
 						)
 					})}
 					<ScrollAnchor trackVisibility={true} />
@@ -116,10 +94,6 @@ const Chat = () => {
 							value={input}
 							onChange={handleInputChange}
 							disabled={isLoading}
-							// onChange={e => {
-							// 	handleSearch(e.target.value)
-							// }}
-							// defaultValue={searchParams.get("query")?.toString()}
 						/>
 						<button
 							type="submit"

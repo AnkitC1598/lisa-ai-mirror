@@ -2,7 +2,7 @@
 
 import logo from "@/app/favicon.ico"
 import { Button } from "@/components/ui/button"
-import { handleAudio, handleCopy } from "@/lib/interactions"
+import { handleAudio, handleCopy, handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import { ClipboardDocumentIcon, SparklesIcon } from "@heroicons/react/16/solid"
 import {
@@ -23,7 +23,7 @@ interface IMessage {
 	message: Message & {
 		createdAt?: Date | string | number
 	}
-	handleFeedback?: () => void
+	params: { courseId: string; topicId: string }
 }
 
 export const UserMessage: React.FC<IMessage> = ({ message }) => {
@@ -54,10 +54,31 @@ export const UserMessage: React.FC<IMessage> = ({ message }) => {
 	)
 }
 
-export const AiMessage: React.FC<IMessage> = ({ message, handleFeedback }) => {
-	const [vote, setVote] = useState<string | null>(null)
-	const [copy, setCopy] = useState<string | null>(null)
-	const [audioState, setAudioState] = useState<string | null>(null)
+export const AiMessage: React.FC<IMessage> = ({
+	message,
+	params: { courseId, topicId },
+}) => {
+	const [vote, setVote] = useState<number>(0)
+	const [copy, setCopy] = useState<number>(0)
+	const [audioState, setAudioState] = useState<number>(0)
+
+	const resetVote = () => setVote(0)
+
+	const handleFeedback = (feedback: number) => {
+		handleVote({
+			body: {
+				feedback:
+					feedback === 1 ? "like" : feedback === -1 ? "dislike" : "",
+			},
+			meta: {
+				courseId,
+				topicId,
+				id: message.id as string,
+				type: "chat",
+			},
+			resetVote,
+		})
+	}
 
 	return (
 		<>
@@ -88,12 +109,11 @@ export const AiMessage: React.FC<IMessage> = ({ message, handleFeedback }) => {
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() =>
-							// @ts-ignore
-							handleFeedback(message.id, "like", vote, setVote)
-						}
+						onClick={() => {
+							handleFeedback(1)
+						}}
 					>
-						{vote === "like" ? (
+						{vote === 1 ? (
 							<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
 						) : (
 							<HandThumbUpIconOutline className="h-4 w-4" />
@@ -102,12 +122,9 @@ export const AiMessage: React.FC<IMessage> = ({ message, handleFeedback }) => {
 					<Button
 						variant="outline"
 						size="icon"
-						onClick={() =>
-							// @ts-ignore
-							handleFeedback(message.id, "dislike", vote, setVote)
-						}
+						onClick={() => handleFeedback(-1)}
 					>
-						{vote === "dislike" ? (
+						{vote === -1 ? (
 							<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
 						) : (
 							<HandThumbDownIconOutline className="h-4 w-4" />
@@ -117,13 +134,13 @@ export const AiMessage: React.FC<IMessage> = ({ message, handleFeedback }) => {
 						variant="outline"
 						size="icon"
 						onClick={() =>
-							handleCopy(message.content, copy, setCopy)
+							handleCopy({ text: message.content, setCopy })
 						}
 					>
 						<ClipboardDocumentIcon
 							className={cn(
 								"h-4 w-4",
-								copy === "copying" ? "fill-blue-500" : ""
+								copy === 1 ? "fill-blue-500" : ""
 							)}
 						/>
 					</Button>
@@ -131,20 +148,17 @@ export const AiMessage: React.FC<IMessage> = ({ message, handleFeedback }) => {
 						variant="outline"
 						size="icon"
 						onClick={() =>
-							handleAudio(
-								message.content,
+							handleAudio({
+								text: message.content,
 								audioState,
-								setAudioState
-							)
+								setAudioState,
+							})
 						}
 					>
 						<SpeakerWaveIcon
 							className={cn(
 								"h-4 w-4",
-								audioState === "playing" ||
-									audioState === "paused"
-									? "fill-blue-500"
-									: ""
+								audioState === 0 ? "fill-blue-500" : ""
 							)}
 						/>
 					</Button>

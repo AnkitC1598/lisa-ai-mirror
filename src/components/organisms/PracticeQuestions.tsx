@@ -34,25 +34,6 @@ const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
 		topicId: string
 	}>()
 
-	const handleFeedback = (
-		feedback: string,
-		questionId: string,
-		vote: string,
-		setVote: any
-	) => {
-		handleVote({
-			type: "quiz",
-			body: {
-				feedback,
-			},
-			vote,
-			setVote,
-			courseId,
-			topicId,
-			id: questionId,
-		})
-	}
-
 	return (
 		<>
 			<div className="px-4">
@@ -66,7 +47,7 @@ const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
 							key={question.id ?? question.question}
 							question={question}
 							idx={idx + 1}
-							handleFeedback={handleFeedback}
+							params={{ courseId, topicId }}
 						/>
 					))}
 				</Accordion>
@@ -91,24 +72,37 @@ export const PracticeQuestionsSkeletonLoader = () => {
 interface IPracticeQuestionProps {
 	question: IPracticeQuestion
 	idx: number
-	handleFeedback: (
-		feedback: string,
-		questionId: string,
-		vote: string,
-		setVote: any
-	) => void
+	params: { courseId: string; topicId: string }
 }
 
 export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 	question,
 	idx,
-	handleFeedback,
+	params: { courseId, topicId },
 }) => {
-	const [vote, setVote] = useState<string | null>(null)
-	const [audioState, setAudioState] = useState<string | null>(null)
+	const [vote, setVote] = useState<number>(0)
+	const [audioState, setAudioState] = useState<number>(0)
 	const [bookmarked, setBookmarked] = useState<boolean>(
 		question.bookmarked ?? false
 	)
+
+	const resetVote = () => setVote(0)
+
+	const handleFeedback = (feedback: number) => {
+		handleVote({
+			body: {
+				feedback:
+					feedback === 1 ? "like" : feedback === -1 ? "dislike" : "",
+			},
+			meta: {
+				courseId,
+				topicId,
+				id: question.id as string,
+				type: "question",
+			},
+			resetVote,
+		})
+	}
 
 	const handleBookmark = () => setBookmarked(prev => !prev)
 
@@ -134,18 +128,11 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 							<Button
 								variant="outline"
 								size="icon"
-								// @ts-ignore
-								onClick={() =>
-									handleFeedback(
-										"like",
-										// @ts-ignore
-										question.id,
-										vote,
-										setVote
-									)
-								}
+								onClick={() => {
+									handleFeedback(1)
+								}}
 							>
-								{vote === "like" ? (
+								{vote === 1 ? (
 									<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
 								) : (
 									<HandThumbUpIconOutline className="h-4 w-4" />
@@ -154,19 +141,9 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 							<Button
 								variant="outline"
 								size="icon"
-								onClick={() =>
-									// @ts-ignore
-									handleFeedback(
-										"dislike",
-
-										// @ts-ignore
-										question.id,
-										vote,
-										setVote
-									)
-								}
+								onClick={() => handleFeedback(-1)}
 							>
-								{vote === "dislike" ? (
+								{vote === -1 ? (
 									<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
 								) : (
 									<HandThumbDownIconOutline className="h-4 w-4" />
@@ -176,22 +153,20 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 								variant="outline"
 								size="icon"
 								onClick={() =>
-									handleAudio(
-										question.question +
+									handleAudio({
+										text:
+											question.question +
 											"\n" +
 											question.answer,
 										audioState,
-										setAudioState
-									)
+										setAudioState,
+									})
 								}
 							>
 								<SpeakerWaveIcon
 									className={cn(
 										"h-4 w-4",
-										audioState === "playing" ||
-											audioState === "paused"
-											? "fill-blue-500"
-											: ""
+										audioState === 0 ? "fill-blue-500" : ""
 									)}
 								/>
 							</Button>
