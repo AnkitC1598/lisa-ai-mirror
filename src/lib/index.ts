@@ -71,24 +71,6 @@ export function runOpenAICompletion<
 							return
 						}
 
-						// we need to convert arguments from z.input to z.output
-						// this is necessary if someone uses a .default in their schema
-						// const zodSchema =
-						// 	functionsMap[functionCallPayload.name].parameters;
-						// const parsedArgs = zodSchema.safeParse(
-						// 	functionCallPayload.arguments
-						// );
-						// console.log(
-						// 	parsedArgs.error,
-						// 	functionCallPayload.arguments
-						// );
-
-						// if (!parsedArgs.success) {
-						// 	throw new Error(
-						// 		`Invalid function call in message. Expected a function call object`
-						// 	);
-						// }
-
 						onFunctionCall[functionCallPayload.name]?.(
 							functionCallPayload.arguments
 						)

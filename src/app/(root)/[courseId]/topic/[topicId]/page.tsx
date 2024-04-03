@@ -1,19 +1,15 @@
 "use client"
 
-import { getSlides, translateSlides } from "@/actions/hierarchy"
 import ContentControls from "@/components/organisms/ContentControls"
 import Slides, { SlidesSkeletonLoader } from "@/components/organisms/Slides"
 import useAIStore from "@/store"
 import { ISlideSet } from "@/types/topic"
-import { useActions, useUIState } from "ai/rsc"
+import { useChat } from "ai/react"
 import { useParams } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
-import { type AI } from "./action"
 
 const TopicContent = () => {
 	const currentTopic = useAIStore(store => store.currentTopic)
-	const [messages, setMessages] = useUIState<typeof AI>()
-	const { submitUserMessage } = useActions<typeof AI>()
 	const [slidesData, setSlidesData] = useState<{
 		[key: string]: ISlideSet
 	} | null>(null)
@@ -23,84 +19,64 @@ const TopicContent = () => {
 		courseId: string
 		topicId: string
 	}>()
+	const { messages, setInput, handleSubmit, stop } = useChat({
+		api: "/lisa-ai/api/functions",
+		body: {
+			cohortId,
+			topicId,
+		},
+		onFinish(message) {
+			// stop()
+			console.log("AIAPI FINISHED", message)
+		},
+		onResponse(response) {
+			console.log("AIAPI RESPONSE", response)
+		},
+	})
 
 	const prompt = useMemo(() => {
-		if (!currentTopic) return undefined
+		if (!currentTopic) return ""
 		return `explain topic ${currentTopic.title} in ${currentTopic.cohort.title}`
 	}, [currentTopic])
 
 	useEffect(() => {
-		getSlides({
-			courseId: cohortId,
-			topicId,
-		}).then(data => {
-			setSlidesData(data?.slides ?? null)
+		// getSlides({
+		// 	courseId: cohortId,
+		// 	topicId,
+		// }).then(data => {
+		// 	setSlidesData(data?.slides ?? null)
 
-			if (slidesData || data?.slides) return
-
-			const getData = async () => {
-				// if (!prompt)
-				// 	throw new Error(
-				// 		"Cannot find prompt to generate explanation"
-				// 	)
-
-				setIsLoading(true)
-				try {
-					// Submit and get response message
-					const responseMessage = await submitUserMessage({
-						content: prompt,
-						cohortId,
-						topicId,
-					})
-					setMessages(currentMessages => [
-						...currentMessages,
-						{
-							id: responseMessage.id,
-							display: responseMessage.display,
-							role: responseMessage.role as "user" | "assistant",
-						},
-					])
-				} catch (error) {
-					// You may want to show a toast or trigger an error state.
-					console.error(error)
-				} finally {
-					setIsLoading(false)
-				}
-			}
-
-			if (
-				!messages.length &&
-				!isLoading &&
-				!slidesData &&
-				prompt &&
-				!data?.slides
-			) {
-				setMessages([
-					{
-						id: Date.now(),
-						role: "user",
-						display: prompt,
-					},
-				])
-				getData()
-			}
-		})
+		// if (slidesData) return
+		setInput(prompt)
+		console.debug(`🚀 ~AIAPI useEffect ~ setInput:`, "CLICKED ")
+		setTimeout(() => {
+			document.getElementById("submit")?.click()
+		}, 1000)
+		setIsLoading(true)
+		// })
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currentTopic])
 
-	useEffect(() => {
-		if (!slidesData || isLoading || slidesData?.[language] || !currentTopic)
-			return
-		translateSlides({
-			courseId: currentTopic.cohort._id,
-			topicId: currentTopic._id,
-			langCode: language,
-		}).then(resp => setSlidesData(resp.slides))
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [language, currentTopic])
+	// useEffect(() => {
+	// 	if (!slidesData || isLoading || slidesData?.[language] || !currentTopic)
+	// 		return
+	// 	translateSlides({
+	// 		courseId: currentTopic.cohort._id,
+	// 		topicId: currentTopic._id,
+	// 		langCode: language,
+	// 	}).then(resp => setSlidesData(resp.slides))
+	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// }, [language, currentTopic])
 
 	return (
 		<div className="flex h-full flex-col gap-4">
+			<form onSubmit={handleSubmit}>
+				<button
+					type="submit"
+					className="hidden"
+					id="submit"
+				></button>
+			</form>
 			<ContentControls
 				language={language}
 				setLanguage={setLanguage}
@@ -113,8 +89,8 @@ const TopicContent = () => {
 				)
 			) : messages.length ? (
 				messages
-					.filter(t => t.role === "assistant")
-					.map(message => message.display)
+					// .filter(t => t.role === "assistant")
+					.map(message => message.content)
 			) : null}
 		</div>
 	)
