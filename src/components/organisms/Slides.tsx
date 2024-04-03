@@ -79,7 +79,7 @@ const Slides: React.FC<ISlidesProps> = ({ slides }) => {
 	}
 
 	return (
-		<div className="flex h-[calc(100%-56px)] flex-1">
+		<div className="flex h-[calc(100%-70px)] flex-1">
 			<ContentPagination
 				vertical
 				slideState={slideState}

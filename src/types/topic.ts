@@ -56,7 +56,7 @@ interface ITopic {
 }
 
 export interface ISlideSet {
-	createdAt: string
+	createdAt: Date | string | number
 	language: string
 	slides: ISlide[]
 }
