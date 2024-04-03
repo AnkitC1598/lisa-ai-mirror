@@ -42,40 +42,34 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 
 	return (
 		<>
-			<div className="flex flex-col gap-4 p-4">
-				<div className="flex gap-4">
-					<div className="relative h-14 w-14 shrink-0 rounded-md ring-1 ring-inset ring-neutral-200 dark:ring-neutral-800">
-						<Image
-							src={icon}
-							alt="icon"
-							fill
-						/>
-					</div>
-					<p className="line-clamp-2 text-lg font-medium">Title</p>
-				</div>
-				<Search />
-				{/* {slug[0] &&
-					currentView &&
-					currentLevel.idType &&
-					currentLevel.id && (
-						<HierarchyList
-							cohortId={slug[0]}
-							currentView={currentView}
-							query={query}
-							idType={currentLevel.idType}
-							id={currentLevel.id}
-						/>
-					)} */}
-				{hierarchyData && hierarchyData.length
-					? hierarchyData.map((hierarchy: any) => (
-							<HierarchyCard
-								type={currentView}
-								cohortId={slug[0]}
-								hierarchy={hierarchy}
-								key={hierarchy._id}
+			<div className="flex h-full flex-col gap-4 overflow-hidden pt-4">
+				<div className="flex flex-col gap-4 px-4">
+					<div className="flex gap-4">
+						<div className="relative h-14 w-14 shrink-0 rounded-md ring-1 ring-inset ring-neutral-200 dark:ring-neutral-800">
+							<Image
+								src={icon}
+								alt="icon"
+								fill
 							/>
-						))
-					: null}
+						</div>
+						<p className="line-clamp-2 text-lg font-medium">
+							Title
+						</p>
+					</div>
+					<Search />
+				</div>
+				<div className="flex flex-col gap-4 overflow-auto px-4 pb-4 scrollbar">
+					{hierarchyData && hierarchyData.length
+						? hierarchyData.map((hierarchy: any) => (
+								<HierarchyCard
+									type={currentView}
+									cohortId={slug[0]}
+									hierarchy={hierarchy}
+									key={hierarchy._id}
+								/>
+							))
+						: null}
+				</div>
 			</div>
 		</>
 	)
