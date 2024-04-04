@@ -12,7 +12,8 @@ export const getUser = async (): Promise<IUser> => {
 }
 
 export const onboardUser = async ({ body }: { body: IUserOnboarding }) => {
-	await fetchClientWithToken("/user/onboard", {
+	console.log(JSON.stringify(body))
+	await fetchClientWithToken("/user/profile/preference/update", {
 		method: "PUT",
 		body: JSON.stringify(body),
 	})
