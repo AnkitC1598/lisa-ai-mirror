@@ -2,7 +2,7 @@
 
 import { getType } from "@/lib"
 import useAIStore from "@/store"
-import { IHierarchy, ILevel } from "@/types/hierarchy"
+import { IHierarchyInfo, ILevel } from "@/types/hierarchy"
 import { useParams } from "next/navigation"
 import { useMemo } from "react"
 
@@ -13,7 +13,7 @@ const hierarchyTypes: Record<string, string[]> = {
 	ct: [],
 }
 
-const useGetHierarchy = (): IHierarchy => {
+const useGetHierarchy = (): IHierarchyInfo => {
 	const params = useParams<{ slug: string[] }>()
 	const { slug } = params
 	const currentHierarchy = useAIStore(store => store.currentHierarchy)
@@ -55,7 +55,7 @@ const useGetHierarchy = (): IHierarchy => {
 			prevLevel.id = slug[idx - 1] ?? currentLevel.id
 		}
 
-		const h: IHierarchy = {
+		const h = {
 			prevLevel,
 			currentLevel,
 			ids,

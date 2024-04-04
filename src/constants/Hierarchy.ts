@@ -2,9 +2,9 @@ import ChapterIcon from "@/svg/chapter"
 import SubjectIcon from "@/svg/subject"
 import TermIcon from "@/svg/term"
 import TopicIcon from "@/svg/topic"
-import { IHierarchyConstantData } from "@/types/hierarchy"
+import { IHierarchyConstant } from "@/types/hierarchy"
 
-const HierarchyConstants: IHierarchyConstantData = {
+const HierarchyConstants: IHierarchyConstant = {
 	cohort: {
 		icon: TermIcon,
 		colors: {

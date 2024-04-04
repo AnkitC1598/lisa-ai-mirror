@@ -58,7 +58,7 @@ const CourseList: React.FC<ICourseList> = ({ courses }) => {
 											<div className="relative h-10 w-10 overflow-hidden rounded-md">
 												<Image
 													src={course.icon ?? icon}
-													alt="icon"
+													alt={course.title}
 													fill
 												/>
 											</div>

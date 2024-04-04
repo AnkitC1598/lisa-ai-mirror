@@ -4,7 +4,11 @@ import { MagnifyingGlassIcon } from "@heroicons/react/16/solid"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Input } from "../ui/input"
 
-const Search = () => {
+interface ISearchProps {
+	placeholder?: string
+}
+
+const Search: React.FC<ISearchProps> = ({ placeholder = "Search" }) => {
 	const searchParams = useSearchParams()
 	const pathname = usePathname()
 	const { replace } = useRouter()
@@ -24,7 +28,7 @@ const Search = () => {
 					<MagnifyingGlassIcon className="h-4 w-4 shrink-0 opacity-50" />
 				</div>
 				<Input
-					placeholder={`Search`}
+					placeholder={placeholder}
 					type="search"
 					className="pl-8"
 					onChange={e => {

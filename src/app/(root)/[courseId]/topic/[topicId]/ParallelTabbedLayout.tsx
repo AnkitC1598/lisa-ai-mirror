@@ -2,7 +2,9 @@
 
 import { getCourse, getTopicDetails } from "@/actions/hierarchy"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import HierarchyTypes from "@/constants/HierarchyTypes"
 import useAIStore from "@/store"
+import { THierarchyType } from "@/types/hierarchy"
 import {
 	Bars3BottomLeftIcon,
 	ChatBubbleLeftEllipsisIcon,
@@ -15,7 +17,7 @@ import {
 	useRouter,
 	useSearchParams,
 } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 
 interface IParallelTabbedLayout {
 	home: React.ReactNode
@@ -32,6 +34,7 @@ const ParallelTabbedLayout: React.FC<Readonly<IParallelTabbedLayout>> = ({
 }) => {
 	const dispatch = useAIStore(store => store.dispatch)
 	const currentTopic = useAIStore(store => store.currentTopic)
+	const currentHierarchy = useAIStore(store => store.currentHierarchy)
 
 	const searchParams = useSearchParams()
 	const tab: string = searchParams.get("tab") ?? "home"
@@ -82,12 +85,22 @@ const ParallelTabbedLayout: React.FC<Readonly<IParallelTabbedLayout>> = ({
 		}
 	}, [cohortId, topicId, dispatch])
 
+	const prevTitle = useMemo(() => {
+		if (!currentHierarchy || !currentTopic) return
+
+		const prevLevel = HierarchyTypes[currentHierarchy].at(
+			-2
+		) as THierarchyType
+
+		return currentTopic[prevLevel].title
+	}, [currentHierarchy, currentTopic])
+
 	if (!currentTopic) return null
 
 	return (
 		<>
 			<div className="flex flex-col gap-1 p-4 pb-0">
-				<p className="line-clamp-1 text-sm">Breadcrumb</p>
+				<p className="line-clamp-1 text-sm">{prevTitle}</p>
 				<p className="text-lg font-semibold">{currentTopic.title}</p>
 			</div>
 			<Tabs
@@ -140,7 +153,7 @@ const ParallelTabbedLayout: React.FC<Readonly<IParallelTabbedLayout>> = ({
 					value="home"
 					className="mt-0 h-bottomNavScreen flex-1 overflow-hidden"
 				>
-					{home}
+					{/* {home} */}
 				</TabsContent>
 				<TabsContent
 					value="resources"

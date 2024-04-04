@@ -1,7 +1,7 @@
 "use server"
 
 import { fetchClientWithToken } from "@/services/fetch"
-import { ICourse, ITopic } from "@/types/hierarchy"
+import { ICourse, IHierarchy, ITopic } from "@/types/hierarchy"
 import {
 	IChatResponse,
 	IPracticeQuestion,
@@ -41,7 +41,7 @@ export const getHierarchyData = async ({
 	idType: string
 	id: string
 	query: string
-}) => {
+}): Promise<IHierarchy> => {
 	const resp = await fetchClientWithToken(
 		`/cohort/${cohortId}/${hierarchy}s?id=${id}&idType=${idType}`,
 		{

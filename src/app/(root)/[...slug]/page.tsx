@@ -6,9 +6,9 @@ import HierarchyCard from "@/components/organisms/HierarchyCard"
 import Search from "@/components/organisms/Search"
 import useGetHierarchy from "@/hooks/useGetHierarchy"
 import { NonNullable } from "@/types"
-import { ILevel, THierarchyType } from "@/types/hierarchy"
+import { IHierarchy, ILevel, THierarchyType } from "@/types/hierarchy"
 import Image from "next/image"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 interface IHierarchySlugs {
 	params: {
@@ -24,12 +24,21 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 	searchParams,
 }) => {
 	const query = searchParams?.query || ""
-	const [hierarchyData, setHierarchyData] = useState([])
+	const [hierarchyData, setHierarchyData] = useState<IHierarchy | null>(null)
 
-	const { currentLevel, currentView } = useGetHierarchy() as {
+	const { prevLevel, currentLevel, currentView } = useGetHierarchy() as {
+		prevLevel: NonNullable<ILevel>
 		currentLevel: NonNullable<ILevel>
 		currentView: THierarchyType
 	}
+	const lastTitle = useMemo(() => {
+		if (!hierarchyData) return null
+
+		if (currentLevel.idType !== prevLevel.idType)
+			return hierarchyData[prevLevel.idType].title
+
+		return null
+	}, [currentLevel.idType, hierarchyData, prevLevel.idType])
 
 	useEffect(() => {
 		if (!currentLevel.id || !currentLevel.idType) return
@@ -39,30 +48,47 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 			hierarchy: currentView,
 			cohortId: slug[0],
 			...currentLevel,
-		}).then(resp => setHierarchyData(resp.children))
+		}).then(resp => setHierarchyData(resp))
 	}, [slug, currentView, currentLevel, query])
+
+	if (!hierarchyData) return <>Loading...</>
 
 	return (
 		<>
 			<div className="flex h-full flex-col gap-4 overflow-hidden pt-4">
 				<div className="flex flex-col gap-4 px-4">
 					<div className="flex gap-4">
-						<div className="relative h-14 w-14 shrink-0 rounded-md ring-1 ring-inset ring-neutral-200 dark:ring-neutral-800">
-							<Image
-								src={icon}
-								alt="icon"
-								fill
-							/>
+						{currentLevel.idType !== "cohort" ? null : (
+							<div className="relative h-14 w-14 shrink-0 rounded-md p-2 ring-1 ring-inset ring-neutral-200 dark:ring-neutral-800">
+								<div className="relative h-10 w-10 overflow-hidden rounded-md">
+									<Image
+										src={hierarchyData.icon ?? icon}
+										alt={hierarchyData.title}
+										fill
+									/>
+								</div>
+							</div>
+						)}
+						<div className="flex flex-col gap-1">
+							{currentLevel.idType !== "cohort" ? (
+								<p className="line-clamp-1 text-sm text-gray-500">
+									{lastTitle}
+								</p>
+							) : null}
+							<p className="line-clamp-2 items-center text-lg font-medium">
+								{hierarchyData.title}{" "}
+								<span className="inline-flex h-5 select-none items-center gap-1 whitespace-nowrap rounded-md bg-purple-50 px-1.5 py-0.5 text-xs font-medium capitalize text-purple-700 ring-1 ring-inset ring-purple-700/10 dark:bg-purple-400/10 dark:text-purple-400 dark:ring-purple-400/30">
+									{`${String(hierarchyData.children.length).padStart(2, "0")}`}{" "}
+									{`${currentView}s`}
+								</span>
+							</p>
 						</div>
-						<p className="line-clamp-2 text-lg font-medium">
-							Title
-						</p>
 					</div>
-					<Search />
+					<Search placeholder={`Search ${currentView}s`} />
 				</div>
 				<div className="flex flex-col gap-4 overflow-auto px-4 pb-4 scrollbar">
-					{hierarchyData && hierarchyData.length
-						? hierarchyData.map((hierarchy: any) => (
+					{hierarchyData.children && hierarchyData.children.length
+						? hierarchyData.children.map((hierarchy: any) => (
 								<HierarchyCard
 									type={currentView}
 									cohortId={slug[0]}

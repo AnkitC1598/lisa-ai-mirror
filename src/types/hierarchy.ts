@@ -3,11 +3,11 @@ import { ISVGIconProps } from "./svg"
 export type TCurrentHierarchy = "ctsct" | "csct" | "cst" | "ct" | null
 export type THierarchyType = "course" | "term" | "subject" | "chapter" | "topic"
 
-export interface IHierarchyConstantData {
-	[key: string]: IHierarchyData
+export interface IHierarchyConstant {
+	[key: string]: IHierarchyConstantData
 }
 
-export interface IHierarchyData {
+export interface IHierarchyConstantData {
 	icon: React.ComponentType<ISVGIconProps> | null
 	colors: IColors
 }
@@ -36,7 +36,7 @@ export interface IForm {
 	lightText: string
 }
 
-export interface IHierarchy {
+export interface IHierarchyInfo {
 	prevLevel: ILevel
 	currentLevel: ILevel
 	ids: Record<string, string | null>
@@ -108,4 +108,62 @@ export interface ITopic {
 		dateRestriction: boolean
 		contentCount: number
 	}
+	[key: string]: any
+}
+
+export interface IHierarchy {
+	_id: string
+	createdAt: string
+	updatedAt: string
+	title: string
+	uid: string
+	details: string | null
+	mode: string
+	status: string
+	coverImage: string | null
+	icon: string | null
+	type: string[]
+	duration: {
+		startDate: string
+		endDate: string
+	}
+	dateRestriction: boolean
+	contentCount: number
+	hierarchy: string[]
+	children: {
+		_id: string
+		createdAt: string
+		updatedAt: string
+		createdBy: {
+			uid: string
+			fullname: string
+			email: string
+			username: string
+			profileImage: string
+		}
+		updatedBy: {
+			uid: string
+			fullname: string
+			email: string
+			username: string
+			profileImage: string
+		}
+		title: string
+		details?: string
+		orgId: string
+		mode: string
+		status: string
+		coverImage: any
+		priority: number
+		startDate: string
+		endDate: string
+		contentCount: number
+	}[]
+	attendance: {
+		cohort: number
+		terms: Record<string, number> | null
+		subjects: Record<string, number> | null
+		chapters: Record<string, number> | null
+	}
+	[key: string]: any
 }
