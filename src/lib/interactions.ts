@@ -36,10 +36,10 @@ export const handleAudio = ({
 }) => {
 	const synth = window.speechSynthesis
 	const voices = synth.getVoices()
-	if (audioState !== null) {
+	if (audioState !== 0) {
 		if (synth.speaking && audioState === 1) {
 			synth.pause()
-			setAudioState(0)
+			setAudioState(-1)
 		} else {
 			synth.resume()
 			setAudioState(1)

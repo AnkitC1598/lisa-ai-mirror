@@ -88,7 +88,7 @@ const Slides: React.FC<ISlidesProps> = ({ slides }) => {
 			<div className="flex-1 snap-y snap-mandatory space-y-4 overflow-y-auto pb-4 pl-1 pr-4 scrollbar-hide">
 				{slides.slides.map((slide, idx) => (
 					<Slide
-						key={slide.id}
+						key={`${idx}_${slide.id}`}
 						idx={idx}
 						slide={slide}
 						setSlideState={setSlideState}
@@ -290,7 +290,7 @@ const Slide: React.FC<ISlideProps> = ({
 					<SpeakerWaveIcon
 						className={cn(
 							"h-4 w-4",
-							audioState === 0 ? "fill-blue-500" : ""
+							audioState === 1 ? "fill-blue-500" : ""
 						)}
 					/>
 				</Button>
