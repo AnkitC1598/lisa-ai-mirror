@@ -12,12 +12,14 @@ interface IContentControls {
 	language: string
 	setLanguage: React.Dispatch<React.SetStateAction<string>>
 	bookmarkState?: boolean
+	langDisabled?: boolean
 }
 
 const ContentControls: React.FC<IContentControls> = ({
 	language,
 	setLanguage,
 	bookmarkState = false,
+	langDisabled = false,
 }) => {
 	const { courseId: cohortId, topicId } = useParams<{
 		courseId: string
@@ -52,7 +54,13 @@ const ContentControls: React.FC<IContentControls> = ({
 					<BookmarkIconOutline className="h-4 w-4 shrink-0" />
 				)}
 			</Button>
-			<LanguageSwitcher {...{ value: language, setValue: setLanguage }} />
+			<LanguageSwitcher
+				{...{
+					value: language,
+					setValue: setLanguage,
+					disabled: langDisabled,
+				}}
+			/>
 		</div>
 	)
 }

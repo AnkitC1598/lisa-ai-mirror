@@ -21,7 +21,9 @@ const ContentPagination: React.FC<IContentPagination> = ({
 			<div
 				className={cn(
 					"flex flex-nowrap gap-2 p-4",
-					vertical ? "flex-col justify-center p-2 pr-1" : ""
+					vertical
+						? "flex-col justify-center pb-8 pl-2 pr-1 pt-4"
+						: ""
 				)}
 			>
 				{Array.from({ length: total }).map((_, i) => (

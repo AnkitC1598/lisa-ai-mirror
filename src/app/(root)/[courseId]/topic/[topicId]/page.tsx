@@ -115,6 +115,7 @@ const TopicContent = () => {
 				language={language}
 				setLanguage={setLanguage}
 				bookmarkState={currentTopic?.bookmarked}
+				langDisabled={aiIsLoading}
 			/>
 			{slidesData ? (
 				slidesData[language] ? (

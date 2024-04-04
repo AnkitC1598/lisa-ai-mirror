@@ -323,6 +323,7 @@ const Slide: React.FC<ISlideProps> = ({
 								setAudioState,
 							})
 						}
+						disabled={langCode !== "en"}
 					>
 						<SpeakerWaveIcon
 							className={cn(
