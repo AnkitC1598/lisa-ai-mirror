@@ -128,7 +128,6 @@ export const getResources = async ({
 			method: "GET",
 		}
 	)
-
 	return resp.results.data.resources
 }
 

@@ -1,6 +1,10 @@
 "use client"
 
 import {
+	addQuestionBookmark,
+	removeQuestionBookmark,
+} from "@/actions/bookmarks"
+import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
@@ -10,15 +14,9 @@ import { Button } from "@/components/ui/button"
 import { handleAudio, handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import { IPracticeQuestion } from "@/types/topic"
-import {
-	BookmarkIcon as BookmarkIconOutline,
-	HandThumbDownIcon as HandThumbDownIconOutline,
-	HandThumbUpIcon as HandThumbUpIconOutline,
-} from "@heroicons/react/24/outline"
+import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/24/outline"
 import {
 	BookmarkIcon as BookmarkIconSolid,
-	HandThumbDownIcon as HandThumbDownIconSolid,
-	HandThumbUpIcon as HandThumbUpIconSolid,
 	SpeakerWaveIcon,
 } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
@@ -29,11 +27,6 @@ interface IPracticeQuestions {
 }
 
 const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
-	const { courseId, topicId } = useParams<{
-		courseId: string
-		topicId: string
-	}>()
-
 	return (
 		<>
 			<div className="px-4">
@@ -41,13 +34,13 @@ const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
 					type="single"
 					collapsible
 					className="space-y-4"
+					defaultValue="1"
 				>
 					{questions.map((question, idx) => (
 						<PracticeQuestion
 							key={question.id ?? question.question}
 							question={question}
 							idx={idx + 1}
-							params={{ courseId, topicId }}
 						/>
 					))}
 				</Accordion>
@@ -72,19 +65,23 @@ export const PracticeQuestionsSkeletonLoader = () => {
 interface IPracticeQuestionProps {
 	question: IPracticeQuestion
 	idx: number
-	params: { courseId: string; topicId: string }
+	hideIndex?: boolean
 }
 
 export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 	question,
 	idx,
-	params: { courseId, topicId },
+	hideIndex = !false,
 }) => {
 	const [vote, setVote] = useState<number>(0)
 	const [audioState, setAudioState] = useState<number>(0)
 	const [bookmarked, setBookmarked] = useState<boolean>(
 		question.bookmarked ?? false
 	)
+	const { courseId, topicId } = useParams<{
+		courseId: string
+		topicId: string
+	}>()
 
 	const resetVote = () => setVote(0)
 
@@ -105,18 +102,39 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 		})
 	}
 
-	const handleBookmark = () => setBookmarked(prev => !prev)
+	const handleBookmark = () => {
+		setBookmarked(prev => !prev)
+		if (bookmarked) {
+			removeQuestionBookmark({
+				cohortId: courseId,
+				topicId,
+				questionId: question.id as string,
+			}).then(code => {
+				if (code === 200) setBookmarked(false)
+			})
+		} else {
+			addQuestionBookmark({
+				cohortId: courseId,
+				topicId,
+				body: question,
+			}).then(code => {
+				if (code === 200) setBookmarked(true)
+			})
+		}
+	}
 
 	return (
 		<>
 			<AccordionItem
 				value={`${idx}`}
-				className="rounded-md px-4 shadow ring-1 ring-inset ring-neutral-200 dark:shadow-neutral-800 dark:ring-neutral-800"
+				className="rounded-md bg-neutral-50 px-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-800 dark:ring-neutral-800"
 			>
 				<AccordionTrigger>
 					<div className="flex flex-col items-start justify-start gap-1 text-sm">
-						<div>Question {String(idx).padStart(2, "0")}</div>
-						<div className="text-left text-gray-500">
+						{hideIndex ? null : (
+							<div>Question {String(idx).padStart(2, "0")}</div>
+						)}
+						<div className=".text-gray-500 text-left">
 							{question.question}
 						</div>
 					</div>
@@ -126,7 +144,7 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 					<span className="text-gray-500">{question.answer}</span>
 					<div className="flex items-center justify-between">
 						<div className="flex gap-2">
-							<Button
+							{/* <Button
 								variant={vote === 1 ? "outline" : "ghost"}
 								size="icon"
 								onClick={() => {
@@ -159,7 +177,7 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 								) : (
 									<HandThumbDownIconOutline className="h-4 w-4" />
 								)}
-							</Button>
+							</Button> */}
 							<Button
 								variant={audioState === 1 ? "outline" : "ghost"}
 								size="icon"
@@ -199,7 +217,7 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 							)}
 						>
 							{bookmarked ? (
-								<BookmarkIconSolid className="h-4 w-4 shrink-0 fill-yellow-500" />
+								<BookmarkIconSolid className="h-4 w-4 shrink-0 fill-yellow-500 dark:fill-yellow-400" />
 							) : (
 								<BookmarkIconOutline className="h-4 w-4 shrink-0" />
 							)}

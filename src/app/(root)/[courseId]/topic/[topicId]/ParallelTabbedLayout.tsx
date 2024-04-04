@@ -92,7 +92,7 @@ const ParallelTabbedLayout: React.FC<Readonly<IParallelTabbedLayout>> = ({
 			-2
 		) as THierarchyType
 
-		return currentTopic[prevLevel].title
+		return currentTopic[prevLevel]?.title
 	}, [currentHierarchy, currentTopic])
 
 	if (!currentTopic) return null
@@ -153,7 +153,7 @@ const ParallelTabbedLayout: React.FC<Readonly<IParallelTabbedLayout>> = ({
 					value="home"
 					className="mt-0 h-bottomNavScreen flex-1 overflow-hidden"
 				>
-					{/* {home} */}
+					{home}
 				</TabsContent>
 				<TabsContent
 					value="resources"

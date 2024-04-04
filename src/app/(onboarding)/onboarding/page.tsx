@@ -161,6 +161,7 @@ const Onboarding = () => {
 											<FormItem>
 												<FormControl>
 													<Input
+														placeholder="City"
 														className={cn(
 															"rounded-full focus-visible:ring-0 focus-visible:ring-offset-0",
 															field.value
@@ -181,6 +182,7 @@ const Onboarding = () => {
 											<FormItem>
 												<FormControl>
 													<Input
+														placeholder="Country"
 														className={cn(
 															"rounded-full focus-visible:ring-0 focus-visible:ring-offset-0",
 															field.value

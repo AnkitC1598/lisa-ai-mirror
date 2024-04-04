@@ -88,7 +88,7 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 							<CheckCircleIcon
 								className={cn(
 									"h-4 w-4 shrink-0",
-									completed
+									hierarchy.completed
 										? "fill-green-500 dark:fill-green-600"
 										: "fill-neutral-300 dark:fill-neutral-700"
 								)}
@@ -100,8 +100,8 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 							{hierarchy.title}
 						</p>
 					</div>
-					{type === "topic" && bookMarked ? (
-						<BookmarkIconSolid className="h-4 w-4 shrink-0 fill-yellow-300 dark:fill-yellow-400" />
+					{type === "topic" && hierarchy.bookmarked ? (
+						<BookmarkIconSolid className="h-4 w-4 shrink-0 fill-yellow-500 dark:fill-yellow-400" />
 					) : null}
 				</div>
 			</Link>

@@ -1,3 +1,4 @@
+import BookmarkFilters from "@/components/organisms/BookmarkFilters"
 import Search from "@/components/organisms/Search"
 import { Suspense } from "react"
 
@@ -16,9 +17,9 @@ const BookmarksLayout: React.FC<Readonly<IBookmarksLayout>> = async ({
 						Bookmarks
 					</p>
 				</div>
-				{/* <Suspense fallback="Loading...">
+				<Suspense fallback="Loading...">
 					<BookmarkFilters />
-				</Suspense> */}
+				</Suspense>
 				<Suspense fallback="Loading...">
 					<Search />
 				</Suspense>

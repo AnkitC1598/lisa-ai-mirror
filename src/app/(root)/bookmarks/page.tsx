@@ -1,7 +1,9 @@
 import { getBookmarks } from "@/actions/bookmarks"
 import HierarchyCard from "@/components/organisms/HierarchyCard"
 import LinkPreview from "@/components/organisms/LinkPreview"
-import { Resource } from "@/types/topic"
+import { PracticeQuestion } from "@/components/organisms/PracticeQuestions"
+import { Accordion } from "@/components/ui/accordion"
+import { IPracticeQuestion, Resource } from "@/types/topic"
 
 type TBookmarkFilters = "topics" | "resources" | "questions"
 
@@ -16,25 +18,35 @@ interface IBookmarks {
 }
 
 const Bookmarks: React.FC<IBookmarks> = async ({ searchParams }) => {
-	// const filter = searchParams?.filter || "all"
+	const filter = searchParams?.filter || "all"
 	const page = searchParams?.page || 1
-	const bookmarks = await getBookmarks({ page })
+	const bookmarks = await getBookmarks({ page, filter })
 
 	return (
 		<div className="flex h-full flex-col gap-5 overflow-y-auto scrollbar">
-			{bookmarks.map(bookmark =>
+			{bookmarks.map((bookmark, idx) =>
 				bookmark.type === "resource" ? (
 					<LinkPreview
 						key={bookmark._id}
 						resource={bookmark.body as Resource}
+						params={{
+							courseId: bookmark.cohortId,
+							topicId: bookmark.topicId,
+						}}
 					/>
+				) : bookmark.type === "question" ? (
+					<Accordion
+						type="single"
+						collapsible
+					>
+						<PracticeQuestion
+							key={bookmark._id}
+							idx={idx}
+							hideIndex
+							question={bookmark.body as IPracticeQuestion}
+						/>
+					</Accordion>
 				) : (
-					// bookmark.type === "question" ? (
-					// <PracticeQuestion
-					// 	key={bookmark._id}
-					// 	question={bookmark.body as IPracticeQuestion}
-					// />
-					// ) :
 					<HierarchyCard
 						key={bookmark._id}
 						type="topic"

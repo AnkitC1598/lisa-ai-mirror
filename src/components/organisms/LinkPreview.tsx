@@ -17,13 +17,19 @@ type TOrientation = "landscape" | "portrait"
 interface ILinkPreview {
 	orientation?: TOrientation
 	resource: Resource
+	params?: { courseId: string; topicId: string }
+	bookmarkState?: boolean
 }
 
 const LinkPreview: React.FC<ILinkPreview> = ({
 	orientation = "portrait",
 	resource,
+	params,
+	bookmarkState = false,
 }) => {
-	const [bookmarked, setBookmarked] = useState<boolean>(false)
+	const [bookmarked, setBookmarked] = useState<boolean>(
+		resource.bookmarked ?? bookmarkState
+	)
 	const { courseId: cohortId, topicId } = useParams<{
 		courseId: string
 		topicId: string
@@ -35,18 +41,19 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 		e.stopPropagation()
 		e.preventDefault()
 		setBookmarked(prev => !prev)
+
 		if (bookmarked) {
 			removeResourceBookmark({
-				cohortId,
-				topicId,
+				cohortId: cohortId ?? params?.courseId,
+				topicId: topicId ?? params?.topicId,
 				resourceId: resource.id,
 			}).then(code => {
 				if (code === 200) setBookmarked(false)
 			})
 		} else {
 			addResourceBookmark({
-				cohortId,
-				topicId,
+				cohortId: cohortId ?? params?.courseId,
+				topicId: topicId ?? params?.topicId,
 				body: resource,
 			}).then(code => {
 				if (code === 200) setBookmarked(true)
@@ -103,7 +110,7 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 							className="relative shrink-0"
 						>
 							{bookmarked ? (
-								<BookmarkIconSolid className="h-4 w-4 shrink-0 dark:fill-yellow-400" />
+								<BookmarkIconSolid className="h-4 w-4 shrink-0 fill-yellow-500 dark:fill-yellow-400" />
 							) : (
 								<BookmarkIconOutline className="h-4 w-4 shrink-0" />
 							)}

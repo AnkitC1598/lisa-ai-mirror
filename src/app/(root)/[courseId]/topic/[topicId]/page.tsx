@@ -114,6 +114,7 @@ const TopicContent = () => {
 			<ContentControls
 				language={language}
 				setLanguage={setLanguage}
+				bookmarkState={currentTopic?.bookmarked}
 			/>
 			{slidesData ? (
 				slidesData[language] ? (
