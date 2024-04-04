@@ -81,7 +81,7 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 					className={
 						size === "large"
 							? "h-5 w-5 shrink-0 opacity-50"
-							: "h-6 w-6"
+							: "h-6 w-6 fill-gray-400"
 					}
 				/>
 				{size === "large" ? (

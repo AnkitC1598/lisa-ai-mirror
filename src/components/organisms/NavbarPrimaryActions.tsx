@@ -17,7 +17,7 @@ const NavbarPrimaryActions = () => {
 			asChild
 		>
 			<Link href="/bookmarks">
-				<BookmarkIcon className="h-4 w-4 shrink-0" />
+				<BookmarkIcon className="h-4 w-4 shrink-0 fill-yellow-500 dark:fill-yellow-400" />
 			</Link>
 		</Button>
 	) : (

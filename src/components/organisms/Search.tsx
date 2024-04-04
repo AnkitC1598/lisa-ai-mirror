@@ -30,11 +30,11 @@ const Search: React.FC<ISearchProps> = ({ placeholder = "Search" }) => {
 				<Input
 					placeholder={placeholder}
 					type="search"
-					className="pl-8"
 					onChange={e => {
 						handleSearch(e.target.value)
 					}}
 					defaultValue={searchParams.get("query")?.toString()}
+					className="pl-8 dark:bg-neutral-900"
 				/>
 			</div>
 		</>

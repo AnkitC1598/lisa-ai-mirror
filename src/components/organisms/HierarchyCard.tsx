@@ -90,7 +90,7 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 								className={cn(
 									"h-4 w-4 shrink-0",
 									hierarchy.completed
-										? "fill-green-500 dark:fill-green-600"
+										? "fill-green-500"
 										: "fill-neutral-300 dark:fill-neutral-700"
 								)}
 							/>
