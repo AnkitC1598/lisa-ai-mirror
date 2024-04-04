@@ -13,12 +13,14 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Preferences } from "@/constants/Preferences"
+import { clientEnv } from "@/env/client"
 import { cn } from "@/lib/utils"
 import { preferenceSchema } from "@/schema/profile"
 import useAIStore from "@/store"
 import { IUserOnboarding } from "@/types/user"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { getYear } from "date-fns"
+import IPData from "ipdata"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -32,9 +34,17 @@ const Onboarding = () => {
 
 	const form = useForm<z.infer<typeof preferenceSchema>>({
 		resolver: zodResolver(preferenceSchema),
-		defaultValues: {
-			...user,
-			yob: Number(getYear(new Date(user.dob))),
+		defaultValues: async () => {
+			const ipdata = new IPData(clientEnv.NEXT_PUBLIC_IPDATA_API_KEY)
+			const ipInfo = await ipdata.lookup()
+			return {
+				...user,
+				location: {
+					city: user.location.city ?? ipInfo.city,
+					country: user.location.country ?? ipInfo.country_name,
+				},
+				yob: Number(getYear(new Date(user.dob))),
+			}
 		},
 	})
 

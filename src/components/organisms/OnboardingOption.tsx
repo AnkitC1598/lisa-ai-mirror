@@ -41,11 +41,13 @@ const OnboardingOption: React.FC<IOnboardingOption> = ({
 						"[object Function]"
 				)
 					onChange(
-						Array.isArray(value)
-							? value.includes(option.value)
-								? value.filter(val => val !== option.value)
-								: [...value, option.value]
-							: [value, option.value]
+						single
+							? option.value
+							: Array.isArray(value)
+								? value.includes(option.value)
+									? value.filter(val => val !== option.value)
+									: [...value, option.value]
+								: [value, option.value]
 					)
 			}}
 		>

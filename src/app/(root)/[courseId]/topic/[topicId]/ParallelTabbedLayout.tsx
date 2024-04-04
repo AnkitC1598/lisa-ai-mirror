@@ -37,7 +37,7 @@ const ParallelTabbedLayout: React.FC<Readonly<IParallelTabbedLayout>> = ({
 	const tab: string = searchParams.get("tab") ?? "home"
 	const pathname = usePathname()
 	const { replace } = useRouter()
-	const { courseId, topicId } = useParams<{
+	const { courseId: cohortId, topicId } = useParams<{
 		courseId: string
 		topicId: string
 	}>()
@@ -51,7 +51,7 @@ const ParallelTabbedLayout: React.FC<Readonly<IParallelTabbedLayout>> = ({
 	}
 
 	useEffect(() => {
-		getCourse({ cohortId: courseId })
+		getCourse({ cohortId })
 			.then(course => {
 				dispatch({
 					type: "SET_STATE",
@@ -80,7 +80,7 @@ const ParallelTabbedLayout: React.FC<Readonly<IParallelTabbedLayout>> = ({
 				},
 			})
 		}
-	}, [courseId, topicId, dispatch])
+	}, [cohortId, topicId, dispatch])
 
 	if (!currentTopic) return null
 

@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
 	const prompt = PromptTemplate.fromTemplate(TEMPLATE)
 	const model = new ChatOpenAI({
 		temperature: 0.8,
+		streaming: true,
 	})
 	const outputParser = new BytesOutputParser()
 

@@ -35,6 +35,7 @@ export interface IPracticeQuestion {
 	id?: string
 	question: string
 	answer: string
+	bookmarked?: boolean
 }
 
 export interface ISlides {
@@ -55,7 +56,7 @@ interface ITopic {
 }
 
 export interface ISlideSet {
-	createdAt: string
+	createdAt: Date | string | number
 	language: string
 	slides: ISlide[]
 }
@@ -72,7 +73,7 @@ export interface ISlide {
 	correctAnswer?: string
 }
 
-interface IAnswer {
+export interface IAnswer {
 	id: string
 	body: string
 	isCorrect: boolean

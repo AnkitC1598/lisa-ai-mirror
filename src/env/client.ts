@@ -13,6 +13,7 @@ export const clientEnv = createEnv({
 		NEXT_PUBLIC_SOCKET_URL: z.string(),
 		NEXT_PUBLIC_HOST_DOMAIN: z.string(),
 		NEXT_PUBLIC_APP_DOMAIN: z.string(),
+		NEXT_PUBLIC_IPDATA_API_KEY: z.string(),
 	},
 	runtimeEnv: {
 		NEXT_PUBLIC_COOKIE_KEY: process.env.NEXT_PUBLIC_COOKIE_KEY,
@@ -22,6 +23,7 @@ export const clientEnv = createEnv({
 		NEXT_PUBLIC_SOCKET_URL: process.env.NEXT_PUBLIC_SOCKET_URL,
 		NEXT_PUBLIC_HOST_DOMAIN: process.env.NEXT_PUBLIC_HOST_DOMAIN,
 		NEXT_PUBLIC_APP_DOMAIN: process.env.NEXT_PUBLIC_APP_DOMAIN,
+		NEXT_PUBLIC_IPDATA_API_KEY: process.env.NEXT_PUBLIC_IPDATA_API_KEY,
 	},
 	onValidationError: (error: ZodError) => {
 		console.error(

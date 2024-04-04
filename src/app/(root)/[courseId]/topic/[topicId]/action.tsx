@@ -153,7 +153,7 @@ If the user requests explanation of a topic, call \`explain_topic\` to show the 
 				}),
 			}
 		)
-		// @ts-ignore
+
 		reply.done(
 			<Slides
 				slides={
