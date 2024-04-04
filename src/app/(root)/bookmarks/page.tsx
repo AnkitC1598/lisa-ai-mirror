@@ -22,10 +22,13 @@ const Bookmarks: React.FC<IBookmarks> = async ({ searchParams }) => {
 	const filter = searchParams?.filter || "all"
 	const query = searchParams?.query || ""
 	const page = searchParams?.page || 1
-	const bookmarks = await getBookmarks({ page, filter })
+	const bookmarks = await getBookmarks({
+		page,
+		filter: filter.replace(/s\b/g, ""),
+	})
 
 	return (
-		<div className="flex h-full flex-col gap-5 overflow-y-auto scrollbar">
+		<div className="flex h-full flex-col gap-5 overflow-y-auto px-4 pb-4 scrollbar">
 			{bookmarks
 				.filter(bookmark => {
 					if (bookmark.body) {

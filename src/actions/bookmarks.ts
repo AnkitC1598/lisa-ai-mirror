@@ -13,7 +13,7 @@ export const getBookmarks = async ({
 	filter: string | null
 }): Promise<IBookmark[]> => {
 	const resp = await fetchClientWithToken(
-		`/ai/slides/bookmarks?page=${page}&limit=15`,
+		`/ai/slides/bookmarks?page=${page}&limit=15&filter=${filter}`,
 		{
 			method: "GET",
 		}
