@@ -28,8 +28,6 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 	...props
 }) => {
 	const pathname = usePathname()
-	const completed = !false
-	const bookMarked = true
 
 	if (!HierarchyConstants.hasOwnProperty(type)) return
 

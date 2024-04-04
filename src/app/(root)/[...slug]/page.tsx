@@ -84,6 +84,15 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 							</p>
 						</div>
 					</div>
+					{currentView === "topic" ? (
+						<div className="flex items-center justify-between text-sm">
+							<span>All Topics</span>
+							<span className="text-gray-500">
+								{hierarchyData.completedAiTopics} of{" "}
+								{hierarchyData.children.length} completed
+							</span>
+						</div>
+					) : null}
 					<Search placeholder={`Search ${currentView}s`} />
 				</div>
 				<div className="flex flex-col gap-4 overflow-auto px-4 pb-4 scrollbar">

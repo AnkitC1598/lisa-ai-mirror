@@ -1,5 +1,3 @@
-import { sleep } from "@/lib"
-import { cache } from "react"
 import ParallelTabbedLayout from "./ParallelTabbedLayout"
 
 interface ITopicContentLayout {
@@ -9,19 +7,12 @@ interface ITopicContentLayout {
 	resources: React.ReactNode
 }
 
-const getTopicContent = cache(async () => {
-	await sleep(1000)
-	return []
-})
-
 const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = async ({
 	children,
 	chat,
 	practiceQuestions,
 	resources,
 }) => {
-	await getTopicContent()
-
 	return (
 		<>
 			<div className="flex h-full flex-col gap-4 overflow-hidden">
