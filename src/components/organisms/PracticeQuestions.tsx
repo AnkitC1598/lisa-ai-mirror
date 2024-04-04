@@ -89,6 +89,7 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 	const resetVote = () => setVote(0)
 
 	const handleFeedback = (feedback: number) => {
+		setVote(feedback)
 		handleVote({
 			body: {
 				feedback:
@@ -124,13 +125,18 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 					<span>Ans.</span>
 					<span className="text-gray-500">{question.answer}</span>
 					<div className="flex items-center justify-between">
-						<div className="flex gap-4">
+						<div className="flex gap-2">
 							<Button
-								variant="outline"
+								variant={vote === 1 ? "outline" : "ghost"}
 								size="icon"
 								onClick={() => {
 									handleFeedback(1)
 								}}
+								className={cn(
+									vote === 1
+										? "border-green-600/20 bg-green-600/10 dark:border-green-600/20 dark:bg-green-600/10"
+										: ""
+								)}
 							>
 								{vote === 1 ? (
 									<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
@@ -139,9 +145,14 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 								)}
 							</Button>
 							<Button
-								variant="outline"
+								variant={vote === -1 ? "outline" : "ghost"}
 								size="icon"
 								onClick={() => handleFeedback(-1)}
+								className={cn(
+									vote === -1
+										? "border-red-600/20 bg-red-600/10 dark:border-red-600/20 dark:bg-red-600/10"
+										: ""
+								)}
 							>
 								{vote === -1 ? (
 									<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
@@ -150,8 +161,13 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 								)}
 							</Button>
 							<Button
-								variant="outline"
+								variant={audioState === 1 ? "outline" : "ghost"}
 								size="icon"
+								className={cn(
+									audioState === 1
+										? "border-blue-600/20 bg-blue-600/10 dark:border-blue-600/20 dark:bg-blue-600/10"
+										: ""
+								)}
 								onClick={() =>
 									handleAudio({
 										text:
@@ -166,19 +182,24 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 								<SpeakerWaveIcon
 									className={cn(
 										"h-4 w-4",
-										audioState === 0 ? "fill-blue-500" : ""
+										audioState === 1 ? "fill-blue-500" : ""
 									)}
 								/>
 							</Button>
 						</div>
 						<Button
-							variant="outline"
+							variant={bookmarked ? "outline" : "ghost"}
 							size="icon"
 							onClick={handleBookmark}
-							className="relative"
+							className={cn(
+								"relative",
+								bookmarked
+									? "border-yellow-500/20 bg-yellow-500/10 dark:border-yellow-500/20 dark:bg-yellow-500/10"
+									: ""
+							)}
 						>
 							{bookmarked ? (
-								<BookmarkIconSolid className="h-4 w-4 shrink-0" />
+								<BookmarkIconSolid className="h-4 w-4 shrink-0 fill-yellow-500" />
 							) : (
 								<BookmarkIconOutline className="h-4 w-4 shrink-0" />
 							)}

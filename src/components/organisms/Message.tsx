@@ -65,6 +65,7 @@ export const AiMessage: React.FC<IMessage> = ({
 	const resetVote = () => setVote(0)
 
 	const handleFeedback = (feedback: number) => {
+		setVote(feedback)
 		handleVote({
 			body: {
 				feedback:
@@ -107,11 +108,16 @@ export const AiMessage: React.FC<IMessage> = ({
 				<p className="text-sm">{message.content}</p>
 				<div className="flex items-center gap-2">
 					<Button
-						variant="outline"
+						variant={vote === 1 ? "outline" : "ghost"}
 						size="icon"
 						onClick={() => {
 							handleFeedback(1)
 						}}
+						className={cn(
+							vote === 1
+								? "border-green-600/20 bg-green-600/10 dark:border-green-600/20 dark:bg-green-600/10"
+								: ""
+						)}
 					>
 						{vote === 1 ? (
 							<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
@@ -120,9 +126,14 @@ export const AiMessage: React.FC<IMessage> = ({
 						)}
 					</Button>
 					<Button
-						variant="outline"
+						variant={vote === -1 ? "outline" : "ghost"}
 						size="icon"
 						onClick={() => handleFeedback(-1)}
+						className={cn(
+							vote === -1
+								? "border-red-600/20 bg-red-600/10 dark:border-red-600/20 dark:bg-red-600/10"
+								: ""
+						)}
 					>
 						{vote === -1 ? (
 							<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
@@ -131,8 +142,13 @@ export const AiMessage: React.FC<IMessage> = ({
 						)}
 					</Button>
 					<Button
-						variant="outline"
+						variant={copy === 1 ? "outline" : "ghost"}
 						size="icon"
+						className={cn(
+							copy === 1
+								? "border-blue-600/20 bg-blue-600/10 dark:border-blue-600/20 dark:bg-blue-600/10"
+								: ""
+						)}
 						onClick={() =>
 							handleCopy({ text: message.content, setCopy })
 						}
@@ -145,8 +161,13 @@ export const AiMessage: React.FC<IMessage> = ({
 						/>
 					</Button>
 					<Button
-						variant="outline"
+						variant={audioState === 1 ? "outline" : "ghost"}
 						size="icon"
+						className={cn(
+							audioState === 1
+								? "border-blue-600/20 bg-blue-600/10 dark:border-blue-600/20 dark:bg-blue-600/10"
+								: ""
+						)}
 						onClick={() =>
 							handleAudio({
 								text: message.content,
@@ -158,7 +179,7 @@ export const AiMessage: React.FC<IMessage> = ({
 						<SpeakerWaveIcon
 							className={cn(
 								"h-4 w-4",
-								audioState === 0 ? "fill-blue-500" : ""
+								audioState === 1 ? "fill-blue-500" : ""
 							)}
 						/>
 					</Button>

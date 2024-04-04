@@ -1,6 +1,7 @@
 "use client"
 
 import { answerQuiz } from "@/actions/hierarchy"
+import useConfetti from "@/hooks/useConfetti"
 import { handleAudio, handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import { SetState } from "@/types"
@@ -147,6 +148,13 @@ const Slide: React.FC<ISlideProps> = ({
 	const [audioState, setAudioState] = useState<number>(0)
 	const [inViewAt, setInViewAt] = useState<number | null>(null)
 	const { ref, inView } = useInView()
+	const [answerState, setAnswerState] = useState<{
+		id?: string
+		body?: string
+		isCorrect?: boolean
+	}>()
+
+	const { getConfettiInstance, fire } = useConfetti({})
 
 	const resetVote = () => setVote(0)
 
@@ -204,16 +212,18 @@ const Slide: React.FC<ISlideProps> = ({
 					<div className="flex h-full flex-col gap-2 py-4">
 						{slide.answers.map(answer => (
 							<button
-								disabled={!!slide.userAnswer}
+								disabled={!!slide.userAnswer || !!answerState}
 								id={answer.body}
 								key={answer.id ?? answer.body}
-								onClick={() =>
+								onClick={() => {
+									setAnswerState(answer)
+									if (answer.isCorrect) fire()
 									handleQuizOption({
 										answer,
 										idx,
 										answers: slide.answers,
 									})
-								}
+								}}
 								className={cn(
 									"w-full cursor-pointer rounded-md border border-neutral-200 bg-neutral-200 p-2 transition-all duration-500 hover:bg-neutral-300 disabled:cursor-not-allowed dark:border-neutral-800 dark:bg-neutral-800 dark:hover:bg-neutral-700",
 									slide.userAnswer
@@ -224,13 +234,24 @@ const Slide: React.FC<ISlideProps> = ({
 												: ""
 										: ""
 								)}
+								style={
+									slide.userAnswer
+										? answer.id === slide.correctAnswer
+											? { backgroundColor: "green" }
+											: slide.userAnswer === answer.id
+												? { backgroundColor: "red" }
+												: {}
+										: {}
+								}
 							>
 								{answer.body}
 							</button>
 						))}
-						{slide.type === "quiz" && slide.userAnswer ? (
+						{slide.type === "quiz" &&
+						(slide.userAnswer || answerState) ? (
 							<div className="flex w-full flex-1 items-center justify-center">
-								{slide.userAnswer === slide.correctAnswer
+								{slide.userAnswer === slide.correctAnswer ||
+								answerState?.isCorrect
 									? "Congratulations"
 									: "Sorry"}
 							</div>
@@ -240,61 +261,78 @@ const Slide: React.FC<ISlideProps> = ({
 					<p className="leading-8">{slide.body}</p>
 				)}
 			</div>
-			<div className="flex items-center justify-between">
-				<div className="flex gap-4">
+			{slide.type === "text" ? (
+				<div className="flex items-center justify-between">
+					<div className="flex gap-2">
+						<Button
+							variant={vote === 1 ? "outline" : "ghost"}
+							size="icon"
+							onClick={() => {
+								handleFeedback(1)
+							}}
+							className={cn(
+								vote === 1
+									? "border-green-600/20 bg-green-600/10 dark:border-green-600/20 dark:bg-green-600/10"
+									: ""
+							)}
+						>
+							{vote === 1 ? (
+								<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
+							) : (
+								<HandThumbUpIconOutline className="h-4 w-4" />
+							)}
+						</Button>
+						<Button
+							variant={vote === -1 ? "outline" : "ghost"}
+							size="icon"
+							onClick={() => handleFeedback(-1)}
+							className={cn(
+								vote === -1
+									? "border-red-600/20 bg-red-600/10 dark:border-red-600/20 dark:bg-red-600/10"
+									: ""
+							)}
+						>
+							{vote === -1 ? (
+								<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
+							) : (
+								<HandThumbDownIconOutline className="h-4 w-4" />
+							)}
+						</Button>
+					</div>
 					<Button
-						variant="outline"
+						variant={audioState === 1 ? "outline" : "ghost"}
 						size="icon"
-						onClick={() => {
-							handleFeedback(1)
-						}}
-					>
-						{vote === 1 ? (
-							<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
-						) : (
-							<HandThumbUpIconOutline className="h-4 w-4" />
+						className={cn(
+							audioState === 1
+								? "border-blue-600/20 bg-blue-600/10 dark:border-blue-600/20 dark:bg-blue-600/10"
+								: ""
 						)}
-					</Button>
-					<Button
-						variant="outline"
-						size="icon"
-						onClick={() => handleFeedback(-1)}
+						onClick={() =>
+							handleAudio({
+								text:
+									slide.type === "quiz"
+										? slide.question +
+											"\n" +
+											(slide.answers
+												? slide.answers
+														.map(a => a.body)
+														.join("\n")
+												: null)
+										: slide.title + "\n" + slide.body,
+								audioState,
+								setAudioState,
+							})
+						}
 					>
-						{vote === -1 ? (
-							<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
-						) : (
-							<HandThumbDownIconOutline className="h-4 w-4" />
-						)}
+						<SpeakerWaveIcon
+							className={cn(
+								"h-4 w-4",
+								audioState === 1 ? "fill-blue-500" : ""
+							)}
+						/>
 					</Button>
 				</div>
-				<Button
-					variant="outline"
-					size="icon"
-					onClick={() =>
-						handleAudio({
-							text:
-								slide.type === "quiz"
-									? slide.question +
-										"\n" +
-										(slide.answers
-											? slide.answers
-													.map(a => a.body)
-													.join("\n")
-											: null)
-									: slide.title + "\n" + slide.body,
-							audioState,
-							setAudioState,
-						})
-					}
-				>
-					<SpeakerWaveIcon
-						className={cn(
-							"h-4 w-4",
-							audioState === 0 ? "fill-blue-500" : ""
-						)}
-					/>
-				</Button>
-			</div>
+			) : null}
 			<span
 				ref={ref}
 				className="absolute inset-x-0 z-0 opacity-0"
