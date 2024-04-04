@@ -1,6 +1,5 @@
 import { sleep } from "@/lib"
 import { cache } from "react"
-import { AI as QuestionsAI } from "./@practiceQuestions/action"
 import ParallelTabbedLayout from "./ParallelTabbedLayout"
 
 interface ITopicContentLayout {
@@ -30,9 +29,7 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = async ({
 					{...{
 						home: children,
 						chat,
-						practiceQuestions: (
-							<QuestionsAI>{practiceQuestions}</QuestionsAI>
-						),
+						practiceQuestions: practiceQuestions,
 						resources,
 					}}
 				/>

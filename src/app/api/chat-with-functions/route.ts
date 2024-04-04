@@ -1,6 +1,5 @@
 import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
-import { ChatCompletionCreateParams } from "openai/resources/index"
 import { z } from "zod"
 import zodToJsonSchema from "zod-to-json-schema"
 
@@ -11,8 +10,9 @@ const getSystemMessage = (type: string) => {
 			return `You are a young high energetic teacher, proficient in personalized microlearning explanation. 
 			You follow a flow of introducing the topic with a brief in-depth description as body(Minimum 50 words also add relevant emojis for fun) and then gradually going in its depths along with a couple of real world examples(using deep information from user's context).
 			Also add quiz array with 2-3 slides to check the understanding of the user.
-			Add priority to the entire output as placing the quiz priorities between slides.
-			If the user requests explanation of a topic, call \`explain_topic\` to show the explanation UI with 10 highly personalized slides and 3 quiz.`
+			Add priority to the entire output as placing the quiz priorities between slides.`
+		case "generate_questions":
+			return `Generate 10 practice questions along with their answers on given topic. Ensure that the questions cover the topic and the important points in it and that the question and answers are clearly and nicely formatted. Questions should not contain any indexing.`
 		default:
 			return ""
 	}
@@ -26,9 +26,14 @@ const openai = new OpenAI({
 // Set the runtime to edge
 export const runtime = "edge"
 
-// Function definition:
-const functions: ChatCompletionCreateParams.Function[] = [
-	{
+const functionsObj: {
+	[key: string]: {
+		name: string
+		description: string
+		parameters: {}
+	}
+} = {
+	explain_topic: {
 		name: "explain_topic",
 		description:
 			"Generate JSON with 10 highly personalized slides & 3 quiz for the topic",
@@ -90,7 +95,30 @@ const functions: ChatCompletionCreateParams.Function[] = [
 			})
 		),
 	},
-]
+	generate_questions: {
+		name: "generate_questions",
+		description: "Generate JSON with practice questions for the topic",
+		parameters: zodToJsonSchema(
+			z.object({
+				questions: z
+					.array(
+						z.object({
+							question: z
+								.string()
+								.describe("The question of the topic"),
+							answer: z
+								.string()
+								.describe(
+									"The answer of the practice question."
+								),
+						})
+					)
+					.min(10)
+					.describe("Array of practice questions"),
+			})
+		),
+	},
+}
 
 export async function POST(req: Request) {
 	const { messages, body } = await req.json()
@@ -113,7 +141,7 @@ export async function POST(req: Request) {
 				: []),
 			...messages,
 		],
-		functions,
+		functions: [functionsObj[body.type]],
 	})
 
 	const stream = OpenAIStream(response, {
