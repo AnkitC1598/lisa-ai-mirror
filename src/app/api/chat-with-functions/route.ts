@@ -4,6 +4,20 @@ import { ChatCompletionCreateParams } from "openai/resources/index"
 import { z } from "zod"
 import zodToJsonSchema from "zod-to-json-schema"
 
+// Switch Case to generate system message
+const getSystemMessage = (type: string) => {
+	switch (type) {
+		case "explain_topic":
+			return `You are a young high energetic teacher, proficient in personalized microlearning explanation. 
+			You follow a flow of introducing the topic with a brief in-depth description as body(Minimum 50 words also add relevant emojis for fun) and then gradually going in its depths along with a couple of real world examples(using deep information from user's context).
+			Also add quiz array with 2-3 slides to check the understanding of the user.
+			Add priority to the entire output as placing the quiz priorities between slides.
+			If the user requests explanation of a topic, call \`explain_topic\` to show the explanation UI with 10 highly personalized slides and 3 quiz.`
+		default:
+			return ""
+	}
+}
+
 // Create an OpenAI API client (that's edge friendly!)
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY || "",
@@ -79,12 +93,26 @@ const functions: ChatCompletionCreateParams.Function[] = [
 ]
 
 export async function POST(req: Request) {
-	const { messages } = await req.json()
+	const { messages, body } = await req.json()
 
 	const response = await openai.chat.completions.create({
-		model: "gpt-3.5-turbo-0613",
+		model: "gpt-4",
 		stream: true,
-		messages,
+		messages: [
+			{
+				role: "system",
+				content: getSystemMessage(body.type),
+			},
+			...(body.userContext
+				? [
+						{
+							role: "user",
+							content: body.context,
+						},
+					]
+				: []),
+			...messages,
+		],
 		functions,
 	})
 

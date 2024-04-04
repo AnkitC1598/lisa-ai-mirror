@@ -1,8 +1,9 @@
 "use client"
 
-import { translateSlides } from "@/actions/hierarchy"
+import { getSlides, translateSlides } from "@/actions/hierarchy"
 import ContentControls from "@/components/organisms/ContentControls"
 import Slides, { SlidesSkeletonLoader } from "@/components/organisms/Slides"
+import { fetchClientWithToken } from "@/services/fetch"
 import useAIStore from "@/store"
 import { ISlideSet } from "@/types/topic"
 import { useChat } from "ai/react"
@@ -14,12 +15,22 @@ const TopicContent = () => {
 	const [slidesData, setSlidesData] = useState<{
 		[key: string]: ISlideSet
 	} | null>(null)
-	const [isLoading, setIsLoading] = useState<boolean>(false)
+	// const [isLoading, setIsLoading] = useState<boolean>(false)
 	const [language, setLanguage] = useState<string>("en")
-	const { courseId: cohortId, topicId } = useParams<{
+	const { courseId, topicId } = useParams<{
 		courseId: string
 		topicId: string
 	}>()
+
+	const context = useMemo(() => {
+		if (!currentTopic) return undefined
+		return `I am Abhishek, a 22-year-old student based in ratlam, madhya pradesh. I enjoys coding during my free time and love listening to bollywood music. I love indian street food and enjoy tom cruise movies. Mission impossible is my all time fav movie. I like to play cricket.`
+	}, [currentTopic])
+
+	const prompt = useMemo(() => {
+		if (!currentTopic) return undefined
+		return `explain topic ${currentTopic.title} in ${currentTopic.cohort.title}`
+	}, [currentTopic])
 
 	const {
 		isLoading: aiIsLoading,
@@ -28,100 +39,60 @@ const TopicContent = () => {
 	} = useChat({
 		api: "/lisa-ai/api/chat-with-functions",
 		body: {
-			cohortId,
-			topicId,
+			body: { type: "explain_topic", userContext: true, context },
 		},
-		onFinish(message) {
+		async onFinish(message) {
 			const { slides, quiz } = JSON.parse(message.content)
 			const finalSlides = [...slides, ...quiz].sort(
 				(a, b) => a.priority - b.priority
 			)
-			setSlidesData({
-				en: {
-					slides: finalSlides,
-					createdAt: new Date(),
-					language: "en",
-				},
-			})
+			let resp = await fetchClientWithToken(
+				`/ai/slides/${courseId}/${topicId}`,
+				{
+					method: "POST",
+					body: JSON.stringify({
+						slides: finalSlides,
+					}),
+				}
+			)
+			setSlidesData(
+				resp?.results?.data?.slides ?? {
+					en: {
+						slides: finalSlides,
+						createdAt: new Date(),
+						language: "en",
+					},
+				}
+			)
 		},
 	})
 
-	const prompt = useMemo(() => {
-		if (!currentTopic) return undefined
-		return `explain topic ${currentTopic.title} in ${currentTopic.cohort.title}`
-	}, [currentTopic])
+	useEffect(() => {
+		if (!currentTopic) return
+		getSlides({
+			courseId,
+			topicId,
+		}).then(data => {
+			setSlidesData(data?.slides ?? null)
+			if (slidesData || data?.slides) return
+
+			if (prompt && !aiIsLoading) {
+				setInput(prompt)
+				setTimeout(() => {
+					document.getElementById("submit")?.click()
+				}, 1000)
+			}
+		})
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [prompt, setInput, currentTopic])
 
 	useEffect(() => {
-		if (prompt) {
-			setInput(prompt)
-			setTimeout(() => {
-				document.getElementById("submit")?.click()
-			}, 1000)
-			setIsLoading(true)
-		}
-	}, [prompt, setInput])
-
-	// useEffect(() => {
-	// 	getSlides({
-	// 		courseId: cohortId,
-	// 		topicId,
-	// 	}).then(data => {
-	// 		setSlidesData(data?.slides ?? null)
-
-	// 		if (slidesData || data?.slides) return
-
-	// 		const getData = async () => {
-	// 			// if (!prompt)
-	// 			// 	throw new Error(
-	// 			// 		"Cannot find prompt to generate explanation"
-	// 			// 	)
-
-	// 			setIsLoading(true)
-	// 			try {
-	// 				// Submit and get response message
-	// 				const responseMessage = await submitUserMessage({
-	// 					content: prompt,
-	// 					cohortId,
-	// 					topicId,
-	// 				})
-	// 				setMessages(currentMessages => [
-	// 					...currentMessages,
-	// 					{
-	// 						id: responseMessage.id,
-	// 						display: responseMessage.display,
-	// 						role: responseMessage.role as "user" | "assistant",
-	// 					},
-	// 				])
-	// 			} catch (error) {
-	// 				// You may want to show a toast or trigger an error state.
-	// 				console.error(error)
-	// 			} finally {
-	// 				setIsLoading(false)
-	// 			}
-	// 		}
-
-	// 		if (
-	// 			!messages.length &&
-	// 			!isLoading &&
-	// 			!slidesData &&
-	// 			prompt &&
-	// 			!data?.slides
-	// 		) {
-	// 			setMessages([
-	// 				{
-	// 					id: Date.now(),
-	// 					role: "user",
-	// 					display: prompt,
-	// 				},
-	// 			])
-	// 			getData()
-	// 		}
-	// 	})
-	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	// }, [currentTopic])
-
-	useEffect(() => {
-		if (!slidesData || isLoading || slidesData?.[language] || !currentTopic)
+		if (
+			!slidesData ||
+			slidesData?.[language] ||
+			!currentTopic ||
+			aiIsLoading
+		)
 			return
 		translateSlides({
 			courseId: currentTopic.cohort._id,
