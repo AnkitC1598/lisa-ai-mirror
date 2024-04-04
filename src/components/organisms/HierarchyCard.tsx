@@ -16,14 +16,16 @@ interface IHierarchyCard {
 	hierarchy: any
 	peekIndex?: number
 	showHierarchy?: boolean
+	[key: string]: any
 }
 
 const HierarchyCard: React.FC<IHierarchyCard> = ({
-	type,
-	cohortId,
-	hierarchy,
+	type = "",
+	cohortId = "",
+	hierarchy = "",
 	peekIndex = 0,
 	showHierarchy = false,
+	...props
 }) => {
 	const pathname = usePathname()
 	const completed = !false
@@ -45,6 +47,7 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 					"mt-6": showHierarchy,
 				})}
 				style={{ zIndex: peekIndex + 10 }}
+				{...props}
 			>
 				{showHierarchy ? (
 					<div

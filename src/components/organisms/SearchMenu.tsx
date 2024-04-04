@@ -119,6 +119,7 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 										peekIndex={50}
 										cohortId={topic.cohortId}
 										hierarchy={topic}
+										onClick={() => setOpen(false)}
 									/>
 								</CommandItem>
 							))}
@@ -139,6 +140,7 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 									<HierarchyCard
 										type={other.type}
 										hierarchy={other}
+										onClick={() => setOpen(false)}
 									/>
 								</CommandItem>
 							))}
