@@ -185,3 +185,11 @@ export const translateSlides = async ({
 
 	return resp.results.data
 }
+
+export const getRecentTopics = async (): Promise<ITopic | null> => {
+	const resp = await fetchClientWithToken(`/ai/recent/topic`, {
+		method: "GET",
+	})
+
+	return resp.results.data
+}
