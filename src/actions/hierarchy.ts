@@ -186,3 +186,28 @@ export const translateSlides = async ({
 
 	return resp.results.data
 }
+
+export const recordSlideDuration = async ({
+	courseId,
+	topicId,
+	slideId,
+	body,
+}: {
+	courseId: string
+	topicId: string
+	slideId: string
+	body: {
+		timeSpent: number
+		langCode?: string
+		isLastSlide: boolean
+	}
+}) => {
+	const resp = await fetchClientWithToken(
+		`/ai/slides/duration/${courseId}/${topicId}/${slideId}`,
+		{
+			method: "PUT",
+			body: JSON.stringify(body),
+		}
+	)
+	return resp
+}
