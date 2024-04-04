@@ -24,39 +24,48 @@ const customFetch = async (
 	endpoint: string,
 	options: RequestOptions = {},
 	tokenType: TTokenType = "access"
-) => {
-	options.headers = {
-		"Content-Type": "application/json",
-		...options.headers,
-	}
-
-	if (tokenType !== null) {
-		const token = getToken(tokenType)
-
-		options.headers = {
-			...options.headers,
-			Authorization: `Bearer ${token}`,
-		}
-	}
-
-	let res: Response = await fetch(`${baseUrl}${endpoint}`, options)
-
-	if (!res.ok) Promise.reject(res)
-
-	if (res.status === 401) {
-		const newToken = await refreshToken()
-		if (newToken) {
+): Promise<any> => {
+	return new Promise(async (resolve, reject) => {
+		try {
 			options.headers = {
+				"Content-Type": "application/json",
 				...options.headers,
-				Authorization: `Bearer ${newToken}`,
 			}
-			res = await fetch(`${baseUrl}${endpoint}`, options)
-		} else {
-			handleTokenRefreshFailure()
-		}
-	}
 
-	return await res.json()
+			if (tokenType !== null) {
+				const token = getToken(tokenType)
+
+				options.headers = {
+					...options.headers,
+					Authorization: `Bearer ${token}`,
+				}
+			}
+
+			let res = await fetch(`${baseUrl}${endpoint}`, options)
+
+			if (!res.ok || res.status !== 200) {
+				reject(new Error(`HTTP error! Status: ${res.status}`))
+			}
+
+			if (res.status === 401) {
+				const newToken = await refreshToken()
+				if (newToken) {
+					options.headers = {
+						...options.headers,
+						Authorization: `Bearer ${newToken}`,
+					}
+					res = await fetch(`${baseUrl}${endpoint}`, options)
+				} else {
+					handleTokenRefreshFailure()
+					reject(new Error("Token refresh failed"))
+				}
+			}
+
+			resolve(await res.json())
+		} catch (error) {
+			reject(error)
+		}
+	})
 }
 
 const refreshToken = async () => {

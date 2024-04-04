@@ -32,6 +32,8 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 	}
 
 	useEffect(() => {
+		if (!currentLevel.id || !currentLevel.idType) return
+
 		getHierarchyData({
 			query,
 			hierarchy: currentView,
