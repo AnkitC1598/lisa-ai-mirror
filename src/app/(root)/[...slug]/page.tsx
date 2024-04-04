@@ -40,16 +40,28 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 		return null
 	}, [currentLevel.idType, hierarchyData, prevLevel.idType])
 
+	const filteredHierarchyChildren = useMemo(() => {
+		if (
+			!hierarchyData ||
+			!hierarchyData.children ||
+			!hierarchyData.children.length
+		)
+			return []
+
+		return hierarchyData.children.filter(child =>
+			child.title.toLowerCase().includes(query.toLowerCase())
+		)
+	}, [hierarchyData, query])
+
 	useEffect(() => {
 		if (!currentLevel.id || !currentLevel.idType) return
 
 		getHierarchyData({
-			query,
 			hierarchy: currentView,
 			cohortId: slug[0],
 			...currentLevel,
 		}).then(resp => setHierarchyData(resp))
-	}, [slug, currentView, currentLevel, query])
+	}, [slug, currentView, currentLevel])
 
 	if (!hierarchyData) return <>Loading...</>
 
@@ -96,8 +108,8 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 					<Search placeholder={`Search ${currentView}s`} />
 				</div>
 				<div className="flex flex-col gap-4 overflow-auto px-4 pb-4 scrollbar">
-					{hierarchyData.children && hierarchyData.children.length
-						? hierarchyData.children.map((hierarchy: any) => (
+					{filteredHierarchyChildren.length
+						? filteredHierarchyChildren.map((hierarchy: any) => (
 								<HierarchyCard
 									type={currentView}
 									cohortId={slug[0]}

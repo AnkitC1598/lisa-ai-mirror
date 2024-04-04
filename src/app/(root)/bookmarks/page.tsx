@@ -14,54 +14,73 @@ interface IBookmarks {
 	searchParams: {
 		filter: TBookmarkFilters
 		page: number
+		query: string
 	}
 }
 
 const Bookmarks: React.FC<IBookmarks> = async ({ searchParams }) => {
 	const filter = searchParams?.filter || "all"
+	const query = searchParams?.query || ""
 	const page = searchParams?.page || 1
 	const bookmarks = await getBookmarks({ page, filter })
 
 	return (
 		<div className="flex h-full flex-col gap-5 overflow-y-auto scrollbar">
-			{bookmarks.map((bookmark, idx) =>
-				bookmark.type === "resource" ? (
-					<LinkPreview
-						key={bookmark._id}
-						resource={bookmark.body as Resource}
-						params={{
-							courseId: bookmark.cohortId,
-							topicId: bookmark.topicId,
-						}}
-					/>
-				) : bookmark.type === "question" ? (
-					<Accordion
-						type="single"
-						collapsible
-					>
-						<PracticeQuestion
+			{bookmarks
+				.filter(bookmark => {
+					if (bookmark.body) {
+						if ((bookmark.body as Resource).title)
+							return (bookmark.body as Resource).title
+								.toLowerCase()
+								.includes(query.toLowerCase())
+						if ((bookmark.body as IPracticeQuestion).question)
+							return (bookmark.body as IPracticeQuestion).question
+								.toLowerCase()
+								.includes(query.toLowerCase())
+					}
+					if (bookmark.topic)
+						return bookmark.topic.title
+							.toLowerCase()
+							.includes(query.toLowerCase())
+					return true
+				})
+				.map((bookmark, idx) =>
+					bookmark.type === "resource" ? (
+						<LinkPreview
 							key={bookmark._id}
-							idx={idx}
-							hideIndex
-							question={bookmark.body as IPracticeQuestion}
+							resource={bookmark.body as Resource}
+							params={{
+								courseId: bookmark.cohortId,
+								topicId: bookmark.topicId,
+							}}
 						/>
-					</Accordion>
-				) : (
-					<HierarchyCard
-						key={bookmark._id}
-						type="topic"
-						showHierarchy
-						hierarchy={
-							bookmark.topic as {
-								_id: string
-								title: string
-								details: any
-								priority: number
+					) : bookmark.type === "question" ? (
+						<Accordion
+							type="single"
+							collapsible
+						>
+							<PracticeQuestion
+								key={bookmark._id}
+								idx={idx}
+								question={bookmark.body as IPracticeQuestion}
+							/>
+						</Accordion>
+					) : (
+						<HierarchyCard
+							key={bookmark._id}
+							type="topic"
+							showHierarchy
+							hierarchy={
+								bookmark.topic as {
+									_id: string
+									title: string
+									details: any
+									priority: number
+								}
 							}
-						}
-					/>
-				)
-			)}
+						/>
+					)
+				)}
 		</div>
 	)
 }
