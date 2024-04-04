@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import useTextToSpeech from "@/hooks/useTextToSpeech"
 import { handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
+import Peek from "@/svg/peek"
 import { IPracticeQuestion } from "@/types/topic"
 import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/24/outline"
 import {
@@ -71,12 +72,16 @@ interface IPracticeQuestionProps {
 	question: IPracticeQuestion
 	idx: number
 	open?: string
+	peekIndex?: number
+	showHierarchy?: boolean
 }
 
 export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 	question,
 	idx,
 	open,
+	peekIndex = 0,
+	showHierarchy = false,
 }) => {
 	const [vote, setVote] = useState<number>(0)
 	const [bookmarked, setBookmarked] = useState<boolean>(
@@ -146,17 +151,59 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 		<>
 			<AccordionItem
 				value={`${idx}`}
-				className="rounded-md bg-neutral-50 px-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-800 dark:ring-neutral-800"
+				className={cn("relative w-full", {
+					"mt-6": showHierarchy,
+				})}
+				style={{ zIndex: peekIndex + 10 }}
 			>
-				<AccordionTrigger>
-					<div className="text-left text-sm">{question.question}</div>
-				</AccordionTrigger>
-				<AccordionContent>
-					<span>Ans.</span>
-					<span className="text-gray-500">{question.answer}</span>
-					<div className="flex items-center justify-between">
-						<div className="flex gap-2">
-							{/* <Button
+				{showHierarchy ? (
+					<div
+						className="absolute inset-x-0 -top-6 flex -space-x-6 overflow-y-auto scrollbar-hide"
+						style={{ zIndex: peekIndex + 9 }}
+					>
+						{Array.from({
+							length: 2,
+						}).map((_, idx) => (
+							<div
+								key={idx}
+								className="relative h-full"
+								style={{
+									zIndex: peekIndex + 10 + -1 * (idx + 1),
+								}}
+							>
+								<Peek
+									border="stroke-purple-300 dark:stroke-purple-600"
+									bg="fill-purple-100 dark:fill-purple-900"
+									className="!h-8 !w-32"
+									style={{
+										zIndex: peekIndex + 10 + -1 * (idx + 1),
+									}}
+								/>
+								<span className="absolute inset-x-0 bottom-3 flex items-center justify-start pl-4 pr-8 text-xs">
+									<span className="truncate">
+										Lorem ipsum dolor sit amet consectetur
+										adipisicing elit
+									</span>
+								</span>
+							</div>
+						))}
+					</div>
+				) : null}
+				<div
+					className="relative rounded-md bg-neutral-50 px-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-800 dark:ring-neutral-800"
+					style={{ zIndex: peekIndex + 20 }}
+				>
+					<AccordionTrigger>
+						<div className="text-left text-sm">
+							{question.question}
+						</div>
+					</AccordionTrigger>
+					<AccordionContent>
+						<span>Ans.</span>
+						<span className="text-gray-500">{question.answer}</span>
+						<div className="flex items-center justify-between">
+							<div className="flex gap-2">
+								{/* <Button
 								variant={vote === 1 ? "outline" : "ghost"}
 								size="icon"
 								onClick={() => {
@@ -190,43 +237,48 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 									<HandThumbDownIconOutline className="h-4 w-4" />
 								)}
 							</Button> */}
+								<Button
+									variant={
+										audioState === 1 ? "outline" : "ghost"
+									}
+									size="icon"
+									className={cn(
+										audioState === 1
+											? "border-blue-600/20 bg-blue-600/10 dark:border-blue-600/20 dark:bg-blue-600/10"
+											: ""
+									)}
+									onClick={handleAudio}
+								>
+									<SpeakerWaveIcon
+										className={cn(
+											"h-4 w-4",
+											audioState === 1
+												? "fill-blue-500"
+												: ""
+										)}
+									/>
+								</Button>
+							</div>
 							<Button
-								variant={audioState === 1 ? "outline" : "ghost"}
+								variant={bookmarked ? "outline" : "ghost"}
 								size="icon"
+								onClick={handleBookmark}
 								className={cn(
-									audioState === 1
-										? "border-blue-600/20 bg-blue-600/10 dark:border-blue-600/20 dark:bg-blue-600/10"
+									"relative",
+									bookmarked
+										? "border-yellow-500/20 bg-yellow-500/10 dark:border-yellow-500/20 dark:bg-yellow-500/10"
 										: ""
 								)}
-								onClick={handleAudio}
 							>
-								<SpeakerWaveIcon
-									className={cn(
-										"h-4 w-4",
-										audioState === 1 ? "fill-blue-500" : ""
-									)}
-								/>
+								{bookmarked ? (
+									<BookmarkIconSolid className="h-4 w-4 shrink-0 fill-yellow-500 dark:fill-yellow-400" />
+								) : (
+									<BookmarkIconOutline className="h-4 w-4 shrink-0" />
+								)}
 							</Button>
 						</div>
-						<Button
-							variant={bookmarked ? "outline" : "ghost"}
-							size="icon"
-							onClick={handleBookmark}
-							className={cn(
-								"relative",
-								bookmarked
-									? "border-yellow-500/20 bg-yellow-500/10 dark:border-yellow-500/20 dark:bg-yellow-500/10"
-									: ""
-							)}
-						>
-							{bookmarked ? (
-								<BookmarkIconSolid className="h-4 w-4 shrink-0 fill-yellow-500 dark:fill-yellow-400" />
-							) : (
-								<BookmarkIconOutline className="h-4 w-4 shrink-0" />
-							)}
-						</Button>
-					</div>
-				</AccordionContent>
+					</AccordionContent>
+				</div>
 			</AccordionItem>
 		</>
 	)

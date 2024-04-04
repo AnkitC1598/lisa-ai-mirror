@@ -56,6 +56,7 @@ const Bookmarks: React.FC<IBookmarks> = async ({ searchParams }) => {
 								courseId: bookmark.cohortId,
 								topicId: bookmark.topicId,
 							}}
+							showHierarchy
 						/>
 					) : bookmark.type === "question" ? (
 						<Accordion
@@ -66,6 +67,7 @@ const Bookmarks: React.FC<IBookmarks> = async ({ searchParams }) => {
 								key={bookmark._id}
 								idx={idx}
 								question={bookmark.body as IPracticeQuestion}
+								showHierarchy
 							/>
 						</Accordion>
 					) : (
@@ -73,6 +75,7 @@ const Bookmarks: React.FC<IBookmarks> = async ({ searchParams }) => {
 							key={bookmark._id}
 							type="topic"
 							showHierarchy
+							cohortId={bookmark.cohortId}
 							hierarchy={
 								bookmark.topic as {
 									_id: string

@@ -4,6 +4,8 @@ import {
 	addResourceBookmark,
 	removeResourceBookmark,
 } from "@/actions/bookmarks"
+import { cn } from "@/lib"
+import Peek from "@/svg/peek"
 import { Resource } from "@/types/topic"
 import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/24/outline"
 import { BookmarkIcon as BookmarkIconSolid } from "@heroicons/react/24/solid"
@@ -19,6 +21,8 @@ interface ILinkPreview {
 	resource: Resource
 	params?: { courseId: string; topicId: string }
 	bookmarkState?: boolean
+	peekIndex?: number
+	showHierarchy?: boolean
 }
 
 const LinkPreview: React.FC<ILinkPreview> = ({
@@ -26,6 +30,8 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 	resource,
 	params,
 	bookmarkState = false,
+	peekIndex = 0,
+	showHierarchy = false,
 }) => {
 	const [bookmarked, setBookmarked] = useState<boolean>(
 		resource.bookmarked ?? bookmarkState
@@ -66,9 +72,48 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 				href={resource.url}
 				target="_blank"
 				rel="noopener noreferrer"
-				className="group/resource flex w-full gap-4 rounded-md bg-neutral-50 px-4 py-5 shadow-md ring-1  ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-800 dark:ring-neutral-800"
+				className={cn("relative w-full", {
+					"mt-6": showHierarchy,
+				})}
+				style={{ zIndex: peekIndex + 10 }}
 			>
-				<div className="flex w-full flex-1 flex-col gap-3">
+				{showHierarchy ? (
+					<div
+						className="absolute inset-x-0 -top-6 flex -space-x-6 overflow-y-auto scrollbar-hide"
+						style={{ zIndex: peekIndex + 9 }}
+					>
+						{Array.from({
+							length: 2,
+						}).map((_, idx) => (
+							<div
+								key={idx}
+								className="relative h-full"
+								style={{
+									zIndex: peekIndex + 10 + -1 * (idx + 1),
+								}}
+							>
+								<Peek
+									border="stroke-purple-300 dark:stroke-purple-600"
+									bg="fill-purple-100 dark:fill-purple-900"
+									className="!h-8 !w-32"
+									style={{
+										zIndex: peekIndex + 10 + -1 * (idx + 1),
+									}}
+								/>
+								<span className="absolute inset-x-0 bottom-3 flex items-center justify-start pl-4 pr-8 text-xs">
+									<span className="truncate">
+										Lorem ipsum dolor sit amet consectetur
+										adipisicing elit
+									</span>
+								</span>
+							</div>
+						))}
+					</div>
+				) : null}
+				<div
+					className="group/resource relative flex w-full flex-1 flex-col gap-3 rounded-md  bg-neutral-50 px-4 py-5 shadow-md ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-800 dark:ring-neutral-800"
+					style={{ zIndex: peekIndex + 20 }}
+				>
 					<div className="flex flex-1 flex-col">
 						<span className="line-clamp-2 pr-7 text-lg underline-offset-2 group-hover/resource:underline">
 							{resource.title}
