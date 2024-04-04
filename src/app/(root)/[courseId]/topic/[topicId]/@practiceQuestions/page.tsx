@@ -62,7 +62,6 @@ const PracticeQuestions = () => {
 			courseId,
 			topicId,
 		}).then(data => {
-			console.debug(`🚀 ~ useEffect ~ data:`, data)
 			setPracticeQuestions(data?.questions ?? null)
 			if (practiceQuestions || data?.questions) return
 			if (prompt && !aiIsLoading) {

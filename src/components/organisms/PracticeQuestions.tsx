@@ -11,7 +11,8 @@ import {
 	AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
-import { handleAudio, handleVote } from "@/lib/interactions"
+import useTextToSpeech from "@/hooks/useTextToSpeech"
+import { handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import { IPracticeQuestion } from "@/types/topic"
 import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/24/outline"
@@ -20,13 +21,15 @@ import {
 	SpeakerWaveIcon,
 } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 interface IPracticeQuestions {
 	questions: IPracticeQuestion[]
 }
 
 const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
+	const [open, setOpen] = useState<string>("1")
+
 	return (
 		<>
 			<div className="px-4">
@@ -35,12 +38,14 @@ const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
 					collapsible
 					className="space-y-4"
 					defaultValue="1"
+					onValueChange={setOpen}
 				>
 					{questions.map((question, idx) => (
 						<PracticeQuestion
 							key={question.id ?? question.question}
 							question={question}
 							idx={idx + 1}
+							open={open}
 						/>
 					))}
 				</Accordion>
@@ -65,16 +70,15 @@ export const PracticeQuestionsSkeletonLoader = () => {
 interface IPracticeQuestionProps {
 	question: IPracticeQuestion
 	idx: number
-	hideIndex?: boolean
+	open?: string
 }
 
 export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 	question,
 	idx,
-	hideIndex = !false,
+	open,
 }) => {
 	const [vote, setVote] = useState<number>(0)
-	const [audioState, setAudioState] = useState<number>(0)
 	const [bookmarked, setBookmarked] = useState<boolean>(
 		question.bookmarked ?? false
 	)
@@ -82,6 +86,9 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 		courseId: string
 		topicId: string
 	}>()
+
+	const { subscribe, handleAudio, unsubscribe, audioState } =
+		useTextToSpeech()
 
 	const resetVote = () => setVote(0)
 
@@ -122,6 +129,18 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 			})
 		}
 	}
+	useEffect(() => {
+		if (!question.question || !question.answer || !open) return
+
+		if (open === `${idx}`)
+			subscribe(`${question.question}\n${question.answer}`)
+		else unsubscribe()
+
+		return () => {
+			unsubscribe()
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [question.question, question.answer, subscribe, open])
 
 	return (
 		<>
@@ -130,14 +149,7 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 				className="rounded-md bg-neutral-50 px-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-800 dark:ring-neutral-800"
 			>
 				<AccordionTrigger>
-					<div className="flex flex-col items-start justify-start gap-1 text-sm">
-						{hideIndex ? null : (
-							<div>Question {String(idx).padStart(2, "0")}</div>
-						)}
-						<div className=".text-gray-500 text-left">
-							{question.question}
-						</div>
-					</div>
+					<div className="text-left text-sm">{question.question}</div>
 				</AccordionTrigger>
 				<AccordionContent>
 					<span>Ans.</span>
@@ -186,16 +198,7 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 										? "border-blue-600/20 bg-blue-600/10 dark:border-blue-600/20 dark:bg-blue-600/10"
 										: ""
 								)}
-								onClick={() =>
-									handleAudio({
-										text:
-											question.question +
-											"\n" +
-											question.answer,
-										audioState,
-										setAudioState,
-									})
-								}
+								onClick={handleAudio}
 							>
 								<SpeakerWaveIcon
 									className={cn(
