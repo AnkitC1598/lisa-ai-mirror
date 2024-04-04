@@ -35,13 +35,21 @@ const Onboarding = () => {
 	const form = useForm<z.infer<typeof preferenceSchema>>({
 		resolver: zodResolver(preferenceSchema),
 		defaultValues: async () => {
-			const ipdata = new IPData(clientEnv.NEXT_PUBLIC_IPDATA_API_KEY)
-			const ipInfo = await ipdata.lookup()
+			let ipInfo
+			if (!user.location.city && !user.location.country) {
+				const ipdata = new IPData(clientEnv.NEXT_PUBLIC_IPDATA_API_KEY)
+				ipInfo = await ipdata.lookup()
+			} else {
+				ipInfo = {
+					city: user.location.city,
+					country_name: user.location.country,
+				}
+			}
 			return {
 				...user,
 				location: {
-					city: user.location.city ?? ipInfo.city,
-					country: user.location.country ?? ipInfo.country_name,
+					city: ipInfo.city ?? "",
+					country: ipInfo.country_name ?? "",
 				},
 				yob: Number(getYear(new Date(user.dob))),
 			}
