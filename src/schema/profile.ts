@@ -5,16 +5,36 @@ export const preferenceSchema = z.object({
 	yob: z.number().lte(new Date().getFullYear()),
 	location: z.object({ country: z.string(), city: z.string() }),
 	interests: z.object({
-		creativity: z.string().array().min(1),
-		goingOut: z.string().array().min(1),
-		stayingIn: z.string().array().min(1),
-		filmTv: z.string().array().min(1),
-		reading: z.string().array().min(1),
-		music: z.string().array().min(1),
-		foodDrinking: z.string().array().min(1),
-		traveling: z.string().array().min(1),
-		pets: z.string().array().min(1),
-		valuesTraits: z.string().array().min(1),
+		creativity: z.string().array().min(1, {
+			message: "Select at least one interest",
+		}),
+		goingOut: z.string().array().min(1, {
+			message: "Select at least one interest",
+		}),
+		stayingIn: z.string().array().min(1, {
+			message: "Select at least one interest",
+		}),
+		filmTv: z.string().array().min(1, {
+			message: "Select at least one interest",
+		}),
+		reading: z.string().array().min(1, {
+			message: "Select at least one interest",
+		}),
+		music: z.string().array().min(1, {
+			message: "Select at least one interest",
+		}),
+		foodDrinking: z.string().array().min(1, {
+			message: "Select at least one interest",
+		}),
+		traveling: z.string().array().min(1, {
+			message: "Select at least one interest",
+		}),
+		pets: z.string().array().min(1, {
+			message: "Select at least one interest",
+		}),
+		valuesTraits: z.string().array().min(1, {
+			message: "Select at least one interest",
+		}),
 	}),
 })
 

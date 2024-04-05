@@ -19,7 +19,7 @@ const Navbar: React.FC<INavbar> = async ({ logoOnly = false }) => {
 		<>
 			<div
 				className={cn(
-					"grid max-h-16 w-full items-center justify-between p-4 shadow dark:shadow-neutral-800",
+					"grid max-h-16 w-full items-center justify-between border-b p-4 dark:border-b-neutral-900",
 					logoOnly ? "grid-cols-1" : "grid-cols-3"
 				)}
 			>
@@ -54,7 +54,7 @@ const Navbar: React.FC<INavbar> = async ({ logoOnly = false }) => {
 						>
 							<Link
 								href="/profile"
-								className="relative aspect-square h-8 overflow-hidden rounded-full !p-0"
+								className="relative aspect-square h-8 overflow-hidden rounded-full border border-gray-400 !p-0 "
 							>
 								<Image
 									src={user.profileImage ?? icon}

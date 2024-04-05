@@ -1,6 +1,6 @@
 "use client"
 
-import { BookmarkIcon } from "@heroicons/react/16/solid"
+import { BookmarkIcon } from "@heroicons/react/24/outline"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "../ui/button"
@@ -17,7 +17,7 @@ const NavbarPrimaryActions = () => {
 			asChild
 		>
 			<Link href="/bookmarks">
-				<BookmarkIcon className="h-4 w-4 shrink-0 fill-yellow-500 dark:fill-yellow-400" />
+				<BookmarkIcon className="h-6 w-6 shrink-0 text-gray-400" />
 			</Link>
 		</Button>
 	) : (

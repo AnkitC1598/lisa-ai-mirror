@@ -66,7 +66,7 @@ const Onboarding = () => {
 		<>
 			<div className="flex h-full flex-col gap-4 overflow-hidden">
 				<div className="flex flex-col gap-2 px-4 pt-4">
-					<span className="text-2xl font-semibold">
+					<span className="text-xl font-semibold">
 						Help lisa understand you better
 					</span>
 				</div>
@@ -81,7 +81,7 @@ const Onboarding = () => {
 								name="gender"
 								render={({ field }) => (
 									<FormItem className="flex flex-col">
-										<FormLabel className="text-sm font-medium text-gray-600 dark:text-gray-400">
+										<FormLabel className="text-sm font-medium uppercase text-gray-500 dark:text-gray-500">
 											First things first, you identify as
 											...
 										</FormLabel>
@@ -128,7 +128,7 @@ const Onboarding = () => {
 								name="yob"
 								render={({ field }) => (
 									<FormItem className="flex flex-col">
-										<FormLabel className="text-sm font-medium text-gray-600 dark:text-gray-400">
+										<FormLabel className="text-sm font-medium uppercase text-gray-600 dark:text-gray-500">
 											Birth Year
 										</FormLabel>
 										<FormControl>
@@ -149,8 +149,8 @@ const Onboarding = () => {
 									</FormItem>
 								)}
 							/>
-							<div className="flex flex-col gap-y-1">
-								<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+							<div className="flex flex-col space-y-4">
+								<span className="text-sm font-medium uppercase text-gray-600 dark:text-gray-500">
 									Location
 								</span>
 								<div className="grid grid-cols-2 gap-4">
@@ -205,7 +205,7 @@ const Onboarding = () => {
 									name={`interests.${key}`}
 									render={({ field }) => (
 										<FormItem className="flex flex-col">
-											<FormLabel className="text-sm font-medium text-gray-600 dark:text-gray-400">
+											<FormLabel className="text-sm font-medium uppercase text-gray-600 dark:text-gray-500">
 												{title}
 											</FormLabel>
 											<FormControl>
@@ -228,12 +228,15 @@ const Onboarding = () => {
 								/>
 							))}
 						</div>
-						<div className="flex-1 px-4 pb-4">
+						<div className="flex flex-1 flex-col items-center justify-center gap-4 px-4 pb-4">
+							<p className="text-sm font-normal text-gray-500 dark:text-gray-500">
+								Choose atleast 7 interests
+							</p>
 							<Button
 								variant="secondary"
-								className="w-full bg-purple-500 text-neutral-50 hover:bg-purple-500/90 dark:bg-purple-900 dark:text-neutral-50 dark:hover:bg-purple-900/90"
+								className="w-full bg-purple-600 text-sm text-neutral-50 hover:bg-purple-500/90 dark:bg-purple-900 dark:text-neutral-50 dark:hover:bg-purple-900/90"
 							>
-								Done
+								Start Learning &nbsp; 🎉
 							</Button>
 						</div>
 					</form>

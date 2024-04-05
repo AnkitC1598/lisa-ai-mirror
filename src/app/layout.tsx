@@ -2,11 +2,21 @@ import "@/app/globals.css"
 import { cn } from "@/lib/utils"
 import AuthProvider from "@/providers/authProvider"
 import NextThemeProvider from "@/providers/nextThemeProvider"
+import type { Viewport } from "next"
 import { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"] })
+
+export const viewport: Viewport = {
+	width: "device-width",
+	initialScale: 1,
+	maximumScale: 1,
+	userScalable: false,
+	// Also supported by less commonly used
+	// interactiveWidget: 'resizes-visual',
+}
 
 export const metadata: Metadata = {
 	title: "lisa AI",
@@ -35,7 +45,7 @@ const AppLayout: React.FC<Readonly<IAppLayout>> = ({ children }) => {
 					defaultTheme="dark"
 					enableSystem
 				>
-					<div className="flex w-full max-w-md flex-col border">
+					<div className="flex w-full max-w-md flex-col">
 						<Suspense fallback={<>Loading...</>}>
 							<AuthProvider>{children}</AuthProvider>
 						</Suspense>
