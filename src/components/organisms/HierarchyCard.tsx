@@ -31,7 +31,7 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 
 	if (!HierarchyConstants.hasOwnProperty(type)) return
 
-	const { icon: Icon } = HierarchyConstants[type]
+	const { icon: Icon, colors } = HierarchyConstants[type]
 	const IconComponent = Icon as React.ComponentType<ISVGIconProps>
 
 	let basePath = type === "topic" ? `/${cohortId}/topic` : pathname
@@ -63,7 +63,12 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 								)}
 							/>
 						) : IconComponent ? (
-							<IconComponent className="h-4 w-4 shrink-0" />
+							<IconComponent
+								className={cn(
+									"h-4 w-4 shrink-0",
+									colors.card.icon
+								)}
+							/>
 						) : null}
 						<p className="line-clamp-1 text-sm">
 							{hierarchy.title}

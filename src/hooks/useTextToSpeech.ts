@@ -37,7 +37,9 @@ const useTextToSpeech = () => {
 	const subscribe = useCallback(
 		(text: string) => {
 			if (synth) {
-				const synthUtterance = new SpeechSynthesisUtterance(text)
+				const synthUtterance = new SpeechSynthesisUtterance(
+					removeEmojis(text)
+				)
 				synthUtterance.onstart = () => setAudioState(1)
 				synthUtterance.onend = () => {
 					setAudioState(0)

@@ -10,12 +10,12 @@ const HierarchyConstants: IHierarchyConstant = {
 		colors: {
 			card: {
 				border: "hover:border-pink-400 dark:hover:border-pink-800",
-				icon: "group-hover:text-pink-500",
+				icon: "text-pink-500",
 				bg: "bg-pink-100 dark:bg-pink-800",
 				text: "text-pink-700 dark:text-pink-50",
 			},
 			content: {
-				createIcon: "group-hover:text-pink-500",
+				createIcon: "text-pink-500",
 				dataIcon: "text-pink-200 dark:text-pink-500",
 			},
 			form: {
@@ -30,12 +30,12 @@ const HierarchyConstants: IHierarchyConstant = {
 		colors: {
 			card: {
 				border: "hover:border-pink-400 dark:hover:border-pink-800",
-				icon: "group-hover:text-pink-500",
+				icon: "text-pink-500",
 				bg: "bg-pink-100 dark:bg-pink-800",
 				text: "text-pink-700 dark:text-pink-50",
 			},
 			content: {
-				createIcon: "group-hover:text-pink-500",
+				createIcon: "text-pink-500",
 				dataIcon: "text-pink-200 dark:text-pink-500",
 			},
 			form: {
@@ -50,12 +50,12 @@ const HierarchyConstants: IHierarchyConstant = {
 		colors: {
 			card: {
 				border: "hover:border-purple-400 dark:hover:border-purple-800",
-				icon: "group-hover:text-purple-500",
+				icon: "text-purple-500",
 				bg: "bg-purple-100 dark:bg-purple-800",
 				text: "text-purple-700 dark:text-purple-50",
 			},
 			content: {
-				createIcon: "group-hover:text-purple-500",
+				createIcon: "text-purple-500",
 				dataIcon: "text-purple-200 dark:text-purple-500",
 			},
 			form: {
@@ -70,12 +70,12 @@ const HierarchyConstants: IHierarchyConstant = {
 		colors: {
 			card: {
 				border: "hover:border-blue-400 dark:hover:border-blue-800",
-				icon: "group-hover:text-blue-500",
+				icon: "text-blue-500",
 				bg: "bg-blue-100 dark:bg-blue-800",
 				text: "text-blue-700 dark:text-blue-50",
 			},
 			content: {
-				createIcon: "group-hover:text-blue-500",
+				createIcon: "text-blue-500",
 				dataIcon: "text-blue-200 dark:text-blue-500",
 			},
 			form: {
@@ -90,12 +90,12 @@ const HierarchyConstants: IHierarchyConstant = {
 		colors: {
 			card: {
 				border: "hover:border-rose-400 dark:hover:border-rose-800",
-				icon: "group-hover:text-rose-500",
+				icon: "text-rose-500",
 				bg: "bg-rose-100 dark:bg-rose-800",
 				text: "text-rose-700 dark:text-rose-50",
 			},
 			content: {
-				createIcon: "group-hover:text-rose-500",
+				createIcon: "text-rose-500",
 				dataIcon: "text-rose-200 dark:text-rose-500",
 			},
 			form: {
@@ -110,12 +110,12 @@ const HierarchyConstants: IHierarchyConstant = {
 		colors: {
 			card: {
 				border: "hover:border-neutral-400 dark:hover:border-neutral-800",
-				icon: "group-hover:text-neutral-500",
+				icon: "text-neutral-500",
 				bg: "bg-neutral-100 dark:bg-neutral-800",
 				text: "text-neutral-700 dark:text-neutral-50",
 			},
 			content: {
-				createIcon: "group-hover:text-neutral-500",
+				createIcon: "text-neutral-500",
 				dataIcon: "text-neutral-200 dark:text-neutral-500",
 			},
 			form: {
