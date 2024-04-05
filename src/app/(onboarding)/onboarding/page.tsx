@@ -56,6 +56,8 @@ const Onboarding = () => {
 		},
 	})
 
+	const { isDirty, isValid, errors } = form.formState
+
 	const onSubmit = async (values: z.infer<typeof preferenceSchema>) => {
 		// Do something with the form values.
 		// ✅ This will be type-safe and validated.
@@ -229,14 +231,11 @@ const Onboarding = () => {
 							))}
 						</div>
 						<div className="flex flex-1 flex-col gap-2 px-4 pb-4 text-center">
-							{form.formState.errors &&
-							form.formState.errors.interests &&
-							form.formState.errors.interests.root ? (
+							{errors &&
+							errors.interests &&
+							errors.interests.root ? (
 								<p className="text-xs font-medium text-red-500 dark:text-red-600">
-									{
-										form.formState.errors.interests.root
-											.message
-									}
+									{errors.interests.root.message}
 								</p>
 							) : (
 								<div className="text-xs">
@@ -246,6 +245,7 @@ const Onboarding = () => {
 							<Button
 								variant="secondary"
 								className="w-full bg-purple-500 text-neutral-50 hover:bg-purple-500/90 dark:bg-purple-900 dark:text-neutral-50 dark:hover:bg-purple-900/90"
+								disabled={!(isDirty && isValid)}
 							>
 								Done
 							</Button>
