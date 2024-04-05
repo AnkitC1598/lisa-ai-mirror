@@ -51,7 +51,16 @@ const Bookmarks: React.FC<IBookmarks> = async ({ searchParams }) => {
 					bookmark.type === "resource" ? (
 						<LinkPreview
 							key={bookmark._id}
-							resource={bookmark.body as Resource}
+							resource={
+								{
+									...bookmark.body,
+									cohort: bookmark.cohort,
+									term: bookmark.term,
+									subject: bookmark.subject,
+									chapter: bookmark.chapter,
+									topic: bookmark.topic,
+								} as Resource & { [key: string]: any }
+							}
 							params={{
 								courseId: bookmark.cohortId,
 								topicId: bookmark.topicId,
@@ -66,7 +75,18 @@ const Bookmarks: React.FC<IBookmarks> = async ({ searchParams }) => {
 							<PracticeQuestion
 								key={bookmark._id}
 								idx={idx}
-								question={bookmark.body as IPracticeQuestion}
+								question={
+									{
+										...bookmark.body,
+										cohort: bookmark.cohort,
+										term: bookmark.term,
+										subject: bookmark.subject,
+										chapter: bookmark.chapter,
+										topic: bookmark.topic,
+									} as IPracticeQuestion & {
+										[key: string]: any
+									}
+								}
 								showHierarchy
 							/>
 						</Accordion>
@@ -76,14 +96,14 @@ const Bookmarks: React.FC<IBookmarks> = async ({ searchParams }) => {
 							type="topic"
 							showHierarchy
 							cohortId={bookmark.cohortId}
-							hierarchy={
-								bookmark.topic as {
-									_id: string
-									title: string
-									details: any
-									priority: number
-								}
-							}
+							hierarchy={{
+								...bookmark.topic,
+								cohort: bookmark.cohort,
+								term: bookmark.term,
+								subject: bookmark.subject,
+								chapter: bookmark.chapter,
+								topic: bookmark.topic,
+							}}
 						/>
 					)
 				)}

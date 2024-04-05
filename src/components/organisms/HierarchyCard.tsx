@@ -63,14 +63,64 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 			hierarchyArr.forEach((h, i) => {
 				const hierarchyKey = h === "course" ? "cohort" : h
 				if (i === 0) route.push(hierarchy.cohort._id)
-				else if (i === hierarchyArr.length - 1) {
+				else if (i === hierarchyArr.length - 1)
 					route.push(hierarchy._id)
-				} else route.push(hierarchy[hierarchyKey]._id)
+				else route.push(hierarchy[hierarchyKey]._id)
 			})
 
 			return route.join("/")
 		}
 	}, [hierarchy, makeRoute, type, cohortId, pathname])
+
+	const peekValue = useMemo(() => {
+		if (!showHierarchy || !hierarchy.cohort)
+			return {
+				icon: "",
+				breadcrumbs: [],
+			}
+
+		const currentHierarchy = hierarchy.cohort.type
+			.map((t: string) => t[0])
+			.join("")
+
+		if (!currentHierarchy)
+			return {
+				icon: "",
+				breadcrumbs: [],
+			}
+		let hierarchyArr = HierarchyTypes[currentHierarchy]
+		hierarchyArr = hierarchyArr
+			.slice(0, hierarchyArr.indexOf(hierarchy.type))
+			.slice(-2)
+		let route: {
+			icon: string | null
+			breadcrumbs: { color: string; title: string; _id: string }[]
+		} = { icon: hierarchy.cohort.icon, breadcrumbs: [] }
+
+		hierarchyArr.forEach((h, i) => {
+			const hierarchyKey = h === "course" ? "cohort" : h
+			if (i === 0)
+				route.breadcrumbs.push({
+					color: "",
+					title: hierarchy.cohort.title,
+					_id: hierarchy.cohort._id,
+				})
+			else if (i === hierarchyArr.length - 1)
+				route.breadcrumbs.push({
+					color: "",
+					title: hierarchy.title,
+					_id: hierarchy._id,
+				})
+			else
+				route.breadcrumbs.push({
+					color: "",
+					title: hierarchy[hierarchyKey].title,
+					_id: hierarchy[hierarchyKey]._id,
+				})
+		})
+
+		return route
+	}, [hierarchy, showHierarchy])
 
 	return (
 		<>
@@ -82,7 +132,12 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 				style={{ zIndex: peekIndex + 10 }}
 				{...props}
 			>
-				{showHierarchy ? <HierarchyPeek peekIndex={peekIndex} /> : null}
+				{showHierarchy ? (
+					<HierarchyPeek
+						peekIndex={peekIndex}
+						peekValue={peekValue}
+					/>
+				) : null}
 				<div
 					className="relative flex items-center justify-between gap-4 rounded-md bg-gray-50 p-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-900 dark:ring-neutral-800"
 					style={{ zIndex: peekIndex + 20 }}

@@ -11,6 +11,7 @@ import {
 	AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
+import HierarchyTypes from "@/constants/HierarchyTypes"
 import useTextToSpeech from "@/hooks/useTextToSpeech"
 import { handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
@@ -21,7 +22,7 @@ import {
 	SpeakerWaveIcon,
 } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import HierarchyPeek from "./HierarchyPeek"
 
 interface IPracticeQuestions {
@@ -69,7 +70,9 @@ export const PracticeQuestionsSkeletonLoader = () => {
 }
 
 interface IPracticeQuestionProps {
-	question: IPracticeQuestion
+	question: IPracticeQuestion & {
+		[key: string]: any
+	}
 	idx: number
 	open?: string
 	peekIndex?: number
@@ -147,6 +150,47 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [question.question, question.answer, subscribe, open])
 
+	const peekValue = useMemo(() => {
+		if (!showHierarchy || !question.cohort)
+			return {
+				icon: "",
+				breadcrumbs: [],
+			}
+
+		const currentHierarchy = question.cohort.type
+			.map((t: string) => t[0])
+			.join("")
+
+		if (!currentHierarchy)
+			return {
+				icon: "",
+				breadcrumbs: [],
+			}
+		const hierarchyArr = HierarchyTypes[currentHierarchy].slice(-2)
+		let route: {
+			icon: string | null
+			breadcrumbs: { color: string; title: string; _id: string }[]
+		} = { icon: question.cohort.icon, breadcrumbs: [] }
+
+		hierarchyArr.forEach((h, i) => {
+			const hierarchyKey = h === "course" ? "cohort" : h
+			if (i === 0)
+				route.breadcrumbs.push({
+					color: "",
+					title: question.cohort.title,
+					_id: question.cohort._id,
+				})
+			else
+				route.breadcrumbs.push({
+					color: "",
+					title: question[hierarchyKey].title,
+					_id: question[hierarchyKey]._id,
+				})
+		})
+
+		return route
+	}, [question, showHierarchy])
+
 	return (
 		<>
 			<AccordionItem
@@ -156,7 +200,12 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 				})}
 				style={{ zIndex: peekIndex + 10 }}
 			>
-				{showHierarchy ? <HierarchyPeek peekIndex={peekIndex} /> : null}
+				{showHierarchy ? (
+					<HierarchyPeek
+						peekIndex={peekIndex}
+						peekValue={peekValue}
+					/>
+				) : null}
 				<div
 					className="relative rounded-md bg-neutral-50 px-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-800 dark:ring-neutral-800"
 					style={{ zIndex: peekIndex + 20 }}

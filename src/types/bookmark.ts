@@ -26,5 +26,21 @@ export interface IBookmark {
 		details: any
 		priority: number
 	}
+	cohort: {
+		title: string
+		icon: string | null
+		type: string[]
+	}
+	term?: {
+		title: string
+	}
+	subject?: {
+		title: string
+	}
+	chapter?: {
+		title: string
+		icon: string | null
+		type: string[]
+	}
 	bookmarked: boolean
 }

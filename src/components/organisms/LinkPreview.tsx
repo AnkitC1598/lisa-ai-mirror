@@ -4,13 +4,14 @@ import {
 	addResourceBookmark,
 	removeResourceBookmark,
 } from "@/actions/bookmarks"
+import HierarchyTypes from "@/constants/HierarchyTypes"
 import { cn } from "@/lib"
 import { Resource } from "@/types/topic"
 import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/24/outline"
 import { BookmarkIcon as BookmarkIconSolid } from "@heroicons/react/24/solid"
 import Image from "next/image"
 import { useParams } from "next/navigation"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Button } from "../ui/button"
 import HierarchyPeek from "./HierarchyPeek"
 
@@ -18,7 +19,9 @@ type TOrientation = "landscape" | "portrait"
 
 interface ILinkPreview {
 	orientation?: TOrientation
-	resource: Resource
+	resource: Resource & {
+		[key: string]: any
+	}
 	params?: { courseId: string; topicId: string }
 	bookmarkState?: boolean
 	peekIndex?: number
@@ -66,6 +69,48 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 			})
 		}
 	}
+
+	const peekValue = useMemo(() => {
+		if (!showHierarchy || !resource.cohort)
+			return {
+				icon: "",
+				breadcrumbs: [],
+			}
+
+		const currentHierarchy = resource.cohort.type
+			.map((t: string) => t[0])
+			.join("")
+
+		if (!currentHierarchy)
+			return {
+				icon: "",
+				breadcrumbs: [],
+			}
+		const hierarchyArr = HierarchyTypes[currentHierarchy].slice(-2)
+		let route: {
+			icon: string | null
+			breadcrumbs: { color: string; title: string; _id: string }[]
+		} = { icon: resource.cohort.icon, breadcrumbs: [] }
+
+		hierarchyArr.forEach((h, i) => {
+			const hierarchyKey = h === "course" ? "cohort" : h
+			if (i === 0)
+				route.breadcrumbs.push({
+					color: "",
+					title: resource.cohort.title,
+					_id: resource.cohort._id,
+				})
+			else
+				route.breadcrumbs.push({
+					color: "",
+					title: resource[hierarchyKey].title,
+					_id: resource[hierarchyKey]._id,
+				})
+		})
+
+		return route
+	}, [resource, showHierarchy])
+
 	return (
 		<>
 			<a
@@ -77,7 +122,12 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 				})}
 				style={{ zIndex: peekIndex + 10 }}
 			>
-				{showHierarchy ? <HierarchyPeek peekIndex={peekIndex} /> : null}
+				{showHierarchy ? (
+					<HierarchyPeek
+						peekIndex={peekIndex}
+						peekValue={peekValue}
+					/>
+				) : null}
 				<div
 					className="group/resource relative flex w-full flex-1 flex-col gap-3 rounded-md  bg-neutral-50 px-4 py-5 shadow-md ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-800 dark:ring-neutral-800"
 					style={{ zIndex: peekIndex + 20 }}
