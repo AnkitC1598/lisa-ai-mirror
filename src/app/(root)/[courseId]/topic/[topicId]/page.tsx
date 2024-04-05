@@ -104,13 +104,6 @@ const TopicContent = () => {
 
 	return (
 		<div className="flex h-full flex-col gap-4">
-			<form onSubmit={handleSubmit}>
-				<button
-					type="submit"
-					className="hidden"
-					id="submit"
-				/>
-			</form>
 			<ContentControls
 				language={language}
 				setLanguage={setLanguage}
@@ -125,7 +118,15 @@ const TopicContent = () => {
 				)
 			) : aiIsLoading ? (
 				<SlidesSkeletonLoader />
-			) : null}
+			) : (
+				<form onSubmit={handleSubmit}>
+					<button
+						type="submit"
+						className="hidden"
+						id="submit"
+					/>
+				</form>
+			)}
 		</div>
 	)
 }

@@ -22,6 +22,7 @@ import {
 } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
+import { Skeleton } from "../ui/skeleton"
 import HierarchyPeek from "./HierarchyPeek"
 
 interface IPracticeQuestions {
@@ -57,13 +58,18 @@ const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
 
 export const PracticeQuestionsSkeletonLoader = () => {
 	return (
-		<div className="flex flex-1 p-2">
-			<div className="flex h-full w-full p-2">
-				<div className="flex w-full flex-shrink-0 flex-col gap-2 rounded-lg bg-neutral-200 p-4 dark:bg-neutral-800">
-					<div className="h-[30px] w-auto rounded-md bg-neutral-300 text-transparent dark:bg-neutral-700 sm:w-[352px]"></div>
-					<div className="h-[42px] w-auto rounded-md bg-neutral-300 text-transparent dark:bg-neutral-700 sm:w-[352px]"></div>
+		<div className="flex w-full flex-col gap-2 p-4">
+			{Array.from({ length: 4 }).map((_, i) => (
+				<div
+					key={i}
+					className={cn(
+						"relative flex h-full w-full flex-col items-start gap-2 overflow-hidden rounded-md bg-white p-4 shadow-md ring-1 ring-inset ring-neutral-200 scrollbar-hide dark:bg-neutral-900 dark:shadow-none dark:ring-neutral-500/20"
+					)}
+				>
+					<Skeleton className="h-5 w-full" />
+					<Skeleton className="h-5 w-[75%]" />
 				</div>
-			</div>
+			))}
 		</div>
 	)
 }

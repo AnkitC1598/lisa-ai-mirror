@@ -1,10 +1,7 @@
 "use client"
 
 import { getQuestions } from "@/actions/hierarchy"
-import {
-	PracticeQuestionsSkeletonLoader,
-	default as QuestionsArray,
-} from "@/components/organisms/PracticeQuestions"
+import { PracticeQuestionsSkeletonLoader } from "@/components/organisms/PracticeQuestions"
 import { fetchClientWithToken } from "@/services/fetch"
 import useAIStore from "@/store"
 import { IPracticeQuestion } from "@/types/topic"
@@ -76,18 +73,19 @@ const PracticeQuestions = () => {
 
 	return (
 		<>
-			<form onSubmit={handleSubmit}>
-				<button
-					type="submit"
-					className="hidden"
-					id="submit"
-				/>
-			</form>
 			{practiceQuestions ? (
-				<QuestionsArray questions={practiceQuestions} />
+				<PracticeQuestionsSkeletonLoader />
 			) : aiIsLoading ? (
 				<PracticeQuestionsSkeletonLoader />
-			) : null}
+			) : (
+				<form onSubmit={handleSubmit}>
+					<button
+						type="submit"
+						className="hidden"
+						id="submit"
+					/>
+				</form>
+			)}
 		</>
 	)
 }

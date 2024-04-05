@@ -6,20 +6,25 @@ import { handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import { SetState } from "@/types"
 import { IAnswer, ISlide } from "@/types/topic"
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/16/solid"
 import {
 	HandThumbDownIcon as HandThumbDownIconOutline,
 	HandThumbUpIcon as HandThumbUpIconOutline,
+	SpeakerWaveIcon as SpeakerWaveIconOutline,
 } from "@heroicons/react/24/outline"
 import {
 	HandThumbDownIcon as HandThumbDownIconSolid,
 	HandThumbUpIcon as HandThumbUpIconSolid,
-	SpeakerWaveIcon,
+	SpeakerWaveIcon as SpeakerWaveIconSolid,
 } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
 import React, { useCallback, useEffect, useState } from "react"
 import { useInView } from "react-intersection-observer"
 import { Button } from "../ui/button"
+import { Skeleton } from "../ui/skeleton"
 import ContentPagination from "./ContentPagination"
+
+const Alphabets: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 interface ISlidesProps {
 	slides: {
@@ -64,11 +69,38 @@ const Slides: React.FC<ISlidesProps> = ({ slides }) => {
 		answers.forEach((ans: any) => {
 			const element = document.getElementById(ans.body)
 			if (element) {
-				element.style.backgroundColor = "transparent"
+				element.classList.remove(
+					"border-green-300",
+					"bg-green-100",
+					"text-green-700",
+					"dark:border-green-700",
+					"dark:bg-green-800",
+					"dark:text-green-200",
+					"border-red-300",
+					"bg-red-100",
+					"text-red-700",
+					"dark:border-red-700",
+					"dark:bg-red-800",
+					"dark:text-red-200"
+				)
 				if ((answer.isCorrect && answer === ans) || ans.isCorrect)
-					element.style.backgroundColor = "green"
+					element.classList.add(
+						"border-green-300",
+						"bg-green-100",
+						"text-green-700",
+						"dark:border-green-700",
+						"dark:bg-green-800",
+						"dark:text-green-200"
+					)
 				else if (!answer.isCorrect && answer === ans)
-					element.style.backgroundColor = "red"
+					element.classList.add(
+						"border-red-300",
+						"bg-red-100",
+						"text-red-700",
+						"dark:border-red-700",
+						"dark:bg-red-800",
+						"dark:text-red-200"
+					)
 			}
 		})
 		answerQuiz({
@@ -114,17 +146,23 @@ export default Slides
 // Create a skeleton loader for the slides
 export const SlidesSkeletonLoader = () => {
 	return (
-		<div className="flex h-[calc(100%-56px)] flex-1 p-2">
-			<div className="flex h-full w-full p-2">
-				<div className="flex w-full flex-shrink-0 flex-col rounded-lg bg-neutral-200 p-4 dark:bg-neutral-800">
-					<div className="mb-1 w-fit rounded-md bg-neutral-300 text-sm text-transparent dark:bg-neutral-700">
-						{"xxxxx"}
-					</div>
-					<div className="mb-1 w-fit rounded-md bg-neutral-300 text-transparent dark:bg-neutral-700">
-						{"xxxxxxxxxxx"}
-					</div>
-					<div className="h-[42px] w-auto rounded-md bg-neutral-300 text-transparent dark:bg-neutral-700 sm:w-[352px]"></div>
-				</div>
+		<div className="flex h-[80%] p-4">
+			<div
+				className={cn(
+					"relative flex h-full w-full snap-center snap-always flex-col items-start gap-2 overflow-hidden rounded-md bg-white p-4 shadow-md ring-1 ring-inset ring-neutral-200 scrollbar-hide dark:bg-neutral-900 dark:shadow-none dark:ring-neutral-500/20"
+				)}
+			>
+				<Skeleton className="h-5 w-full" />
+				<Skeleton className="h-5 w-[75%]" />
+				<Skeleton className="mt-4 h-5 w-full" />
+				<Skeleton className="h-5 w-[87%]" />
+				<Skeleton className="h-5 w-full" />
+				<Skeleton className="h-5 w-[92%]" />
+				<Skeleton className="h-5 w-[75%]" />
+				<Skeleton className="h-5 w-[87%]" />
+				<Skeleton className="h-5 w-full" />
+				<Skeleton className="h-5 w-[92%]" />
+				<Skeleton className="h-5 w-[75%]" />
 			</div>
 		</div>
 	)
@@ -231,19 +269,23 @@ const Slide: React.FC<ISlideProps> = ({
 		<div
 			id={`slide-${idx}`}
 			className={cn(
-				"relative flex h-full w-full snap-center snap-always flex-col justify-center rounded-md px-4 shadow-md ring-1 ring-inset ring-neutral-200 scrollbar-hide dark:shadow-none dark:ring-neutral-500/20",
-				inView ? "py-4" : ""
+				"relative flex h-full w-full snap-center snap-always flex-col justify-center overflow-hidden rounded-md bg-white shadow-md ring-1 ring-inset ring-neutral-200 scrollbar-hide dark:bg-neutral-900 dark:shadow-none dark:ring-neutral-500/20"
 			)}
 		>
-			<div className="flex flex-1 flex-col gap-2">
-				<span className="font-semibold">
+			<div className="flex flex-1 flex-col gap-4 overflow-hidden p-4 pb-0">
+				{slide.type === "quiz" ? (
+					<div className="flex w-full items-center justify-center text-xs text-purple-700 dark:text-purple-400">
+						💡&nbsp;Lets see how much you remember
+					</div>
+				) : null}
+				<span className="font-medium">
 					{slide.title || slide.question}
 				</span>
 				{slide.answers &&
 				slide.answers.length &&
 				slide.type === "quiz" ? (
-					<div className="flex h-full flex-col gap-2 py-4">
-						{slide.answers.map(answer => (
+					<div className="flex h-full flex-col gap-2">
+						{slide.answers.map((answer, i) => (
 							<button
 								disabled={!!slide.userAnswer || !!answerState}
 								id={answer.body}
@@ -258,44 +300,62 @@ const Slide: React.FC<ISlideProps> = ({
 									})
 								}}
 								className={cn(
-									"w-full cursor-pointer rounded-md border border-neutral-200 bg-neutral-200 p-2 transition-all duration-500 hover:bg-neutral-300 disabled:cursor-not-allowed dark:border-neutral-800 dark:bg-neutral-800 dark:hover:bg-neutral-700",
-									slide.userAnswer
+									"flex w-full cursor-pointer items-center justify-between rounded-md border border-neutral-300 bg-white px-3 py-2 text-left text-xs font-medium text-gray-700 transition-all duration-500  disabled:cursor-not-allowed dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-200 ",
+									slide.userAnswer ||
+										answerState?.id === answer.id
 										? answer.id === slide.correctAnswer
-											? "bg-green-500"
+											? "border-green-300 bg-green-100 text-green-700 dark:border-green-700 dark:bg-green-800 dark:text-green-200"
 											: slide.userAnswer === answer.id
-												? "bg-red-500"
+												? "border-red-300 bg-red-100 text-red-700 dark:border-red-700 dark:bg-red-800 dark:text-red-200"
 												: ""
 										: ""
 								)}
-								style={
-									slide.userAnswer
-										? answer.id === slide.correctAnswer
-											? { backgroundColor: "green" }
-											: slide.userAnswer === answer.id
-												? { backgroundColor: "red" }
-												: {}
-										: {}
-								}
+								// style={
+								// 	slide.userAnswer
+								// 		? answer.id === slide.correctAnswer
+								// 			? { backgroundColor: "green" }
+								// 			: slide.userAnswer === answer.id
+								// 				? { backgroundColor: "red" }
+								// 				: {}
+								// 		: {}
+								// }
 							>
-								{answer.body}
+								<span>
+									{Alphabets[i]}.&nbsp; {answer.body}
+								</span>
+								{slide.userAnswer || answerState ? (
+									answer.id === slide.userAnswer ||
+									answer.id === answerState?.id ? (
+										answer.isCorrect ? (
+											<CheckCircleIcon className="h-4 w-4 shrink-0 fill-green-500 dark:fill-green-200" />
+										) : (
+											<XCircleIcon className="h-4 w-4 shrink-0 fill-red-500 dark:fill-red-200" />
+										)
+									) : null
+								) : null}
 							</button>
 						))}
-						{slide.type === "quiz" &&
-						(slide.userAnswer || answerState) ? (
-							<div className="flex w-full flex-1 items-center justify-center">
-								{slide.userAnswer === slide.correctAnswer ||
-								answerState?.isCorrect
-									? "Congratulations"
-									: "Sorry"}
-							</div>
+						{slide.userAnswer || answerState ? (
+							slide.userAnswer === slide.correctAnswer ||
+							answerState?.isCorrect ? (
+								<div className="mt-2 flex w-full items-center justify-center rounded-md bg-green-50 p-2 text-xs font-medium text-green-600 dark:bg-green-400/10 dark:text-green-200">
+									🎊 Congratulations! Good Work! 🎊
+								</div>
+							) : (
+								<div className="mt-2 flex w-full items-center justify-center rounded-md bg-red-50 p-2 text-xs font-medium text-red-600 dark:bg-red-400/10 dark:text-red-200">
+									🎊 Uh Oh! But hope you got the right one 🎊
+								</div>
+							)
 						) : null}
 					</div>
 				) : (
-					<p className="leading-8">{slide.body}</p>
+					<p className="h-full overflow-auto text-sm leading-7 text-gray-900 scrollbar dark:text-neutral-200">
+						{slide.body}
+					</p>
 				)}
 			</div>
 			{slide.type === "text" ? (
-				<div className="flex items-center justify-between">
+				<div className="flex items-center justify-between p-4">
 					<div className="flex gap-2">
 						<Button
 							variant={vote === 1 ? "outline" : "ghost"}
@@ -312,7 +372,7 @@ const Slide: React.FC<ISlideProps> = ({
 							{vote === 1 ? (
 								<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
 							) : (
-								<HandThumbUpIconOutline className="h-4 w-4" />
+								<HandThumbUpIconOutline className="h-4 w-4 opacity-70" />
 							)}
 						</Button>
 						<Button
@@ -328,7 +388,7 @@ const Slide: React.FC<ISlideProps> = ({
 							{vote === -1 ? (
 								<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
 							) : (
-								<HandThumbDownIconOutline className="h-4 w-4" />
+								<HandThumbDownIconOutline className="h-4 w-4 opacity-70" />
 							)}
 						</Button>
 					</div>
@@ -343,12 +403,11 @@ const Slide: React.FC<ISlideProps> = ({
 						onClick={handleAudio}
 						disabled={langCode !== "en"}
 					>
-						<SpeakerWaveIcon
-							className={cn(
-								"h-4 w-4",
-								audioState === 1 ? "fill-blue-500" : ""
-							)}
-						/>
+						{audioState === 1 ? (
+							<SpeakerWaveIconSolid className="h-4 w-4 fill-blue-500" />
+						) : (
+							<SpeakerWaveIconOutline className="h-4 w-4 opacity-70" />
+						)}
 					</Button>
 				</div>
 			) : null}

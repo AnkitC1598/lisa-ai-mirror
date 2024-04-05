@@ -30,13 +30,13 @@ const ContentPagination: React.FC<IContentPagination> = ({
 					<div
 						key={i}
 						className={cn(
-							"flex rounded-full ring-2 ring-inset ring-neutral-500/10 dark:ring-neutral-400/20",
+							"flex rounded-full bg-neutral-200 dark:bg-neutral-700",
 							vertical ? "w-2 flex-1" : "h-2 flex-1",
-							slideState.current === i
-								? "ring-green-300 dark:ring-green-900"
-								: "",
 							slideState.finished.includes(i)
-								? "bg-green-600 dark:bg-green-400"
+								? "border border-green-400 bg-green-500 dark:border-emerald-600 dark:bg-emerald-600"
+								: "",
+							slideState.current === i
+								? "dakr:border-emerald-500 border border-emerald-600"
 								: ""
 						)}
 					></div>
