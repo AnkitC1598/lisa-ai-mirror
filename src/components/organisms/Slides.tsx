@@ -86,7 +86,10 @@ const Slides: React.FC<ISlidesProps> = ({ slides }) => {
 				slideState={slideState}
 				total={slides.slides.length}
 			/>
-			<div className="flex-1 snap-y snap-mandatory space-y-4 overflow-y-auto pb-4 pl-1 pr-4 scrollbar-hide">
+			<div
+				id="slidesContainer"
+				className="flex-1 snap-y snap-mandatory space-y-4 overflow-y-auto pb-4 pl-1 pr-4 scrollbar-hide"
+			>
 				{slides.slides.map((slide, idx) => (
 					<Slide
 						key={`${idx}_${slide.id}`}
@@ -96,6 +99,8 @@ const Slides: React.FC<ISlidesProps> = ({ slides }) => {
 						handleQuizOption={handleQuizOption}
 						params={{ courseId, topicId }}
 						langCode={slides.language}
+						isLastSlide={idx === slides.slides.length - 1}
+						// handleRecordSlideDuration={handleRecordSlideDuration}
 					/>
 				))}
 			</div>
@@ -134,6 +139,8 @@ interface ISlideProps {
 		topicId: string
 	}
 	langCode?: string
+	isLastSlide?: boolean
+	// handleRecordSlideDuration?: Function
 }
 
 const Slide: React.FC<ISlideProps> = ({
@@ -143,6 +150,7 @@ const Slide: React.FC<ISlideProps> = ({
 	handleQuizOption,
 	params: { courseId, topicId },
 	langCode,
+	isLastSlide = false,
 }) => {
 	const [vote, setVote] = useState<number>(0)
 	// const [audioState, setAudioState] = useState<number>(0)
@@ -172,10 +180,10 @@ const Slide: React.FC<ISlideProps> = ({
 	const resetVote = () => setVote(0)
 
 	const handleFeedback = (feedback: number) => {
-		setSlideState(prev => ({
-			...prev,
-			finished: [...prev.finished, idx],
-		}))
+		// setSlideState(prev => ({
+		// 	...prev,
+		// 	finished: [...prev.finished, idx],
+		// }))
 		setVote(feedback)
 		handleVote({
 			meta: { courseId, topicId, id: slide.id as string, type: "slide" },
@@ -215,6 +223,7 @@ const Slide: React.FC<ISlideProps> = ({
 				finished: [...prev.finished, idx],
 			}))
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [idx, inView, inViewAt, setSlideState])
 
 	return (

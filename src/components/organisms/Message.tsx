@@ -174,7 +174,7 @@ export const AiMessage: React.FC<IMessage> = ({
 							)}
 						/>
 					</Button>
-					<Button
+					{/* <Button
 						variant={audioState === 1 ? "outline" : "ghost"}
 						size="icon"
 						className={cn(
@@ -190,7 +190,7 @@ export const AiMessage: React.FC<IMessage> = ({
 								audioState === 1 ? "fill-blue-500" : ""
 							)}
 						/>
-					</Button>
+					</Button> */}
 				</div>
 			</div>
 		</>

@@ -33,7 +33,10 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 }) => {
 	const pathname = usePathname()
 
-	const { icon: Icon } = HierarchyConstants[type] ?? { icon: null }
+	const { icon: Icon, colors } = HierarchyConstants[type] ?? {
+		icon: null,
+		colors: {},
+	}
 	const IconComponent = Icon as React.ComponentType<ISVGIconProps>
 
 	const href = useMemo(() => {
@@ -95,7 +98,12 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 								)}
 							/>
 						) : IconComponent ? (
-							<IconComponent className="h-4 w-4 shrink-0" />
+							<IconComponent
+								className={cn(
+									"h-4 w-4 shrink-0",
+									colors.card.icon
+								)}
+							/>
 						) : null}
 						<p className="line-clamp-1 text-sm">
 							{hierarchy.title}
