@@ -2,20 +2,52 @@ import { z } from "zod"
 
 export const preferenceSchema = z.object({
 	gender: z.string(),
-	yob: z.number().lte(new Date().getFullYear()),
+	yob: z.coerce.number().lte(new Date().getFullYear()),
 	location: z.object({ country: z.string(), city: z.string() }),
-	interests: z.object({
-		creativity: z.string().array().min(1),
-		goingOut: z.string().array().min(1),
-		stayingIn: z.string().array().min(1),
-		filmTv: z.string().array().min(1),
-		reading: z.string().array().min(1),
-		music: z.string().array().min(1),
-		foodDrinking: z.string().array().min(1),
-		traveling: z.string().array().min(1),
-		pets: z.string().array().min(1),
-		valuesTraits: z.string().array().min(1),
-	}),
+	interests: z
+		.object({
+			creativity: z.string().array(),
+			goingOut: z.string().array(),
+			stayingIn: z.string().array(),
+			filmTv: z.string().array(),
+			reading: z.string().array(),
+			music: z.string().array(),
+			foodDrinking: z.string().array(),
+			traveling: z.string().array(),
+			pets: z.string().array(),
+			valuesTraits: z.string().array(),
+		})
+		.refine(
+			data => {
+				const {
+					creativity = [],
+					goingOut = [],
+					stayingIn = [],
+					filmTv = [],
+					reading = [],
+					music = [],
+					foodDrinking = [],
+					traveling = [],
+					pets = [],
+					valuesTraits = [],
+				} = data
+				const totalValues =
+					creativity.length +
+					goingOut.length +
+					stayingIn.length +
+					filmTv.length +
+					reading.length +
+					music.length +
+					foodDrinking.length +
+					traveling.length +
+					pets.length +
+					valuesTraits.length
+				return totalValues > 5
+			},
+			{
+				message: "Sum of all values must be more than 5",
+			}
+		),
 })
 
 export const profileSchema = z.object({
