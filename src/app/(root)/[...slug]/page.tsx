@@ -4,7 +4,9 @@ import { getHierarchyData } from "@/actions/hierarchy"
 import icon from "@/app/favicon.ico"
 import HierarchyCard from "@/components/organisms/HierarchyCard"
 import Search from "@/components/organisms/Search"
+import HierarchyConstants from "@/constants/Hierarchy"
 import useGetHierarchy from "@/hooks/useGetHierarchy"
+import { cn } from "@/lib/utils"
 import { NonNullable } from "@/types"
 import { IHierarchy, ILevel, THierarchyType } from "@/types/hierarchy"
 import Image from "next/image"
@@ -63,6 +65,8 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 		}).then(resp => setHierarchyData(resp))
 	}, [slug, currentView, currentLevel])
 
+	const { colors } = HierarchyConstants[currentView]
+
 	if (!hierarchyData) return <>Loading...</>
 
 	return (
@@ -87,25 +91,33 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 									{lastTitle}
 								</p>
 							) : null}
-							<p className="line-clamp-2 flex items-center gap-2 text-lg font-medium">
-								{hierarchyData.title}{" "}
-								<span className="inline-flex h-5 select-none items-center gap-1 whitespace-nowrap rounded-md bg-purple-50 px-1.5 py-0.5 text-xs font-medium capitalize text-purple-700 ring-1 ring-inset ring-purple-700/10 dark:bg-purple-400/10 dark:text-purple-400 dark:ring-purple-400/30">
-									{`${String(hierarchyData.children.length).padStart(2, "0")}`}{" "}
-									{`${currentView}s`}
-								</span>
+							<p className="flex items-center gap-2 text-base font-medium">
+								{hierarchyData.title}
 							</p>
 						</div>
 					</div>
+					<Search placeholder={`Search ${currentView}s`} />
 					{currentView === "topic" ? (
-						<div className="flex items-center justify-between text-sm">
+						<div className="mt-2 flex items-center justify-between text-sm">
 							<span>All Topics</span>
 							<span className="text-gray-500">
-								{hierarchyData.completedAiTopics} of{" "}
+								{hierarchyData.completedAiTopics} /{" "}
 								{hierarchyData.children.length} completed
 							</span>
 						</div>
-					) : null}
-					<Search placeholder={`Search ${currentView}s`} />
+					) : (
+						<div className="mt-2 flex items-center justify-start gap-2 text-sm">
+							<span>{`All ${currentView}s`}</span>{" "}
+							<span
+								className={cn(
+									"inline-flex h-5 select-none items-center gap-1 whitespace-nowrap  rounded-md px-1.5 py-0.5 text-xs font-medium capitalize ring-1 ring-inset",
+									colors.badge
+								)}
+							>
+								{`${String(hierarchyData.children.length).padStart(2, "0")}`}
+							</span>
+						</div>
+					)}
 				</div>
 				<div className="flex flex-col gap-4 overflow-auto px-4 pb-4 scrollbar">
 					{filteredHierarchyChildren.length
