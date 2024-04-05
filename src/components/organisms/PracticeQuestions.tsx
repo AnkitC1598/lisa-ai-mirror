@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button"
 import useTextToSpeech from "@/hooks/useTextToSpeech"
 import { handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
-import Peek from "@/svg/peek"
 import { IPracticeQuestion } from "@/types/topic"
 import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/24/outline"
 import {
@@ -23,6 +22,7 @@ import {
 } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
+import HierarchyPeek from "./HierarchyPeek"
 
 interface IPracticeQuestions {
 	questions: IPracticeQuestion[]
@@ -156,39 +156,7 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 				})}
 				style={{ zIndex: peekIndex + 10 }}
 			>
-				{showHierarchy ? (
-					<div
-						className="absolute inset-x-0 -top-6 flex -space-x-6 overflow-y-auto scrollbar-hide"
-						style={{ zIndex: peekIndex + 9 }}
-					>
-						{Array.from({
-							length: 2,
-						}).map((_, idx) => (
-							<div
-								key={idx}
-								className="relative h-full"
-								style={{
-									zIndex: peekIndex + 10 + -1 * (idx + 1),
-								}}
-							>
-								<Peek
-									border="stroke-purple-300 dark:stroke-purple-600"
-									bg="fill-purple-100 dark:fill-purple-900"
-									className="!h-8 !w-32"
-									style={{
-										zIndex: peekIndex + 10 + -1 * (idx + 1),
-									}}
-								/>
-								<span className="absolute inset-x-0 bottom-3 flex items-center justify-start pl-4 pr-8 text-xs">
-									<span className="truncate">
-										Lorem ipsum dolor sit amet consectetur
-										adipisicing elit
-									</span>
-								</span>
-							</div>
-						))}
-					</div>
-				) : null}
+				{showHierarchy ? <HierarchyPeek peekIndex={peekIndex} /> : null}
 				<div
 					className="relative rounded-md bg-neutral-50 px-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-800 dark:ring-neutral-800"
 					style={{ zIndex: peekIndex + 20 }}
