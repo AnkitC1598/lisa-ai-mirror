@@ -1,6 +1,7 @@
 "use client"
 
 import HierarchyConstants from "@/constants/Hierarchy"
+import HierarchyTypes from "@/constants/HierarchyTypes"
 import { cn } from "@/lib/utils"
 import { THierarchyType } from "@/types/hierarchy"
 import { ISVGIconProps } from "@/types/svg"
@@ -8,6 +9,7 @@ import { CheckCircleIcon } from "@heroicons/react/16/solid"
 import { BookmarkIcon as BookmarkIconSolid } from "@heroicons/react/24/solid"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useMemo } from "react"
 import HierarchyPeek from "./HierarchyPeek"
 
 interface IHierarchyCard {
@@ -16,31 +18,61 @@ interface IHierarchyCard {
 	hierarchy: any
 	peekIndex?: number
 	showHierarchy?: boolean
+	makeRoute?: boolean
 	[key: string]: any
 }
 
 const HierarchyCard: React.FC<IHierarchyCard> = ({
-	type = "",
+	type,
 	cohortId = "",
-	hierarchy = "",
+	hierarchy,
 	peekIndex = 0,
 	showHierarchy = false,
+	makeRoute = false,
 	...props
 }) => {
 	const pathname = usePathname()
 
-	if (!HierarchyConstants.hasOwnProperty(type)) return
-
-	const { icon: Icon } = HierarchyConstants[type]
+	const { icon: Icon } = HierarchyConstants[type] ?? { icon: null }
 	const IconComponent = Icon as React.ComponentType<ISVGIconProps>
 
-	let basePath = type === "topic" ? `/${cohortId}/topic` : pathname
-	basePath = basePath.endsWith("/") ? basePath : `${basePath}/`
+	const href = useMemo(() => {
+		if (!hierarchy) return "/"
+		if (!makeRoute) {
+			let link = type === "topic" ? `/${cohortId}/topic` : pathname
+			return link.endsWith("/") ? link : `${link}/` + hierarchy._id
+		}
+
+		if (hierarchy.type === "cohort") return `/${hierarchy._id}`
+		else {
+			const currentHierarchy = hierarchy.cohort.type
+				.map((t: string) => t[0])
+				.join("")
+
+			if (!currentHierarchy) return "/"
+			let hierarchyArr = HierarchyTypes[currentHierarchy]
+			hierarchyArr = hierarchyArr.slice(
+				0,
+				hierarchyArr.indexOf(hierarchy.type) + 1
+			)
+			let route = [""]
+
+			hierarchyArr.forEach((h, i) => {
+				const hierarchyKey = h === "course" ? "cohort" : h
+				if (i === 0) route.push(hierarchy.cohort._id)
+				else if (i === hierarchyArr.length - 1) {
+					route.push(hierarchy._id)
+				} else route.push(hierarchy[hierarchyKey]._id)
+			})
+
+			return route.join("/")
+		}
+	}, [hierarchy, makeRoute, type, cohortId, pathname])
 
 	return (
 		<>
 			<Link
-				href={`${basePath}${hierarchy._id}`}
+				href={href}
 				className={cn("relative w-full", {
 					"mt-6": showHierarchy,
 				})}

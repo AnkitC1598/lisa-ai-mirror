@@ -138,6 +138,7 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 									className="!p-0"
 								>
 									<HierarchyCard
+										makeRoute
 										type={other.type}
 										hierarchy={other}
 										onClick={() => setOpen(false)}
