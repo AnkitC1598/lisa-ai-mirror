@@ -55,13 +55,6 @@ const Onboarding = () => {
 			}
 		},
 	})
-	console.log(
-		form.formState.errors
-			? form.formState.errors.interests
-				? form.formState.errors.interests.root
-				: null
-			: null
-	)
 
 	const onSubmit = async (values: z.infer<typeof preferenceSchema>) => {
 		// Do something with the form values.

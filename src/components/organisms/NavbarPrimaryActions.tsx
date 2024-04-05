@@ -1,6 +1,6 @@
 "use client"
 
-import { BookmarkIcon } from "@heroicons/react/16/solid"
+import { BookmarkIcon } from "@heroicons/react/24/solid"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "../ui/button"

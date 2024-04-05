@@ -87,7 +87,7 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 									{lastTitle}
 								</p>
 							) : null}
-							<p className="line-clamp-2 flex items-center gap-2 text-lg font-medium">
+							<p className="line-clamp-2 text-lg font-medium">
 								{hierarchyData.title}{" "}
 								<span className="inline-flex h-5 select-none items-center gap-1 whitespace-nowrap rounded-md bg-purple-50 px-1.5 py-0.5 text-xs font-medium capitalize text-purple-700 ring-1 ring-inset ring-purple-700/10 dark:bg-purple-400/10 dark:text-purple-400 dark:ring-purple-400/30">
 									{`${String(hierarchyData.children.length).padStart(2, "0")}`}{" "}
