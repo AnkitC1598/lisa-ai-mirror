@@ -158,7 +158,7 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 			>
 				{showHierarchy ? <HierarchyPeek peekIndex={peekIndex} /> : null}
 				<div
-					className="relative rounded-md bg-neutral-50 px-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-800 dark:ring-neutral-800"
+					className="relative rounded-md bg-neutral-50 px-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-none dark:ring-neutral-500/20"
 					style={{ zIndex: peekIndex + 20 }}
 				>
 					<AccordionTrigger>

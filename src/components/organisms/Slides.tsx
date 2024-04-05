@@ -231,7 +231,7 @@ const Slide: React.FC<ISlideProps> = ({
 		<div
 			id={`slide-${idx}`}
 			className={cn(
-				"relative flex h-full w-full snap-center snap-always flex-col justify-center rounded-md px-4 shadow-md ring-1 ring-inset ring-neutral-200 scrollbar-hide dark:shadow-neutral-800 dark:ring-neutral-800",
+				"relative flex h-full w-full snap-center snap-always flex-col justify-center rounded-md px-4 shadow-md ring-1 ring-inset ring-neutral-200 scrollbar-hide dark:shadow-none dark:ring-neutral-500/20",
 				inView ? "py-4" : ""
 			)}
 		>

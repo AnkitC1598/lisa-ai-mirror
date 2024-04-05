@@ -37,20 +37,22 @@ const AppLayout: React.FC<Readonly<IAppLayout>> = ({ children }) => {
 			<body
 				className={cn(
 					inter.className,
-					"flex h-screen w-screen justify-center overflow-hidden bg-gray-50 text-gray-900 transition-all duration-300 ease-in-out dark:bg-neutral-950 dark:text-gray-200"
+					"flex h-screen w-screen justify-center overflow-hidden text-gray-900 transition-all duration-300 ease-in-out dark:text-gray-200"
 				)}
 			>
-				<NextThemeProvider
-					attribute="class"
-					defaultTheme="dark"
-					enableSystem
-				>
-					<div className="flex w-full max-w-md flex-col">
-						<Suspense fallback={<>Loading...</>}>
-							<AuthProvider>{children}</AuthProvider>
-						</Suspense>
-					</div>
-				</NextThemeProvider>
+				<main className="flex h-screen w-screen justify-center md:p-4">
+					<NextThemeProvider
+						attribute="class"
+						defaultTheme="dark"
+						enableSystem
+					>
+						<div className="flex w-full max-w-md flex-col bg-gray-50 dark:bg-neutral-950 md:rounded-md md:border md:border-neutral-500">
+							<Suspense fallback={<>Loading...</>}>
+								<AuthProvider>{children}</AuthProvider>
+							</Suspense>
+						</div>
+					</NextThemeProvider>
+				</main>
 			</body>
 		</html>
 	)
