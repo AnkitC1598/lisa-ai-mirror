@@ -81,7 +81,7 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 					className={
 						size === "large"
 							? "h-5 w-5 shrink-0 opacity-50"
-							: "h-6 w-6"
+							: "h-6 w-6 fill-gray-400"
 					}
 				/>
 				{size === "large" ? (
@@ -119,6 +119,7 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 										peekIndex={50}
 										cohortId={topic.cohortId}
 										hierarchy={topic}
+										onClick={() => setOpen(false)}
 									/>
 								</CommandItem>
 							))}
@@ -139,6 +140,7 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 									<HierarchyCard
 										type={other.type}
 										hierarchy={other}
+										onClick={() => setOpen(false)}
 									/>
 								</CommandItem>
 							))}

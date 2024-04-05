@@ -43,9 +43,14 @@ const Languages = [
 interface ILanguageSwitcher {
 	value: string
 	setValue: React.Dispatch<React.SetStateAction<string>>
+	disabled: boolean
 }
 
-const LanguageSwitcher: React.FC<ILanguageSwitcher> = ({ value, setValue }) => {
+const LanguageSwitcher: React.FC<ILanguageSwitcher> = ({
+	value,
+	setValue,
+	disabled,
+}) => {
 	const [open, setOpen] = useState<boolean>(false)
 
 	return (
@@ -58,6 +63,7 @@ const LanguageSwitcher: React.FC<ILanguageSwitcher> = ({ value, setValue }) => {
 					variant="outline"
 					size="icon"
 					className="relative"
+					disabled={disabled}
 				>
 					<LanguageIcon className="h-4 w-4 shrink-0" />
 				</Button>

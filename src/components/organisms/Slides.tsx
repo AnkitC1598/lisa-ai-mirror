@@ -1,8 +1,8 @@
 "use client"
 
 import { answerQuiz } from "@/actions/hierarchy"
-import useConfetti from "@/hooks/useConfetti"
-import { handleAudio, handleVote } from "@/lib/interactions"
+import useTextToSpeech from "@/hooks/useTextToSpeech"
+import { handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import { SetState } from "@/types"
 import { IAnswer, ISlide } from "@/types/topic"
@@ -16,7 +16,7 @@ import {
 	SpeakerWaveIcon,
 } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useInView } from "react-intersection-observer"
 import { Button } from "../ui/button"
 import ContentPagination from "./ContentPagination"
@@ -154,7 +154,7 @@ const Slide: React.FC<ISlideProps> = ({
 	isLastSlide = false,
 }) => {
 	const [vote, setVote] = useState<number>(0)
-	const [audioState, setAudioState] = useState<number>(0)
+	// const [audioState, setAudioState] = useState<number>(0)
 	const [inViewAt, setInViewAt] = useState<number | null>(null)
 	const { ref, inView } = useInView()
 	const [answerState, setAnswerState] = useState<{
@@ -163,7 +163,20 @@ const Slide: React.FC<ISlideProps> = ({
 		isCorrect?: boolean
 	}>()
 
-	const { getConfettiInstance, fire } = useConfetti({})
+	const getTextForSpeech = useCallback(() => {
+		if (slide.type === "quiz") {
+			const questionText = slide.question
+			const answersText = slide.answers
+				? slide.answers.map(a => a.body).join("\n")
+				: ""
+			return `${questionText}\n${answersText}`
+		} else {
+			return `${slide.title}\n${slide.body}`
+		}
+	}, [slide.answers, slide.body, slide.question, slide.title, slide.type])
+
+	const { subscribe, handleAudio, unsubscribe, audioState } =
+		useTextToSpeech()
 
 	const resetVote = () => setVote(0)
 
@@ -183,6 +196,16 @@ const Slide: React.FC<ISlideProps> = ({
 			},
 		})
 	}
+
+	useEffect(() => {
+		if (inView) subscribe(`${slide.title}\n${slide.body}`)
+		else unsubscribe()
+
+		return () => {
+			unsubscribe()
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [inView, slide.body, slide.title])
 
 	useEffect(() => {
 		if (inView && inViewAt === null) {
@@ -317,22 +340,8 @@ const Slide: React.FC<ISlideProps> = ({
 								? "border-blue-600/20 bg-blue-600/10 dark:border-blue-600/20 dark:bg-blue-600/10"
 								: ""
 						)}
-						onClick={() =>
-							handleAudio({
-								text:
-									slide.type === "quiz"
-										? slide.question +
-											"\n" +
-											(slide.answers
-												? slide.answers
-														.map(a => a.body)
-														.join("\n")
-												: null)
-										: slide.title + "\n" + slide.body,
-								audioState,
-								setAudioState,
-							})
-						}
+						onClick={handleAudio}
+						disabled={langCode !== "en"}
 					>
 						<SpeakerWaveIcon
 							className={cn(

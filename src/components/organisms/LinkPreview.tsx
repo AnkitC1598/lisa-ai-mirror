@@ -4,6 +4,7 @@ import {
 	addResourceBookmark,
 	removeResourceBookmark,
 } from "@/actions/bookmarks"
+import { cn } from "@/lib"
 import { Resource } from "@/types/topic"
 import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/24/outline"
 import { BookmarkIcon as BookmarkIconSolid } from "@heroicons/react/24/solid"
@@ -11,19 +12,30 @@ import Image from "next/image"
 import { useParams } from "next/navigation"
 import { useState } from "react"
 import { Button } from "../ui/button"
+import HierarchyPeek from "./HierarchyPeek"
 
 type TOrientation = "landscape" | "portrait"
 
 interface ILinkPreview {
 	orientation?: TOrientation
 	resource: Resource
+	params?: { courseId: string; topicId: string }
+	bookmarkState?: boolean
+	peekIndex?: number
+	showHierarchy?: boolean
 }
 
 const LinkPreview: React.FC<ILinkPreview> = ({
 	orientation = "portrait",
 	resource,
+	params,
+	bookmarkState = false,
+	peekIndex = 0,
+	showHierarchy = false,
 }) => {
-	const [bookmarked, setBookmarked] = useState<boolean>(false)
+	const [bookmarked, setBookmarked] = useState<boolean>(
+		resource.bookmarked ?? bookmarkState
+	)
 	const { courseId: cohortId, topicId } = useParams<{
 		courseId: string
 		topicId: string
@@ -35,18 +47,19 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 		e.stopPropagation()
 		e.preventDefault()
 		setBookmarked(prev => !prev)
+
 		if (bookmarked) {
 			removeResourceBookmark({
-				cohortId,
-				topicId,
+				cohortId: cohortId ?? params?.courseId,
+				topicId: topicId ?? params?.topicId,
 				resourceId: resource.id,
 			}).then(code => {
 				if (code === 200) setBookmarked(false)
 			})
 		} else {
 			addResourceBookmark({
-				cohortId,
-				topicId,
+				cohortId: cohortId ?? params?.courseId,
+				topicId: topicId ?? params?.topicId,
 				body: resource,
 			}).then(code => {
 				if (code === 200) setBookmarked(true)
@@ -59,9 +72,16 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 				href={resource.url}
 				target="_blank"
 				rel="noopener noreferrer"
-				className="group/resource flex w-full gap-4 rounded-md bg-neutral-50 px-4 py-5 shadow-md ring-1  ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-800 dark:ring-neutral-800"
+				className={cn("relative w-full", {
+					"mt-6": showHierarchy,
+				})}
+				style={{ zIndex: peekIndex + 10 }}
 			>
-				<div className="flex w-full flex-1 flex-col gap-3">
+				{showHierarchy ? <HierarchyPeek peekIndex={peekIndex} /> : null}
+				<div
+					className="group/resource relative flex w-full flex-1 flex-col gap-3 rounded-md  bg-neutral-50 px-4 py-5 shadow-md ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-800 dark:ring-neutral-800"
+					style={{ zIndex: peekIndex + 20 }}
+				>
 					<div className="flex flex-1 flex-col">
 						<span className="line-clamp-2 pr-7 text-lg underline-offset-2 group-hover/resource:underline">
 							{resource.title}
@@ -103,7 +123,7 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 							className="relative shrink-0"
 						>
 							{bookmarked ? (
-								<BookmarkIconSolid className="h-4 w-4 shrink-0 dark:fill-yellow-400" />
+								<BookmarkIconSolid className="h-4 w-4 shrink-0 fill-yellow-500 dark:fill-yellow-400" />
 							) : (
 								<BookmarkIconOutline className="h-4 w-4 shrink-0" />
 							)}

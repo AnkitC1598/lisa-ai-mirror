@@ -11,17 +11,21 @@ import LanguageSwitcher from "./LanguageSwitcher"
 interface IContentControls {
 	language: string
 	setLanguage: React.Dispatch<React.SetStateAction<string>>
+	bookmarkState?: boolean
+	langDisabled?: boolean
 }
 
 const ContentControls: React.FC<IContentControls> = ({
 	language,
 	setLanguage,
+	bookmarkState = false,
+	langDisabled = false,
 }) => {
 	const { courseId: cohortId, topicId } = useParams<{
 		courseId: string
 		topicId: string
 	}>()
-	const [bookmarked, setBookmarked] = useState<boolean>(false)
+	const [bookmarked, setBookmarked] = useState<boolean>(bookmarkState)
 
 	const handleBookmark = () => {
 		setBookmarked(prev => !prev)
@@ -45,12 +49,18 @@ const ContentControls: React.FC<IContentControls> = ({
 				className="relative"
 			>
 				{bookmarked ? (
-					<BookmarkIconSolid className="h-4 w-4 shrink-0" />
+					<BookmarkIconSolid className="h-4 w-4 shrink-0 fill-yellow-500 dark:fill-yellow-400" />
 				) : (
 					<BookmarkIconOutline className="h-4 w-4 shrink-0" />
 				)}
 			</Button>
-			<LanguageSwitcher {...{ value: language, setValue: setLanguage }} />
+			<LanguageSwitcher
+				{...{
+					value: language,
+					setValue: setLanguage,
+					disabled: langDisabled,
+				}}
+			/>
 		</div>
 	)
 }

@@ -2,7 +2,8 @@
 
 import logo from "@/app/favicon.ico"
 import { Button } from "@/components/ui/button"
-import { handleAudio, handleCopy, handleVote } from "@/lib/interactions"
+import useTextToSpeech from "@/hooks/useTextToSpeech"
+import { handleCopy, handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import { ClipboardDocumentIcon, SparklesIcon } from "@heroicons/react/16/solid"
 import {
@@ -17,7 +18,7 @@ import {
 import { Message } from "ai/react"
 import { formatDistance } from "date-fns"
 import Image from "next/image"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 interface IMessage {
 	message: Message & {
@@ -60,7 +61,9 @@ export const AiMessage: React.FC<IMessage> = ({
 }) => {
 	const [vote, setVote] = useState<number>(0)
 	const [copy, setCopy] = useState<number>(0)
-	const [audioState, setAudioState] = useState<number>(0)
+
+	const { subscribe, handleAudio, unsubscribe, audioState } =
+		useTextToSpeech()
 
 	const resetVote = () => setVote(0)
 
@@ -80,6 +83,17 @@ export const AiMessage: React.FC<IMessage> = ({
 			resetVote,
 		})
 	}
+
+	useEffect(() => {
+		if (!message.content) return
+
+		subscribe(message.content)
+
+		return () => {
+			unsubscribe()
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [message.content, subscribe])
 
 	return (
 		<>
@@ -168,13 +182,7 @@ export const AiMessage: React.FC<IMessage> = ({
 								? "border-blue-600/20 bg-blue-600/10 dark:border-blue-600/20 dark:bg-blue-600/10"
 								: ""
 						)}
-						onClick={() =>
-							handleAudio({
-								text: message.content,
-								audioState,
-								setAudioState,
-							})
-						}
+						onClick={handleAudio}
 					>
 						<SpeakerWaveIcon
 							className={cn(

@@ -29,6 +29,7 @@ export type Resource = {
 				logo: boolean
 		  }
 		| undefined
+	bookmarked?: boolean
 }
 
 export interface IPracticeQuestion {

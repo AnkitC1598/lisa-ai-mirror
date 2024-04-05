@@ -6,8 +6,8 @@ export interface IBookmark {
 	_id: string
 	createdAt: string
 	updatedAt: string
-	topicId?: string
-	cohortId?: string
+	topicId: string
+	cohortId: string
 	type: TBookmarkType
 	resourceId?: string
 	termId?: string
@@ -26,4 +26,5 @@ export interface IBookmark {
 		details: any
 		priority: number
 	}
+	bookmarked: boolean
 }

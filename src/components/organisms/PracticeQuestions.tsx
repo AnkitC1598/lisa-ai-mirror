@@ -1,38 +1,35 @@
 "use client"
 
 import {
+	addQuestionBookmark,
+	removeQuestionBookmark,
+} from "@/actions/bookmarks"
+import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
-import { handleAudio, handleVote } from "@/lib/interactions"
+import useTextToSpeech from "@/hooks/useTextToSpeech"
+import { handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import { IPracticeQuestion } from "@/types/topic"
-import {
-	BookmarkIcon as BookmarkIconOutline,
-	HandThumbDownIcon as HandThumbDownIconOutline,
-	HandThumbUpIcon as HandThumbUpIconOutline,
-} from "@heroicons/react/24/outline"
+import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/24/outline"
 import {
 	BookmarkIcon as BookmarkIconSolid,
-	HandThumbDownIcon as HandThumbDownIconSolid,
-	HandThumbUpIcon as HandThumbUpIconSolid,
 	SpeakerWaveIcon,
 } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import HierarchyPeek from "./HierarchyPeek"
 
 interface IPracticeQuestions {
 	questions: IPracticeQuestion[]
 }
 
 const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
-	const { courseId, topicId } = useParams<{
-		courseId: string
-		topicId: string
-	}>()
+	const [open, setOpen] = useState<string>("1")
 
 	return (
 		<>
@@ -41,13 +38,15 @@ const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
 					type="single"
 					collapsible
 					className="space-y-4"
+					defaultValue="1"
+					onValueChange={setOpen}
 				>
 					{questions.map((question, idx) => (
 						<PracticeQuestion
 							key={question.id ?? question.question}
 							question={question}
 							idx={idx + 1}
-							params={{ courseId, topicId }}
+							open={open}
 						/>
 					))}
 				</Accordion>
@@ -72,19 +71,29 @@ export const PracticeQuestionsSkeletonLoader = () => {
 interface IPracticeQuestionProps {
 	question: IPracticeQuestion
 	idx: number
-	params: { courseId: string; topicId: string }
+	open?: string
+	peekIndex?: number
+	showHierarchy?: boolean
 }
 
 export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 	question,
 	idx,
-	params: { courseId, topicId },
+	open,
+	peekIndex = 0,
+	showHierarchy = false,
 }) => {
 	const [vote, setVote] = useState<number>(0)
-	const [audioState, setAudioState] = useState<number>(0)
 	const [bookmarked, setBookmarked] = useState<boolean>(
 		question.bookmarked ?? false
 	)
+	const { courseId, topicId } = useParams<{
+		courseId: string
+		topicId: string
+	}>()
+
+	const { subscribe, handleAudio, unsubscribe, audioState } =
+		useTextToSpeech()
 
 	const resetVote = () => setVote(0)
 
@@ -105,28 +114,64 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 		})
 	}
 
-	const handleBookmark = () => setBookmarked(prev => !prev)
+	const handleBookmark = () => {
+		setBookmarked(prev => !prev)
+		if (bookmarked) {
+			removeQuestionBookmark({
+				cohortId: courseId,
+				topicId,
+				questionId: question.id as string,
+			}).then(code => {
+				if (code === 200) setBookmarked(false)
+			})
+		} else {
+			addQuestionBookmark({
+				cohortId: courseId,
+				topicId,
+				body: question,
+			}).then(code => {
+				if (code === 200) setBookmarked(true)
+			})
+		}
+	}
+	useEffect(() => {
+		if (!question.question || !question.answer || !open) return
+
+		if (open === `${idx}`)
+			subscribe(`${question.question}\n${question.answer}`)
+		else unsubscribe()
+
+		return () => {
+			unsubscribe()
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [question.question, question.answer, subscribe, open])
 
 	return (
 		<>
 			<AccordionItem
 				value={`${idx}`}
-				className="rounded-md px-4 shadow ring-1 ring-inset ring-neutral-200 dark:shadow-neutral-800 dark:ring-neutral-800"
+				className={cn("relative w-full", {
+					"mt-6": showHierarchy,
+				})}
+				style={{ zIndex: peekIndex + 10 }}
 			>
-				<AccordionTrigger>
-					<div className="flex flex-col items-start justify-start gap-1 text-sm">
-						<div>Question {String(idx).padStart(2, "0")}</div>
-						<div className="text-left text-gray-500">
+				{showHierarchy ? <HierarchyPeek peekIndex={peekIndex} /> : null}
+				<div
+					className="relative rounded-md bg-neutral-50 px-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-800 dark:ring-neutral-800"
+					style={{ zIndex: peekIndex + 20 }}
+				>
+					<AccordionTrigger>
+						<div className="text-left text-sm">
 							{question.question}
 						</div>
-					</div>
-				</AccordionTrigger>
-				<AccordionContent>
-					<span>Ans.</span>
-					<span className="text-gray-500">{question.answer}</span>
-					<div className="flex items-center justify-between">
-						<div className="flex gap-2">
-							<Button
+					</AccordionTrigger>
+					<AccordionContent>
+						<span>Ans.</span>
+						<span className="text-gray-500">{question.answer}</span>
+						<div className="flex items-center justify-between">
+							<div className="flex gap-2">
+								{/* <Button
 								variant={vote === 1 ? "outline" : "ghost"}
 								size="icon"
 								onClick={() => {
@@ -159,53 +204,49 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 								) : (
 									<HandThumbDownIconOutline className="h-4 w-4" />
 								)}
-							</Button>
+							</Button> */}
+								<Button
+									variant={
+										audioState === 1 ? "outline" : "ghost"
+									}
+									size="icon"
+									className={cn(
+										audioState === 1
+											? "border-blue-600/20 bg-blue-600/10 dark:border-blue-600/20 dark:bg-blue-600/10"
+											: ""
+									)}
+									onClick={handleAudio}
+								>
+									<SpeakerWaveIcon
+										className={cn(
+											"h-4 w-4",
+											audioState === 1
+												? "fill-blue-500"
+												: ""
+										)}
+									/>
+								</Button>
+							</div>
 							<Button
-								variant={audioState === 1 ? "outline" : "ghost"}
+								variant={bookmarked ? "outline" : "ghost"}
 								size="icon"
+								onClick={handleBookmark}
 								className={cn(
-									audioState === 1
-										? "border-blue-600/20 bg-blue-600/10 dark:border-blue-600/20 dark:bg-blue-600/10"
+									"relative",
+									bookmarked
+										? "border-yellow-500/20 bg-yellow-500/10 dark:border-yellow-500/20 dark:bg-yellow-500/10"
 										: ""
 								)}
-								onClick={() =>
-									handleAudio({
-										text:
-											question.question +
-											"\n" +
-											question.answer,
-										audioState,
-										setAudioState,
-									})
-								}
 							>
-								<SpeakerWaveIcon
-									className={cn(
-										"h-4 w-4",
-										audioState === 1 ? "fill-blue-500" : ""
-									)}
-								/>
+								{bookmarked ? (
+									<BookmarkIconSolid className="h-4 w-4 shrink-0 fill-yellow-500 dark:fill-yellow-400" />
+								) : (
+									<BookmarkIconOutline className="h-4 w-4 shrink-0" />
+								)}
 							</Button>
 						</div>
-						<Button
-							variant={bookmarked ? "outline" : "ghost"}
-							size="icon"
-							onClick={handleBookmark}
-							className={cn(
-								"relative",
-								bookmarked
-									? "border-yellow-500/20 bg-yellow-500/10 dark:border-yellow-500/20 dark:bg-yellow-500/10"
-									: ""
-							)}
-						>
-							{bookmarked ? (
-								<BookmarkIconSolid className="h-4 w-4 shrink-0 fill-yellow-500" />
-							) : (
-								<BookmarkIconOutline className="h-4 w-4 shrink-0" />
-							)}
-						</Button>
-					</div>
-				</AccordionContent>
+					</AccordionContent>
+				</div>
 			</AccordionItem>
 		</>
 	)

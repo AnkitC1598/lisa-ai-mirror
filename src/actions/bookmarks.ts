@@ -3,14 +3,17 @@
 import { fetchClientWithToken } from "@/services/fetch"
 import { IBookmark } from "@/types/bookmark"
 import { IPracticeQuestion, Resource } from "@/types/topic"
+import { revalidatePath } from "next/cache"
 
 export const getBookmarks = async ({
 	page,
+	filter,
 }: {
 	page: number
+	filter: string | null
 }): Promise<IBookmark[]> => {
 	const resp = await fetchClientWithToken(
-		`/ai/slides/bookmarks?page=${page}&limit=15`,
+		`/ai/slides/bookmarks?page=${page}&limit=15&filter=${filter}`,
 		{
 			method: "GET",
 		}
@@ -66,7 +69,7 @@ export const addResourceBookmark = async ({
 			body: JSON.stringify({ ...body, type: "resource" }),
 		}
 	)
-	console.log(resp.code)
+	revalidatePath("/bookmarks")
 	return resp.code
 }
 
@@ -85,6 +88,7 @@ export const removeResourceBookmark = async ({
 			method: "DELETE",
 		}
 	)
+	revalidatePath("/bookmarks")
 	return resp.code
 }
 

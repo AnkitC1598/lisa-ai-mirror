@@ -14,7 +14,7 @@ const Back = () => {
 				size="icon"
 				onClick={() => router.back()}
 			>
-				<ArrowLeftIcon className="h-6 w-6" />
+				<ArrowLeftIcon className="h-6 w-6 fill-gray-400" />
 			</Button>
 		</>
 	)

@@ -38,9 +38,11 @@ const Navbar: React.FC<INavbar> = async ({ logoOnly = false }) => {
 					<div className="flex">
 						<span className="flex gap-1 whitespace-nowrap text-2xl font-semibold tracking-wider">
 							<span>lisa</span>
-							<span className="text-purple-500">AI</span>
+							<span className="bg-clip-text font-extrabold text-purple-600 dark:bg-[linear-gradient(56.07deg,_#9333EA_16.26%,_#CB92FF_66.17%)] dark:text-transparent">
+								AI
+							</span>
 						</span>
-						<SparklesIcon className="h-3 w-3 flex-shrink-0 fill-yellow-300" />
+						<SparklesIcon className="h-3.5 w-3.5 flex-shrink-0 -rotate-90 fill-yellow-400" />
 					</div>
 				</Link>
 				{logoOnly ? null : (

@@ -34,13 +34,11 @@ export const getHierarchyData = async ({
 	cohortId,
 	idType,
 	id,
-	query,
 }: {
 	hierarchy: string
 	cohortId: string
 	idType: string
 	id: string
-	query: string
 }): Promise<IHierarchy> => {
 	const resp = await fetchClientWithToken(
 		`/cohort/${cohortId}/${hierarchy}s?id=${id}&idType=${idType}`,
@@ -128,7 +126,6 @@ export const getResources = async ({
 			method: "GET",
 		}
 	)
-
 	return resp.results.data.resources
 }
 
@@ -210,4 +207,12 @@ export const recordSlideDuration = async ({
 		}
 	)
 	return resp
+}
+
+export const getRecentTopics = async (): Promise<ITopic | null> => {
+	const resp = await fetchClientWithToken(`/ai/recent/topic`, {
+		method: "GET",
+	})
+
+	return resp.results.data
 }
