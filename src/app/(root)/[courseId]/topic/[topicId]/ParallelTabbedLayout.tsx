@@ -98,7 +98,8 @@ const ParallelTabbedLayout: React.FC<Readonly<IParallelTabbedLayout>> = ({
 			-2
 		) as THierarchyType
 
-		return currentTopic[prevLevel]?.title
+		return currentTopic[prevLevel === "course" ? "cohort" : prevLevel]
+			?.title
 	}, [currentHierarchy, currentTopic])
 
 	if (!currentTopic) return null

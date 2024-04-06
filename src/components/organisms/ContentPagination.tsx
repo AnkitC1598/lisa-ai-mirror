@@ -36,7 +36,7 @@ const ContentPagination: React.FC<IContentPagination> = ({
 								? "border border-green-400 bg-green-500 dark:border-emerald-600 dark:bg-emerald-600"
 								: "",
 							slideState.current === i
-								? "dakr:border-emerald-500 border border-emerald-600"
+								? "border border-emerald-600 dark:border-emerald-500"
 								: ""
 						)}
 					></div>

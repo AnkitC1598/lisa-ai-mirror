@@ -1,3 +1,4 @@
+import Loading from "@/components/atoms/Loading"
 import BookmarkFilters from "@/components/organisms/BookmarkFilters"
 import Search from "@/components/organisms/Search"
 import { Suspense } from "react"
@@ -18,10 +19,22 @@ const BookmarksLayout: React.FC<Readonly<IBookmarksLayout>> = async ({
 					</p>
 				</div>
 				<div className="flex flex-col gap-4 px-4">
-					<Suspense fallback="Loading...">
+					<Suspense
+						fallback={
+							<div className="flex h-full w-full items-center justify-center py-8">
+								<Loading />
+							</div>
+						}
+					>
 						<BookmarkFilters />
 					</Suspense>
-					<Suspense fallback="Loading...">
+					<Suspense
+						fallback={
+							<div className="flex h-full w-full items-center justify-center py-8">
+								<Loading />
+							</div>
+						}
+					>
 						<Search />
 					</Suspense>
 				</div>

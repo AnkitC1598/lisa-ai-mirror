@@ -2,6 +2,7 @@
 
 import { getHierarchyData } from "@/actions/hierarchy"
 import icon from "@/app/favicon.ico"
+import Loading from "@/components/atoms/Loading"
 import HierarchyCard from "@/components/organisms/HierarchyCard"
 import Search from "@/components/organisms/Search"
 import HierarchyConstants from "@/constants/Hierarchy"
@@ -67,7 +68,12 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 
 	const { colors } = HierarchyConstants[currentView]
 
-	if (!hierarchyData) return <>Loading...</>
+	if (!hierarchyData)
+		return (
+			<div className="flex h-full w-full items-center justify-center py-8">
+				<Loading />
+			</div>
+		)
 
 	return (
 		<>

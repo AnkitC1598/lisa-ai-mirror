@@ -1,4 +1,5 @@
 import "@/app/globals.css"
+import Loading from "@/components/atoms/Loading"
 import { cn } from "@/lib/utils"
 import AuthProvider from "@/providers/authProvider"
 import NextThemeProvider from "@/providers/nextThemeProvider"
@@ -47,7 +48,13 @@ const AppLayout: React.FC<Readonly<IAppLayout>> = ({ children }) => {
 						enableSystem
 					>
 						<div className="flex w-full max-w-md flex-col bg-gray-50 dark:bg-neutral-950 md:rounded-md md:border md:border-neutral-500">
-							<Suspense fallback={<>Loading...</>}>
+							<Suspense
+								fallback={
+									<div className="flex h-full w-full items-center justify-center py-8">
+										<Loading />
+									</div>
+								}
+							>
 								<AuthProvider>{children}</AuthProvider>
 							</Suspense>
 						</div>

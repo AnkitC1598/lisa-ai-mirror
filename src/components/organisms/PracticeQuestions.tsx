@@ -15,10 +15,13 @@ import useTextToSpeech from "@/hooks/useTextToSpeech"
 import { handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import { IPracticeQuestion } from "@/types/topic"
-import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/24/outline"
+import {
+	BookmarkIcon as BookmarkIconOutline,
+	SpeakerWaveIcon as SpeakerWaveIconOutline,
+} from "@heroicons/react/24/outline"
 import {
 	BookmarkIcon as BookmarkIconSolid,
-	SpeakerWaveIcon,
+	SpeakerWaveIcon as SpeakerWaveIconSolid,
 } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -223,14 +226,11 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 									)}
 									onClick={handleAudio}
 								>
-									<SpeakerWaveIcon
-										className={cn(
-											"h-4 w-4",
-											audioState === 1
-												? "fill-blue-500"
-												: ""
-										)}
-									/>
+									{audioState === 1 ? (
+										<SpeakerWaveIconSolid className="h-4 w-4 fill-blue-500" />
+									) : (
+										<SpeakerWaveIconOutline className="h-4 w-4 opacity-70" />
+									)}
 								</Button>
 							</div>
 							<Button

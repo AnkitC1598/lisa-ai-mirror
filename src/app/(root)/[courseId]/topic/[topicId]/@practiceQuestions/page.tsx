@@ -1,7 +1,10 @@
 "use client"
 
 import { getQuestions } from "@/actions/hierarchy"
-import { PracticeQuestionsSkeletonLoader } from "@/components/organisms/PracticeQuestions"
+import {
+	PracticeQuestionsSkeletonLoader,
+	default as QuestionsArray,
+} from "@/components/organisms/PracticeQuestions"
 import { fetchClientWithToken } from "@/services/fetch"
 import useAIStore from "@/store"
 import { IPracticeQuestion } from "@/types/topic"
@@ -74,7 +77,7 @@ const PracticeQuestions = () => {
 	return (
 		<>
 			{practiceQuestions ? (
-				<PracticeQuestionsSkeletonLoader />
+				<QuestionsArray questions={practiceQuestions} />
 			) : aiIsLoading ? (
 				<PracticeQuestionsSkeletonLoader />
 			) : (

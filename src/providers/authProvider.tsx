@@ -2,6 +2,7 @@
 
 import { login } from "@/actions/auth"
 import { getUser } from "@/actions/user"
+import Loading from "@/components/atoms/Loading"
 import { clientEnv } from "@/env/client"
 import cookieService from "@/services/cookie"
 import useAIStore from "@/store"
@@ -102,7 +103,13 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-	return ready ? children : <>Loading...</>
+	return ready ? (
+		children
+	) : (
+		<div className="flex h-full w-full items-center justify-center py-8">
+			<Loading />
+		</div>
+	)
 }
 
 export default AuthProvider

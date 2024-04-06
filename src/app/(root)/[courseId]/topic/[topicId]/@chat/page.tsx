@@ -82,6 +82,18 @@ const Chat = () => {
 						)
 					})}
 					<ScrollAnchor trackVisibility={true} />
+					{isLoading ? (
+						<AiMessage
+							loader={true}
+							params={{ courseId, topicId }}
+							// @ts-ignore
+							message={{
+								content: "",
+								role: "assistant",
+								createdAt: new Date(),
+							}}
+						/>
+					) : null}
 				</div>
 				<form
 					onSubmit={handleSubmit}
