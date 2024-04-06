@@ -51,7 +51,7 @@ const AppLayout: React.FC<Readonly<IAppLayout>> = ({ children }) => {
 							<Suspense
 								fallback={
 									<div className="flex h-full w-full items-center justify-center py-8">
-										<Loading />
+										<Loading icon />
 									</div>
 								}
 							>

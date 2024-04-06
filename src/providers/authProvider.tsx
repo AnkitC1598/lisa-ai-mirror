@@ -107,7 +107,7 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 		children
 	) : (
 		<div className="flex h-full w-full items-center justify-center py-8">
-			<Loading />
+			<Loading icon />
 		</div>
 	)
 }
