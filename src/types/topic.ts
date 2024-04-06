@@ -22,13 +22,11 @@ export type Resource = {
 		favicon: string
 		path: string
 	}
-	thumbnail:
-		| {
-				src: string
-				original: string
-				logo: boolean
-		  }
-		| undefined
+	thumbnail?: {
+		src: string
+		original: string
+		logo: boolean
+	}
 	bookmarked?: boolean
 }
 
@@ -68,6 +66,12 @@ export interface ISlide {
 	title?: string
 	body?: string
 	question?: string
+	completed?: boolean
+	feedback?: string
+	duration?: {
+		timeSpent: number
+		createdAt: Date | string | number
+	}[]
 	priority: number
 	answers?: IAnswer[]
 	userAnswer?: string | null

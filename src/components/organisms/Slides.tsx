@@ -1,6 +1,6 @@
 "use client"
 
-import { answerQuiz } from "@/actions/hierarchy"
+import { answerQuiz, recordSlideDuration } from "@/actions/hierarchy"
 import useTextToSpeech from "@/hooks/useTextToSpeech"
 import { handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
@@ -43,7 +43,7 @@ const Slides: React.FC<ISlidesProps> = ({ slides }) => {
 		current: 0,
 		finished: [
 			...slides.slides
-				.map((s, i) => (s?.userAnswer ? i : -1))
+				.map((s, i) => (s?.userAnswer || s?.completed ? i : -1))
 				.filter(v => v > -1),
 		],
 	})
@@ -51,65 +51,6 @@ const Slides: React.FC<ISlidesProps> = ({ slides }) => {
 		courseId: string
 		topicId: string
 	}>()
-
-	const handleQuizOption = ({
-		answer,
-		idx,
-		answers,
-	}: {
-		answer: IAnswer
-		idx: number
-		answers: IAnswer[]
-	}) => {
-		setSlideState(prev => ({
-			...prev,
-			finished: [...prev.finished, idx],
-		}))
-		answers.forEach((ans: any) => {
-			const element = document.getElementById(ans.body)
-			if (element) {
-				element.classList.remove(
-					"border-green-300",
-					"bg-green-100",
-					"text-green-700",
-					"dark:border-green-700",
-					"dark:bg-green-800",
-					"dark:text-green-200",
-					"border-red-300",
-					"bg-red-100",
-					"text-red-700",
-					"dark:border-red-700",
-					"dark:bg-red-800",
-					"dark:text-red-200"
-				)
-				if ((answer.isCorrect && answer === ans) || ans.isCorrect)
-					element.classList.add(
-						"border-green-300",
-						"bg-green-100",
-						"text-green-700",
-						"dark:border-green-700",
-						"dark:bg-green-800",
-						"dark:text-green-200"
-					)
-				else if (!answer.isCorrect && answer === ans)
-					element.classList.add(
-						"border-red-300",
-						"bg-red-100",
-						"text-red-700",
-						"dark:border-red-700",
-						"dark:bg-red-800",
-						"dark:text-red-200"
-					)
-			}
-		})
-		answerQuiz({
-			courseId: courseId,
-			topicId,
-			langCode: slides.language,
-			questionId: slides.slides[idx].id,
-			answerId: answer.id,
-		})
-	}
 
 	return (
 		<div className="flex h-[calc(100%-70px)] flex-1">
@@ -128,11 +69,9 @@ const Slides: React.FC<ISlidesProps> = ({ slides }) => {
 						idx={idx}
 						slide={slide}
 						setSlideState={setSlideState}
-						handleQuizOption={handleQuizOption}
 						params={{ courseId, topicId }}
 						langCode={slides.language}
 						isLastSlide={idx === slides.slides.length - 1}
-						// handleRecordSlideDuration={handleRecordSlideDuration}
 					/>
 				))}
 			</div>
@@ -171,26 +110,25 @@ interface ISlideProps {
 	idx?: number
 	slide: ISlide
 	setSlideState: SetState<ISlideState>
-	handleQuizOption: Function
 	params: {
 		courseId: string
 		topicId: string
 	}
 	langCode?: string
 	isLastSlide?: boolean
-	// handleRecordSlideDuration?: Function
 }
 
 const Slide: React.FC<ISlideProps> = ({
 	idx = 0,
 	slide,
 	setSlideState,
-	handleQuizOption,
 	params: { courseId, topicId },
 	langCode,
 	isLastSlide = false,
 }) => {
-	const [vote, setVote] = useState<number>(0)
+	const [vote, setVote] = useState<number>(
+		slide.feedback === "like" ? 1 : slide.feedback === "dislike" ? -1 : 0
+	)
 	const [inViewAt, setInViewAt] = useState<number | null>(null)
 	const { ref, inView } = useInView()
 	const [answerState, setAnswerState] = useState<{
@@ -205,10 +143,6 @@ const Slide: React.FC<ISlideProps> = ({
 	const resetVote = () => setVote(0)
 
 	const handleFeedback = (feedback: number) => {
-		// setSlideState(prev => ({
-		// 	...prev,
-		// 	finished: [...prev.finished, idx],
-		// }))
 		setVote(feedback)
 		handleVote({
 			meta: { courseId, topicId, id: slide.id as string, type: "slide" },
@@ -218,6 +152,17 @@ const Slide: React.FC<ISlideProps> = ({
 				feedback:
 					feedback === 1 ? "like" : feedback === -1 ? "dislike" : "",
 			},
+		})
+	}
+
+	const handleAnswer = (answer: IAnswer) => {
+		setAnswerState(answer)
+		answerQuiz({
+			courseId: courseId,
+			topicId,
+			langCode,
+			questionId: slide.id as string,
+			answerId: answer.id,
 		})
 	}
 
@@ -233,23 +178,44 @@ const Slide: React.FC<ISlideProps> = ({
 
 	useEffect(() => {
 		if (inView && inViewAt === null) {
+			if (slide.type === "quiz" && !!answerState) return
+
 			setInViewAt(new Date().getTime())
 			setSlideState(prev => ({
 				...prev,
 				current: idx,
 			}))
 		}
-		if (!inView && inViewAt !== null) {
-			const diff = Math.abs(new Date().getTime() - inViewAt)
-			console.log(`${idx} stayed for ${diff / 1000}`)
+
+		if (
+			((!isLastSlide && slide.type === "text" && !inView) ||
+				(slide.type === "quiz" &&
+					inView &&
+					!slide.userAnswer &&
+					!!answerState)) &&
+			inViewAt !== null
+		) {
+			const timeSpent = Math.abs(new Date().getTime() - inViewAt) / 1000
+			recordSlideDuration({
+				courseId,
+				topicId,
+				slideId: slide.id as string,
+				body: {
+					timeSpent,
+					langCode,
+					isLastSlide,
+				},
+			})
 			setInViewAt(null)
 			setSlideState(prev => ({
 				...prev,
 				finished: [...prev.finished, idx],
 			}))
 		}
+
+		if (!inView && inViewAt !== null) setInViewAt(null)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [idx, inView, inViewAt, setSlideState])
+	}, [idx, inView, inViewAt, setSlideState, answerState])
 
 	return (
 		<div
@@ -271,56 +237,47 @@ const Slide: React.FC<ISlideProps> = ({
 				slide.answers.length &&
 				slide.type === "quiz" ? (
 					<div className="flex h-full flex-col gap-2">
-						{slide.answers.map((answer, i) => (
-							<button
-								disabled={!!slide.userAnswer || !!answerState}
-								id={answer.body}
-								key={answer.id ?? answer.body}
-								onClick={() => {
-									setAnswerState(answer)
-									// if (answer.isCorrect) fire()
-									handleQuizOption({
-										answer,
-										idx,
-										answers: slide.answers,
-									})
-								}}
-								className={cn(
-									"flex w-full cursor-pointer items-center justify-between rounded-md border border-neutral-300 bg-white px-3 py-2 text-left text-xs font-medium text-gray-700 transition-all duration-500  disabled:cursor-not-allowed dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-200 ",
-									slide.userAnswer ||
-										answerState?.id === answer.id
-										? answer.id === slide.correctAnswer
+						{slide.answers.map((answer, i) => {
+							const isAnswer =
+								slide.userAnswer === answer.id ||
+								answerState?.id === answer.id
+									? answer.isCorrect
+										? true
+										: false
+									: (!!slide.userAnswer || !!answerState) &&
+										  answer.isCorrect
+										? true
+										: null
+							return (
+								<button
+									disabled={
+										!!slide.userAnswer || !!answerState
+									}
+									id={answer.body}
+									key={answer.id ?? answer.body}
+									onClick={() => {
+										handleAnswer(answer)
+									}}
+									className={cn(
+										"flex w-full cursor-pointer items-center justify-between rounded-md border border-neutral-300 bg-white px-3 py-2 text-left text-xs font-medium text-gray-700 transition-all duration-500  disabled:cursor-not-allowed dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-200",
+										isAnswer === true
 											? "border-green-300 bg-green-100 text-green-700 dark:border-green-700 dark:bg-green-800 dark:text-green-200"
-											: slide.userAnswer === answer.id
+											: isAnswer === false
 												? "border-red-300 bg-red-100 text-red-700 dark:border-red-700 dark:bg-red-800 dark:text-red-200"
 												: ""
-										: ""
-								)}
-								// style={
-								// 	slide.userAnswer
-								// 		? answer.id === slide.correctAnswer
-								// 			? { backgroundColor: "green" }
-								// 			: slide.userAnswer === answer.id
-								// 				? { backgroundColor: "red" }
-								// 				: {}
-								// 		: {}
-								// }
-							>
-								<span>
-									{Alphabets[i]}.&nbsp; {answer.body}
-								</span>
-								{slide.userAnswer || answerState ? (
-									answer.id === slide.userAnswer ||
-									answer.id === answerState?.id ? (
-										answer.isCorrect ? (
-											<CheckCircleIcon className="h-4 w-4 shrink-0 fill-green-500 dark:fill-green-200" />
-										) : (
-											<XCircleIcon className="h-4 w-4 shrink-0 fill-red-500 dark:fill-red-200" />
-										)
-									) : null
-								) : null}
-							</button>
-						))}
+									)}
+								>
+									<span>
+										{Alphabets[i]}.&nbsp; {answer.body}
+									</span>
+									{isAnswer === true ? (
+										<CheckCircleIcon className="h-4 w-4 shrink-0 fill-green-500 dark:fill-green-200" />
+									) : isAnswer === false ? (
+										<XCircleIcon className="h-4 w-4 shrink-0 fill-red-500 dark:fill-red-200" />
+									) : null}
+								</button>
+							)
+						})}
 						{slide.userAnswer || answerState ? (
 							slide.userAnswer === slide.correctAnswer ||
 							answerState?.isCorrect ? (
