@@ -19,7 +19,7 @@ import {
 import { Message } from "ai/react"
 import { formatDistance } from "date-fns"
 import Image from "next/image"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Skeleton } from "../ui/skeleton"
 
 interface IMessage {
@@ -125,11 +125,11 @@ export const AiMessage: React.FC<IMessage> = ({
 					</span>
 				</div>
 				{loader ? (
-					<p className="mt-1 flex flex-col gap-2">
+					<div className="mt-1 flex flex-col gap-2">
 						<Skeleton className="h-4 w-full" />
 						<Skeleton className="h-4 w-full" />
 						<Skeleton className="h-4 w-[75%]" />
-					</p>
+					</div>
 				) : (
 					<p className="text-sm">{message.content}</p>
 				)}

@@ -18,7 +18,7 @@ import {
 	SpeakerWaveIcon as SpeakerWaveIconSolid,
 } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useInView } from "react-intersection-observer"
 import { Button } from "../ui/button"
 import { Skeleton } from "../ui/skeleton"
@@ -191,7 +191,6 @@ const Slide: React.FC<ISlideProps> = ({
 	isLastSlide = false,
 }) => {
 	const [vote, setVote] = useState<number>(0)
-	// const [audioState, setAudioState] = useState<number>(0)
 	const [inViewAt, setInViewAt] = useState<number | null>(null)
 	const { ref, inView } = useInView()
 	const [answerState, setAnswerState] = useState<{
@@ -199,18 +198,6 @@ const Slide: React.FC<ISlideProps> = ({
 		body?: string
 		isCorrect?: boolean
 	}>()
-
-	const getTextForSpeech = useCallback(() => {
-		if (slide.type === "quiz") {
-			const questionText = slide.question
-			const answersText = slide.answers
-				? slide.answers.map(a => a.body).join("\n")
-				: ""
-			return `${questionText}\n${answersText}`
-		} else {
-			return `${slide.title}\n${slide.body}`
-		}
-	}, [slide.answers, slide.body, slide.question, slide.title, slide.type])
 
 	const { subscribe, handleAudio, unsubscribe, audioState } =
 		useTextToSpeech()

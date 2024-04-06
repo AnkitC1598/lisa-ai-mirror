@@ -47,7 +47,7 @@ const AppLayout: React.FC<Readonly<IAppLayout>> = ({ children }) => {
 						defaultTheme="dark"
 						enableSystem
 					>
-						<div className="flex w-full max-w-md flex-col bg-gray-50 dark:bg-neutral-950 md:rounded-md md:border md:border-neutral-500">
+						<div className="flex w-full max-w-md flex-col overflow-hidden bg-gray-50 dark:bg-neutral-950 md:rounded-md md:border md:border-neutral-500">
 							<Suspense
 								fallback={
 									<div className="flex h-full w-full items-center justify-center py-8">

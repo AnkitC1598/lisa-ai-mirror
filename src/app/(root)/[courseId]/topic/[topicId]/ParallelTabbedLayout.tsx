@@ -3,6 +3,7 @@
 import { getCourse, getTopicDetails } from "@/actions/hierarchy"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import HierarchyTypes from "@/constants/HierarchyTypes"
+import PageTransitionProvider from "@/providers/pageTransitionProvider"
 import useAIStore from "@/store"
 import { THierarchyType } from "@/types/hierarchy"
 import {
@@ -180,25 +181,27 @@ const ParallelTabbedLayout: React.FC<Readonly<IParallelTabbedLayout>> = ({
 					value="home"
 					className="mt-0 h-bottomNavScreen flex-1 overflow-hidden"
 				>
-					{home}
+					<PageTransitionProvider>{home}</PageTransitionProvider>
 				</TabsContent>
 				<TabsContent
 					value="resources"
 					className="mt-0 h-bottomNavScreen flex-1 overflow-y-auto pb-4 scrollbar"
 				>
-					{resources}
+					<PageTransitionProvider>{resources}</PageTransitionProvider>
 				</TabsContent>
 				<TabsContent
 					value="practiceQuestions"
 					className="mt-0 h-bottomNavScreen flex-1 overflow-y-auto pb-4 scrollbar"
 				>
-					{practiceQuestions}
+					<PageTransitionProvider>
+						{practiceQuestions}
+					</PageTransitionProvider>
 				</TabsContent>
 				<TabsContent
 					value="chat"
 					className="mt-0 h-bottomNavScreen flex-1 overflow-hidden pb-4"
 				>
-					{chat}
+					<PageTransitionProvider>{chat}</PageTransitionProvider>
 				</TabsContent>
 			</Tabs>
 		</>
