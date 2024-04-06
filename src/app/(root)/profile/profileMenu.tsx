@@ -12,11 +12,12 @@ import useAIStore from "@/store"
 import { EllipsisVerticalIcon } from "@heroicons/react/16/solid"
 import { useTheme } from "next-themes"
 import Link from "next/link"
-import posthog from "posthog-js"
+import { usePostHog } from "posthog-js/react"
 
 const ProfileMenu = () => {
 	const { theme, setTheme } = useTheme()
 	const dispatch = useAIStore(store => store.dispatch)
+	const posthog = usePostHog()
 
 	const logout = () => {
 		cookieService.removeTokens()

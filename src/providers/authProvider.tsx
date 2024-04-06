@@ -11,7 +11,7 @@ import * as Sentry from "@sentry/nextjs"
 import { addMinutes, fromUnixTime, isAfter } from "date-fns"
 import { jwtDecode } from "jwt-decode"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import posthog from "posthog-js"
+import { usePostHog } from "posthog-js/react"
 import { useEffect, useState } from "react"
 
 interface IAuthProvider {
@@ -26,6 +26,7 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 	const [ready, setReady] = useState<boolean>(false)
 
 	const dispatch = useAIStore(store => store.dispatch)
+	const posthog = usePostHog()
 
 	useEffect(() => {
 		if (window.location.pathname !== "/auth" && !ready) {

@@ -22,15 +22,16 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { getYear } from "date-fns"
 import IPData from "ipdata"
 import { useRouter } from "next/navigation"
+import { usePostHog } from "posthog-js/react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
 const Onboarding = () => {
 	const router = useRouter()
 
 	const user = useAIStore(store => store.user) as IUserOnboarding & {
 		dob: string
 	}
+	const posthog = usePostHog()
 
 	const form = useForm<z.infer<typeof preferenceSchema>>({
 		resolver: zodResolver(preferenceSchema),

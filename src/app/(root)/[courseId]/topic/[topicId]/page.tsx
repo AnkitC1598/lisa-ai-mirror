@@ -11,9 +11,8 @@ import { IUser } from "@/types/user"
 import { useChat } from "ai/react"
 import { differenceInCalendarYears } from "date-fns"
 import { useParams } from "next/navigation"
-import posthog from "posthog-js"
+import { usePostHog } from "posthog-js/react"
 import { useEffect, useMemo, useState } from "react"
-
 const TopicContent = () => {
 	const currentTopic = useAIStore(store => store.currentTopic)
 	const user = useAIStore(store => store.user) as IUser
@@ -26,6 +25,7 @@ const TopicContent = () => {
 		courseId: string
 		topicId: string
 	}>()
+	const posthog = usePostHog()
 
 	const userContext = useMemo(() => {
 		let interestString = ""

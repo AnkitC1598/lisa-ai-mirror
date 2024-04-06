@@ -10,7 +10,7 @@ import useAIStore from "@/store"
 import { IPracticeQuestion } from "@/types/topic"
 import { useChat } from "ai/react"
 import { useParams } from "next/navigation"
-import posthog from "posthog-js"
+import { usePostHog } from "posthog-js/react"
 import { useEffect, useMemo, useState } from "react"
 
 const PracticeQuestions = () => {
@@ -22,6 +22,7 @@ const PracticeQuestions = () => {
 		courseId: string
 		topicId: string
 	}>()
+	const posthog = usePostHog()
 
 	// const [isLoading, setIsLoading] = useState(false)
 
