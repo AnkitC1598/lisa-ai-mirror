@@ -16,6 +16,7 @@ export interface IColors {
 	card: ICard
 	content: IContent
 	form: IForm
+	badge?: string
 }
 
 export interface ICard {

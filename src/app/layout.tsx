@@ -1,12 +1,23 @@
 import "@/app/globals.css"
+import Loading from "@/components/atoms/Loading"
 import { cn } from "@/lib/utils"
 import AuthProvider from "@/providers/authProvider"
 import NextThemeProvider from "@/providers/nextThemeProvider"
+import type { Viewport } from "next"
 import { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"] })
+
+export const viewport: Viewport = {
+	width: "device-width",
+	initialScale: 1,
+	maximumScale: 1,
+	userScalable: false,
+	// Also supported by less commonly used
+	// interactiveWidget: 'resizes-visual',
+}
 
 export const metadata: Metadata = {
 	title: "lisa AI",
@@ -27,20 +38,28 @@ const AppLayout: React.FC<Readonly<IAppLayout>> = ({ children }) => {
 			<body
 				className={cn(
 					inter.className,
-					"flex h-screen w-screen justify-center overflow-hidden bg-gray-50 text-gray-900 transition-all duration-300 ease-in-out dark:bg-neutral-950 dark:text-gray-200"
+					"flex h-screen w-screen justify-center overflow-hidden text-gray-900 transition-all duration-300 ease-in-out dark:text-gray-200"
 				)}
 			>
-				<NextThemeProvider
-					attribute="class"
-					defaultTheme="dark"
-					enableSystem
-				>
-					<div className="flex w-full max-w-md flex-col border">
-						<Suspense fallback={<>Loading...</>}>
-							<AuthProvider>{children}</AuthProvider>
-						</Suspense>
-					</div>
-				</NextThemeProvider>
+				<main className="flex h-screen w-screen justify-center md:p-4">
+					<NextThemeProvider
+						attribute="class"
+						defaultTheme="dark"
+						enableSystem
+					>
+						<div className="flex w-full max-w-md flex-col bg-gray-50 dark:bg-neutral-950 md:rounded-md md:border md:border-neutral-500">
+							<Suspense
+								fallback={
+									<div className="flex h-full w-full items-center justify-center py-8">
+										<Loading icon />
+									</div>
+								}
+							>
+								<AuthProvider>{children}</AuthProvider>
+							</Suspense>
+						</div>
+					</NextThemeProvider>
+				</main>
 			</body>
 		</html>
 	)

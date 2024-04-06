@@ -45,10 +45,10 @@ const Peek: React.FC<IPeek> = ({
 					width="60.5869"
 					height="60"
 					filterUnits="userSpaceOnUse"
-					color-interpolation-filters="sRGB"
+					colorInterpolationFilters="sRGB"
 				>
 					<feFlood
-						flood-opacity="0"
+						floodOpacity="0"
 						result="BackgroundImageFix"
 					/>
 					<feColorMatrix

@@ -8,14 +8,16 @@ const Home = async () => {
 
 	return (
 		<>
-			<div className="flex h-full flex-col gap-8 overflow-y-auto overflow-x-hidden p-4 scrollbar">
-				<div className="flex flex-col gap-5">
-					<div className="text-xl font-bold">Your Courses</div>
+			<div className="flex h-full flex-col gap-4 overflow-y-auto overflow-x-hidden scrollbar">
+				<div className="flex flex-col gap-4">
+					<div className="p-4 pb-0 text-base font-medium">
+						Your Courses
+					</div>
 					<CourseList courses={courses} />
 				</div>
 				{recent ? (
-					<div className="flex flex-col gap-5">
-						<div className="text-xl font-bold">
+					<div className="flex flex-col gap-4 p-4">
+						<div className="text-base font-medium">
 							Continue Learning
 						</div>
 						<HierarchyCard

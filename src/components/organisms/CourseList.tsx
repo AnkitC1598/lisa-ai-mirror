@@ -52,10 +52,10 @@ const CourseList: React.FC<ICourseList> = ({ courses }) => {
 								>
 									<Link
 										href={`/${course._id}`}
-										className="flex gap-4 rounded-md p-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-900 dark:ring-neutral-800"
+										className="flex gap-4 rounded-md p-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-none dark:ring-neutral-500/20"
 									>
-										<div className="relative h-14 w-14 shrink-0 rounded-md p-2 ring-1 ring-inset ring-neutral-200 dark:ring-neutral-800">
-											<div className="relative h-10 w-10 overflow-hidden rounded-md">
+										<div className="relative h-10 w-10 shrink-0 rounded-md p-1 ring-1 ring-inset ring-neutral-200 dark:ring-neutral-800">
+											<div className="relative h-8 w-8 overflow-hidden rounded-md">
 												<Image
 													src={course.icon ?? icon}
 													alt={course.title}
@@ -63,9 +63,11 @@ const CourseList: React.FC<ICourseList> = ({ courses }) => {
 												/>
 											</div>
 										</div>
-										<p className="line-clamp-2 text-lg font-medium">
-											{course.title}
-										</p>
+										<div className="flex items-center">
+											<p className="line-clamp-2 text-sm">
+												{course.title}
+											</p>
+										</div>
 									</Link>
 								</CarouselItem>
 							) : null

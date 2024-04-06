@@ -16,13 +16,17 @@ import useTextToSpeech from "@/hooks/useTextToSpeech"
 import { handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import { IPracticeQuestion } from "@/types/topic"
-import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/24/outline"
+import {
+	BookmarkIcon as BookmarkIconOutline,
+	SpeakerWaveIcon as SpeakerWaveIconOutline,
+} from "@heroicons/react/24/outline"
 import {
 	BookmarkIcon as BookmarkIconSolid,
-	SpeakerWaveIcon,
+	SpeakerWaveIcon as SpeakerWaveIconSolid,
 } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
+import { Skeleton } from "../ui/skeleton"
 import HierarchyPeek from "./HierarchyPeek"
 
 interface IPracticeQuestions {
@@ -58,13 +62,18 @@ const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
 
 export const PracticeQuestionsSkeletonLoader = () => {
 	return (
-		<div className="flex flex-1 p-2">
-			<div className="flex h-full w-full p-2">
-				<div className="flex w-full flex-shrink-0 flex-col gap-2 rounded-lg bg-neutral-200 p-4 dark:bg-neutral-800">
-					<div className="h-[30px] w-auto rounded-md bg-neutral-300 text-transparent dark:bg-neutral-700 sm:w-[352px]"></div>
-					<div className="h-[42px] w-auto rounded-md bg-neutral-300 text-transparent dark:bg-neutral-700 sm:w-[352px]"></div>
+		<div className="flex w-full flex-col gap-2 p-4">
+			{Array.from({ length: 4 }).map((_, i) => (
+				<div
+					key={i}
+					className={cn(
+						"relative flex h-full w-full flex-col items-start gap-2 overflow-hidden rounded-md bg-white p-4 shadow-md ring-1 ring-inset ring-neutral-200 scrollbar-hide dark:bg-neutral-900 dark:shadow-none dark:ring-neutral-500/20"
+					)}
+				>
+					<Skeleton className="h-5 w-full" />
+					<Skeleton className="h-5 w-[75%]" />
 				</div>
-			</div>
+			))}
 		</div>
 	)
 }
@@ -207,7 +216,7 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 					/>
 				) : null}
 				<div
-					className="relative rounded-md bg-neutral-50 px-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-800 dark:ring-neutral-800"
+					className="relative rounded-md bg-neutral-50 px-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-none dark:ring-neutral-500/20"
 					style={{ zIndex: peekIndex + 20 }}
 				>
 					<AccordionTrigger>
@@ -266,14 +275,11 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 									)}
 									onClick={handleAudio}
 								>
-									<SpeakerWaveIcon
-										className={cn(
-											"h-4 w-4",
-											audioState === 1
-												? "fill-blue-500"
-												: ""
-										)}
-									/>
+									{audioState === 1 ? (
+										<SpeakerWaveIconSolid className="h-4 w-4 fill-blue-500" />
+									) : (
+										<SpeakerWaveIconOutline className="h-4 w-4 opacity-70" />
+									)}
 								</Button>
 							</div>
 							<Button

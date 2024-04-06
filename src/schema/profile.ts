@@ -52,10 +52,10 @@ export const preferenceSchema = z.object({
 					traveling.length +
 					pets.length +
 					valuesTraits.length
-				return totalValues >= 5
+				return totalValues >= 7
 			},
 			{
-				message: "At least 5 interests must be selected",
+				message: "At least 7 interests must be selected",
 			}
 		),
 })

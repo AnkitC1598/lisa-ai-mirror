@@ -26,6 +26,7 @@ interface ILinkPreview {
 	bookmarkState?: boolean
 	peekIndex?: number
 	showHierarchy?: boolean
+	comingFrom?: string
 }
 
 const LinkPreview: React.FC<ILinkPreview> = ({
@@ -35,6 +36,7 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 	bookmarkState = false,
 	peekIndex = 0,
 	showHierarchy = false,
+	comingFrom = "topic",
 }) => {
 	const [bookmarked, setBookmarked] = useState<boolean>(
 		resource.bookmarked ?? bookmarkState
@@ -43,7 +45,6 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 		courseId: string
 		topicId: string
 	}>()
-
 	const handleBookmark = (
 		e: React.MouseEvent<HTMLButtonElement, MouseEvent>
 	) => {
@@ -114,7 +115,7 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 	return (
 		<>
 			<a
-				href={resource.url}
+				href={`${resource.url}?utm_source=lisa_ai_${comingFrom}&utm_medium=${cohortId ?? params?.courseId}&utm_content=resource_link_click`}
 				target="_blank"
 				rel="noopener noreferrer"
 				className={cn("relative w-full", {
@@ -129,15 +130,15 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 					/>
 				) : null}
 				<div
-					className="group/resource relative flex w-full flex-1 flex-col gap-3 rounded-md  bg-neutral-50 px-4 py-5 shadow-md ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-neutral-800 dark:ring-neutral-800"
+					className="group/resource relative flex w-full flex-1 flex-col gap-3 rounded-md  bg-neutral-50 p-4 shadow-md ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-none dark:ring-neutral-500/20"
 					style={{ zIndex: peekIndex + 20 }}
 				>
-					<div className="flex flex-1 flex-col">
-						<span className="line-clamp-2 pr-7 text-lg underline-offset-2 group-hover/resource:underline">
+					<div className="flex flex-1 flex-col gap-2">
+						<span className="line-clamp-2 pr-7 text-sm font-medium underline-offset-2 group-hover/resource:underline">
 							{resource.title}
 						</span>
 						<span
-							className="line-clamp-2 text-sm text-gray-500 dark:[&_strong]:font-normal"
+							className="line-clamp-2 text-xs text-gray-500"
 							dangerouslySetInnerHTML={{
 								__html: resource.description,
 							}}
@@ -145,7 +146,7 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 					</div>
 					<div className="flex w-full items-center justify-between">
 						<div className="flex items-center gap-3">
-							<div className="relative flex h-[30px] w-[30px] shrink-0 items-center justify-center overflow-hidden rounded-md bg-neutral-50">
+							<div className="relative flex h-[30px] w-[30px] shrink-0 items-center justify-center overflow-hidden rounded-md border bg-neutral-50">
 								<div className="relative h-[20px] w-[20px] rounded">
 									<Image
 										src={resource.profile.img}
@@ -157,12 +158,11 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 								</div>
 							</div>
 							<div className="flex flex-col gap-0.5">
-								<p className="line-clamp-1 text-xs font-bold text-gray-500">
+								<p className="line-clamp-1 text-xs text-gray-500">
 									{resource.profile.name}
 								</p>
 								<p className="line-clamp-1 text-xs text-gray-500">
-									{resource.meta_url.netloc}{" "}
-									{resource.meta_url.path}
+									{resource.url}
 								</p>
 							</div>
 						</div>

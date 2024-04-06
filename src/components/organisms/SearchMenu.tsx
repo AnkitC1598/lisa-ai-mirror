@@ -81,7 +81,7 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 					className={
 						size === "large"
 							? "h-5 w-5 shrink-0 opacity-50"
-							: "h-6 w-6 fill-gray-400"
+							: "h-6 w-6 opacity-70"
 					}
 				/>
 				{size === "large" ? (
@@ -125,9 +125,9 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 							))}
 						</CommandGroup>
 					) : null}
-					{query && results.topics.length && results.others.length ? (
+					{/* {query && results.topics.length && results.others.length ? (
 						<CommandSeparator alwaysRender />
-					) : null}
+					) : null} */}
 					{results.others.length && query ? (
 						<CommandGroup heading="Others">
 							{results.others.map(other => (

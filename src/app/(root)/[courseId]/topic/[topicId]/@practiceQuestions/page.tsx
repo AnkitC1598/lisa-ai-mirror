@@ -76,18 +76,19 @@ const PracticeQuestions = () => {
 
 	return (
 		<>
-			<form onSubmit={handleSubmit}>
-				<button
-					type="submit"
-					className="hidden"
-					id="submit"
-				/>
-			</form>
 			{practiceQuestions ? (
 				<QuestionsArray questions={practiceQuestions} />
 			) : aiIsLoading ? (
 				<PracticeQuestionsSkeletonLoader />
-			) : null}
+			) : (
+				<form onSubmit={handleSubmit}>
+					<button
+						type="submit"
+						className="hidden"
+						id="submit"
+					/>
+				</form>
+			)}
 		</>
 	)
 }

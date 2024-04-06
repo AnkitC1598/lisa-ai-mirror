@@ -10,7 +10,7 @@ const HierarchyConstants: IHierarchyConstant = {
 		colors: {
 			card: {
 				border: "hover:border-pink-400 dark:hover:border-pink-800",
-				icon: "text-pink-500",
+				icon: "text-pink-300 dark:text-pink-600",
 				bg: "bg-pink-100 dark:bg-pink-800",
 				text: "text-pink-700 dark:text-pink-50",
 			},
@@ -23,6 +23,7 @@ const HierarchyConstants: IHierarchyConstant = {
 				text: "text-pink-50",
 				lightText: "text-pink-200",
 			},
+			badge: "bg-pink-50 ring-pink-700/10 dark:bg-pink-400/10 dark:ring-pink-400/30 text-pink-800 dark:text-pink-400",
 		},
 	},
 	term: {
@@ -30,7 +31,7 @@ const HierarchyConstants: IHierarchyConstant = {
 		colors: {
 			card: {
 				border: "hover:border-pink-400 dark:hover:border-pink-800",
-				icon: "text-pink-500",
+				icon: "text-pink-300 dark:text-pink-600",
 				bg: "bg-pink-100 dark:bg-pink-800",
 				text: "text-pink-700 dark:text-pink-50",
 			},
@@ -43,6 +44,7 @@ const HierarchyConstants: IHierarchyConstant = {
 				text: "text-pink-50",
 				lightText: "text-pink-200",
 			},
+			badge: "bg-pink-50 ring-pink-700/10 dark:bg-pink-400/10 dark:ring-pink-400/30 text-pink-800 dark:text-pink-400",
 		},
 	},
 	subject: {
@@ -50,7 +52,7 @@ const HierarchyConstants: IHierarchyConstant = {
 		colors: {
 			card: {
 				border: "hover:border-purple-400 dark:hover:border-purple-800",
-				icon: "text-purple-500",
+				icon: "text-purple-300 dark:text-purple-600",
 				bg: "bg-purple-100 dark:bg-purple-800",
 				text: "text-purple-700 dark:text-purple-50",
 			},
@@ -63,6 +65,7 @@ const HierarchyConstants: IHierarchyConstant = {
 				text: "text-purple-50",
 				lightText: "text-purple-200",
 			},
+			badge: "bg-purple-50 ring-purple-700/10 dark:bg-purple-400/10 dark:ring-purple-400/30 text-purple-800 dark:text-purple-400",
 		},
 	},
 	chapter: {
@@ -70,7 +73,7 @@ const HierarchyConstants: IHierarchyConstant = {
 		colors: {
 			card: {
 				border: "hover:border-blue-400 dark:hover:border-blue-800",
-				icon: "text-blue-500",
+				icon: "text-blue-300 dark:text-blue-600",
 				bg: "bg-blue-100 dark:bg-blue-800",
 				text: "text-blue-700 dark:text-blue-50",
 			},
@@ -83,6 +86,7 @@ const HierarchyConstants: IHierarchyConstant = {
 				text: "text-blue-50",
 				lightText: "text-blue-200",
 			},
+			badge: "bg-blue-50 ring-blue-700/10 dark:bg-blue-400/10 dark:ring-blue-400/30 text-blue-800 dark:text-blue-400",
 		},
 	},
 	topic: {
@@ -90,7 +94,7 @@ const HierarchyConstants: IHierarchyConstant = {
 		colors: {
 			card: {
 				border: "hover:border-rose-400 dark:hover:border-rose-800",
-				icon: "text-rose-500",
+				icon: "text-rose-300 dark:text-rose-600",
 				bg: "bg-rose-100 dark:bg-rose-800",
 				text: "text-rose-700 dark:text-rose-50",
 			},
@@ -103,6 +107,7 @@ const HierarchyConstants: IHierarchyConstant = {
 				text: "text-rose-50",
 				lightText: "text-rose-200",
 			},
+			badge: "bg-rose-50 ring-rose-700/10 dark:bg-rose-400/10 dark:ring-rose-400/30 text-rose-800 dark:text-rose-400",
 		},
 	},
 	default: {
@@ -110,7 +115,7 @@ const HierarchyConstants: IHierarchyConstant = {
 		colors: {
 			card: {
 				border: "hover:border-neutral-400 dark:hover:border-neutral-800",
-				icon: "text-neutral-500",
+				icon: "text-neutral-300 dark:text-neutral-600",
 				bg: "bg-neutral-100 dark:bg-neutral-800",
 				text: "text-neutral-700 dark:text-neutral-50",
 			},
@@ -123,6 +128,7 @@ const HierarchyConstants: IHierarchyConstant = {
 				text: "text-neutral-50",
 				lightText: "text-neutral-200",
 			},
+			badge: "bg-neutral-50 ring-neutral-700/10 dark:bg-neutral-400/10 dark:ring-neutral-400/30 text-neutral-800 dark:text-neutral-400",
 		},
 	},
 }

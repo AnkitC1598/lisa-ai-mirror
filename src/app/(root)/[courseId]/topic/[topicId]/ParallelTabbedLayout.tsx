@@ -6,11 +6,17 @@ import HierarchyTypes from "@/constants/HierarchyTypes"
 import useAIStore from "@/store"
 import { THierarchyType } from "@/types/hierarchy"
 import {
-	Bars3BottomLeftIcon,
-	ChatBubbleLeftEllipsisIcon,
-	HomeIcon,
-	RectangleStackIcon,
-} from "@heroicons/react/16/solid"
+	Bars3BottomLeftIcon as Bars3BottomLeftIconSolid,
+	ChatBubbleLeftEllipsisIcon as ChatBubbleLeftEllipsisIconSolid,
+	QueueListIcon as QueueListIconSolid,
+	RectangleStackIcon as RectangleStackIconSolid,
+} from "@heroicons/react/20/solid"
+import {
+	Bars3BottomLeftIcon as Bars3BottomLeftIconOutline,
+	ChatBubbleLeftEllipsisIcon as ChatBubbleLeftEllipsisIconOutline,
+	QueueListIcon as QueueListIconOutline,
+	RectangleStackIcon as RectangleStackIconOutline,
+} from "@heroicons/react/24/outline"
 import {
 	useParams,
 	usePathname,
@@ -92,16 +98,21 @@ const ParallelTabbedLayout: React.FC<Readonly<IParallelTabbedLayout>> = ({
 			-2
 		) as THierarchyType
 
-		return currentTopic[prevLevel]?.title
+		return currentTopic[prevLevel === "course" ? "cohort" : prevLevel]
+			?.title
 	}, [currentHierarchy, currentTopic])
 
 	if (!currentTopic) return null
 
 	return (
 		<>
-			<div className="flex flex-col gap-1 p-4 pb-0">
-				<p className="line-clamp-1 text-sm">{prevTitle}</p>
-				<p className="text-lg font-semibold">{currentTopic.title}</p>
+			<div className="flex flex-col justify-center gap-1 p-4 pb-0">
+				<p className="line-clamp-1 text-sm text-gray-500">
+					{prevTitle}
+				</p>
+				<p className="flex items-center gap-2 text-base font-medium">
+					{currentTopic.title}
+				</p>
 			</div>
 			<Tabs
 				defaultValue={tab}
@@ -110,43 +121,59 @@ const ParallelTabbedLayout: React.FC<Readonly<IParallelTabbedLayout>> = ({
 				<TabsList className="h-[unset] justify-between p-4">
 					<TabsTrigger
 						value="home"
-						className="flex gap-1 rounded-full px-4 py-2.5 data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-700 dark:data-[state=active]:text-purple-100"
+						className="flex items-center justify-center gap-1 rounded-full px-4 py-2.5 data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-700 dark:data-[state=active]:text-purple-100"
 						onClick={() => handleTabSwitch("home")}
 					>
-						<HomeIcon className="h-4 w-4" />
 						{tab === "home" ? (
-							<span className="text-xs">Home</span>
-						) : null}
+							<>
+								<QueueListIconSolid className="h-5 w-5 opacity-70" />
+								<span className="text-xs">Explanation</span>
+							</>
+						) : (
+							<QueueListIconOutline className="h-5 w-5 opacity-70" />
+						)}
 					</TabsTrigger>
 					<TabsTrigger
 						value="resources"
 						className="flex gap-1 rounded-full px-4 py-2.5 data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-700 dark:data-[state=active]:text-purple-100"
 						onClick={() => handleTabSwitch("resources")}
 					>
-						<RectangleStackIcon className="h-4 w-4" />
 						{tab === "resources" ? (
-							<span className="text-xs">Resources</span>
-						) : null}
+							<>
+								<RectangleStackIconSolid className="h-5 w-5 opacity-70" />
+								<span className="text-xs">Resources</span>
+							</>
+						) : (
+							<RectangleStackIconOutline className="h-5 w-5 opacity-70" />
+						)}
 					</TabsTrigger>
 					<TabsTrigger
 						value="practiceQuestions"
 						className="flex gap-1 rounded-full px-4 py-2.5 data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-700 dark:data-[state=active]:text-purple-100"
 						onClick={() => handleTabSwitch("practiceQuestions")}
 					>
-						<Bars3BottomLeftIcon className="h-4 w-4" />
 						{tab === "practiceQuestions" ? (
-							<span className="text-xs">Practice Questions</span>
-						) : null}
+							<>
+								<Bars3BottomLeftIconSolid className="h-5 w-5 opacity-70" />
+								<span className="text-xs">Questions</span>
+							</>
+						) : (
+							<Bars3BottomLeftIconOutline className="h-5 w-5 opacity-70" />
+						)}
 					</TabsTrigger>
 					<TabsTrigger
 						value="chat"
 						className="flex gap-1 rounded-full px-4 py-2.5 data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-700 dark:data-[state=active]:text-purple-100"
 						onClick={() => handleTabSwitch("chat")}
 					>
-						<ChatBubbleLeftEllipsisIcon className="h-4 w-4" />
 						{tab === "chat" ? (
-							<span className="text-xs">Chat</span>
-						) : null}
+							<>
+								<ChatBubbleLeftEllipsisIconSolid className="h-5 w-5 opacity-70" />
+								<span className="text-xs">Chat</span>
+							</>
+						) : (
+							<ChatBubbleLeftEllipsisIconOutline className="h-5 w-5 opacity-70" />
+						)}
 					</TabsTrigger>
 				</TabsList>
 				<TabsContent

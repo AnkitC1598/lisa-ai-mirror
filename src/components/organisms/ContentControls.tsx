@@ -2,6 +2,7 @@
 
 import { addTopicBookmark, removeTopicBookmark } from "@/actions/bookmarks"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/24/outline"
 import { BookmarkIcon as BookmarkIconSolid } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
@@ -43,15 +44,19 @@ const ContentControls: React.FC<IContentControls> = ({
 	return (
 		<div className="flex items-center justify-between px-4">
 			<Button
-				variant="outline"
+				variant={bookmarked ? "outline" : "ghost"}
 				size="icon"
 				onClick={handleBookmark}
-				className="relative"
+				className={cn(
+					bookmarked
+						? "relative border-yellow-600/20 bg-yellow-600/10 dark:border-yellow-600/20 dark:bg-yellow-600/10"
+						: ""
+				)}
 			>
 				{bookmarked ? (
-					<BookmarkIconSolid className="h-4 w-4 shrink-0 fill-yellow-500 dark:fill-yellow-400" />
+					<BookmarkIconSolid className="h-4 w-4 fill-yellow-500" />
 				) : (
-					<BookmarkIconOutline className="h-4 w-4 shrink-0" />
+					<BookmarkIconOutline className="h-4 w-4 opacity-70" />
 				)}
 			</Button>
 			<LanguageSwitcher
