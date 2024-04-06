@@ -31,7 +31,7 @@ const Profile = async () => {
 					<div className="flex flex-col gap-4">
 						<div className="relative z-10 -mt-16 flex h-24 w-24 overflow-hidden rounded-md border-4 border-white bg-white dark:bg-neutral-800">
 							<Image
-								src={user.profileImage}
+								src={user.profileImage ?? logo}
 								alt={user.fullname}
 								fill
 							/>
@@ -52,128 +52,157 @@ const Profile = async () => {
 						<span className="text-sm font-medium text-gray-700 dark:text-gray-300">
 							Personal details
 						</span>
-						<div className="flex flex-col gap-1">
-							<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-								About
-							</span>
-							<span className="text-sm">{user.description}</span>
-						</div>
-						<div className="flex flex-col gap-1">
-							<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-								Age
-							</span>
-							<span className="text-sm">
-								{format(new Date(user.dob), "dd MMMM yyyy")},{" "}
-								{differenceInCalendarYears(
-									new Date(),
-									new Date(user.dob)
-								)}
-								yrs
-							</span>
-						</div>
-						<div className="flex flex-col gap-1">
-							<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-								Gender
-							</span>
-							<span className="text-sm capitalize">
-								{user.gender}
-							</span>
-						</div>
-						<div className="flex flex-col gap-1">
-							<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-								Location
-							</span>
-							<span className="text-sm">
-								{user.location.city}, {user.location.country}
-							</span>
-						</div>
-						<div className="flex flex-col gap-1">
-							<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-								Email
-							</span>
-							<span className="text-sm">{user.email}</span>
-						</div>
-						<div className="flex flex-col gap-1">
-							<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-								Phone
-							</span>
-							<div className="flex justify-between gap-4">
-								<span className="text-sm">
-									{user.mobile.numberWithCountryCode}
-								</span>
-								<LockClosedIcon className="h-4 w-4 fill-neutral-500" />
-							</div>
-						</div>
-					</div>
-					<div className="flex flex-col gap-1 pt-4">
-						<span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-							Social Profiles
-						</span>
-						<div className="flex gap-4">
-							<Button
-								variant="outline"
-								size="icon"
-								asChild
-							>
-								<a href={user.socials.github ?? "#"}>
-									<GitHubLogoIcon className="h-4 w-4" />
-								</a>
-							</Button>
-							<Button
-								variant="outline"
-								size="icon"
-								asChild
-							>
-								<a href={user.socials.instagram ?? "#"}>
-									<InstagramLogoIcon className="h-4 w-4" />
-								</a>
-							</Button>
-							<Button
-								variant="outline"
-								size="icon"
-								asChild
-							>
-								<a href={user.socials.twitter ?? "#"}>
-									<TwitterLogoIcon className="h-4 w-4" />
-								</a>
-							</Button>
-						</div>
-					</div>
-					<div className="flex flex-col gap-4 pt-4">
-						<span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-							Preferences
-						</span>
-						{Preferences.map(preference => (
-							<div
-								key={preference.key}
-								className="flex flex-col gap-1"
-							>
+						{user.description ? (
+							<div className="flex flex-col gap-1">
 								<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-									{preference.title}
+									About
 								</span>
-								<div className="flex flex-wrap gap-4">
-									{preference.options
-										.filter(option =>
-											user.interests[
-												preference.key
-											].includes(option.value)
-										)
-										.map(option => (
-											<OnboardingOption
-												key={`${option.value}_${option.label}`}
-												option={option}
-												value={
-													user.interests[
-														preference.key
-													]
-												}
-												disabled
-											/>
-										))}
+								<span className="text-sm">
+									{user.description}
+								</span>
+							</div>
+						) : null}
+						{user.dob ? (
+							<div className="flex flex-col gap-1">
+								<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+									Age
+								</span>
+								<span className="text-sm">
+									{format(new Date(user.dob), "dd MMMM yyyy")}
+									,{" "}
+									{differenceInCalendarYears(
+										new Date(),
+										new Date(user.dob)
+									)}
+									yrs
+								</span>
+							</div>
+						) : null}
+						{user.gender ? (
+							<div className="flex flex-col gap-1">
+								<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+									Gender
+								</span>
+								<span className="text-sm capitalize">
+									{user.gender}
+								</span>
+							</div>
+						) : null}
+						{Object.values(user.location).filter(Boolean).length ? (
+							<div className="flex flex-col gap-1">
+								<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+									Location
+								</span>
+								<span className="text-sm">
+									{user.location.city},{" "}
+									{user.location.country}
+								</span>
+							</div>
+						) : null}
+						{user.email ? (
+							<div className="flex flex-col gap-1">
+								<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+									Email
+								</span>
+								<span className="text-sm">{user.email}</span>
+							</div>
+						) : null}
+						{Object.values(user.mobile).filter(Boolean).length &&
+						user.mobile.numberWithCountryCode ? (
+							<div className="flex flex-col gap-1">
+								<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+									Phone
+								</span>
+								<div className="flex justify-between gap-4">
+									<span className="text-sm">
+										{user.mobile.numberWithCountryCode}
+									</span>
+									<LockClosedIcon className="h-4 w-4 fill-neutral-500" />
 								</div>
 							</div>
-						))}
+						) : null}
 					</div>
+					{Object.values(user.socials).filter(Boolean).length ? (
+						<div className="flex flex-col gap-1 pt-4">
+							<span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+								Social Profiles
+							</span>
+							<div className="flex gap-4">
+								{user.socials.github ? (
+									<Button
+										variant="outline"
+										size="icon"
+										asChild
+									>
+										<a href={user.socials.github}>
+											<GitHubLogoIcon className="h-4 w-4" />
+										</a>
+									</Button>
+								) : null}
+								{user.socials.instagram ? (
+									<Button
+										variant="outline"
+										size="icon"
+										asChild
+									>
+										<a href={user.socials.instagram}>
+											<InstagramLogoIcon className="h-4 w-4" />
+										</a>
+									</Button>
+								) : null}
+								{user.socials.twitter ? (
+									<Button
+										variant="outline"
+										size="icon"
+										asChild
+									>
+										<a href={user.socials.twitter}>
+											<TwitterLogoIcon className="h-4 w-4" />
+										</a>
+									</Button>
+								) : null}
+							</div>
+						</div>
+					) : null}
+					{Object.values(user.interests).flat().length ? (
+						<div className="flex flex-col gap-4 pt-4">
+							<span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+								Preferences
+							</span>
+							{Preferences.map(preference =>
+								user.interests[preference.key].length ? (
+									<div
+										key={preference.key}
+										className="flex flex-col gap-1"
+									>
+										<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+											{preference.title}
+										</span>
+										<div className="flex flex-wrap gap-4">
+											{preference.options
+												.filter(option =>
+													user.interests[
+														preference.key
+													].includes(option.value)
+												)
+												.map(option => (
+													<OnboardingOption
+														key={`${option.value}_${option.label}`}
+														option={option}
+														value={
+															user.interests[
+																preference.key
+															]
+														}
+														disabled
+													/>
+												))}
+										</div>
+									</div>
+								) : null
+							)}
+						</div>
+					) : null}
 					<div className="flex flex-col gap-1 pt-4">
 						<span className="text-sm font-medium text-gray-600 dark:text-gray-400">
 							Joined on
