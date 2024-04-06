@@ -33,7 +33,12 @@ const Bookmarks: React.FC<IBookmarks> = async ({ searchParams }) => {
 	return (
 		<div className="flex h-full flex-col gap-4 overflow-hidden">
 			<div className="flex flex-col gap-2 p-4 pb-0">
-				<p className="line-clamp-1 text-2xl font-semibold">Bookmarks</p>
+				<p className="line-clamp-1 text-2xl font-semibold">
+					Bookmarks{" "}
+					<span className="inline-flex h-5 select-none items-center gap-1 whitespace-nowrap rounded-md bg-purple-50 px-1.5 py-0.5 text-xs font-medium capitalize text-purple-700 ring-1 ring-inset ring-purple-700/10 dark:bg-purple-400/10 dark:text-purple-400 dark:ring-purple-400/30">
+						{`${String(bookmarks.length).padStart(2, "0")}`}
+					</span>
+				</p>
 			</div>
 			<div className="flex flex-col gap-4 px-4">
 				<Suspense fallback="Loading...">
