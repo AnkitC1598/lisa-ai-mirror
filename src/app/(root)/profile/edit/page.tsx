@@ -18,6 +18,7 @@ import { Preferences } from "@/constants/Preferences"
 import { profileSchema } from "@/schema/profile"
 import useAIStore from "@/store"
 import { IFormUser, IUser } from "@/types/user"
+import { CameraIcon } from "@heroicons/react/16/solid"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
 import Head from "next/head"
@@ -51,6 +52,28 @@ const EditProfile = () => {
 		// form.reset()
 	}
 
+	const handleImage = ({
+		e,
+		type = "profileImage",
+		onChange,
+	}: {
+		e: React.ChangeEvent<HTMLInputElement>
+		type: keyof z.infer<typeof profileSchema>
+		onChange: Function
+	}) => {
+		const target = e.target as HTMLInputElement
+		let fileList: FileList | null = target.files
+		// if (fileList && fileList.length) {
+		// 	const formData = new FormData()
+		// 	formData.append(type, fileList[0])
+		// 	updateImage({ body: formData, type }).then(resp => {
+		// 		console.log(resp)
+		// 		onChange(resp)
+		// 	})
+		// }
+	}
+	console.log(form.getValues("profileImage"))
+
 	return (
 		<>
 			<Head>
@@ -60,28 +83,118 @@ const EditProfile = () => {
 					href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"
 				/>
 			</Head>
-			<div className="flex h-full flex-col overflow-y-auto scrollbar">
-				<div className="relative aspect-[8/3] w-full shrink-0 overflow-hidden bg-purple-50 dark:bg-purple-950/30">
-					<Image
-						src={user.coverImage ?? logo}
-						alt={user.firstname}
-						fill
-						objectFit="contain"
-					/>
-				</div>
-				<div className="flex flex-col gap-4 divide-y divide-neutral-200 p-4 dark:divide-neutral-800">
-					<div className="relative z-10 -mt-16 flex h-24 w-24 overflow-hidden rounded-md border-4 border-white bg-white dark:bg-neutral-800">
+			<Form {...form}>
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className="flex h-full flex-col overflow-y-auto scrollbar"
+				>
+					<div className="relative aspect-[8/3] w-full shrink-0 overflow-hidden bg-purple-50 dark:bg-purple-950/30">
 						<Image
-							src={user.profileImage}
-							alt={user.firstname}
+							src={form.getValues("coverImage") ?? logo}
+							alt={form.getValues("firstname")}
 							fill
+							className="object-contain"
+						/>
+
+						<FormField
+							control={form.control}
+							name="profileImage"
+							render={({ field }) => (
+								<FormItem className="absolute bottom-2 right-2 z-50 flex cursor-pointer">
+									<FormLabel className="rounded-md bg-rose-50 p-1.5 text-sm font-semibold text-rose-800 shadow-sm ring-1 ring-inset ring-rose-200 hover:cursor-pointer">
+										{false ? (
+											<div
+												style={{
+													borderTopColor:
+														"transparent",
+												}}
+												className={
+													"h-4 w-4 animate-spin rounded-full border-2 border-solid border-rose-800"
+												}
+											/>
+										) : (
+											<CameraIcon className="h-4 w-4 cursor-pointer" />
+										)}
+										<span className="sr-only hover:cursor-pointer">
+											Cover Image
+										</span>
+									</FormLabel>
+									<FormControl>
+										<Input
+											type="file"
+											className="absolute inset-0 h-full flex-1 cursor-pointer rounded-md opacity-0"
+											accept=".png, .jpg, .jpeg"
+											onChange={e =>
+												handleImage({
+													e,
+													type: "profileImage",
+													onChange: field.onChange,
+												})
+											}
+										/>
+									</FormControl>
+									<FormDescription className="sr-only hover:cursor-pointer">
+										Cover Image
+									</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
 						/>
 					</div>
-					<Form {...form}>
-						<form
-							onSubmit={form.handleSubmit(onSubmit)}
-							className="space-y-2 divide-y divide-neutral-200 dark:divide-neutral-800"
-						>
+					<div className="flex flex-col gap-4 divide-y divide-neutral-200 p-4 dark:divide-neutral-800">
+						<div className="relative z-10 -mt-16 flex h-24 w-24 rounded-md border-4 border-white bg-white dark:bg-neutral-800">
+							<Image
+								src={form.getValues("profileImage") ?? logo}
+								alt={form.getValues("firstname")}
+								fill
+							/>
+							<FormField
+								control={form.control}
+								name="profileImage"
+								render={({ field }) => (
+									<FormItem className="absolute -bottom-2 -right-4 z-50 flex hover:cursor-pointer">
+										<FormLabel className="rounded-md bg-rose-50 p-1.5 text-sm font-semibold text-rose-800 shadow-sm ring-1 ring-inset ring-rose-200 hover:cursor-pointer">
+											{false ? (
+												<div
+													style={{
+														borderTopColor:
+															"transparent",
+													}}
+													className={
+														"h-4 w-4 animate-spin rounded-full border-2 border-solid border-rose-800"
+													}
+												/>
+											) : (
+												<CameraIcon className="h-4 w-4 cursor-pointer" />
+											)}
+											<span className="sr-only hover:cursor-pointer">
+												Profile Image
+											</span>
+										</FormLabel>
+										<FormControl>
+											<Input
+												type="file"
+												className="absolute inset-0 h-full flex-1 rounded-md opacity-0 hover:cursor-pointer"
+												accept=".png, .jpg, .jpeg"
+												onChange={e =>
+													handleImage({
+														e,
+														type: "profileImage",
+														onChange:
+															field.onChange,
+													})
+												}
+											/>
+										</FormControl>
+										<FormDescription className="sr-only hover:cursor-pointer">
+											Profile Image
+										</FormDescription>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+						<div className="space-y-2 divide-y divide-neutral-200 dark:divide-neutral-800">
 							<div className="flex flex-col gap-4 pt-4">
 								<span className="text-sm font-medium text-gray-700 dark:text-gray-300">
 									Personal details
@@ -404,10 +517,10 @@ const EditProfile = () => {
 									Save
 								</Button>
 							</div>
-						</form>
-					</Form>
-				</div>
-			</div>
+						</div>
+					</div>
+				</form>
+			</Form>
 		</>
 	)
 }

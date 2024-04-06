@@ -24,3 +24,18 @@ export const updateUser = async ({ body }: { body: IUser }) => {
 		body: JSON.stringify(body),
 	})
 }
+export const updateImage = async ({
+	body,
+	type = "profileImage",
+}: {
+	body: FormData
+	type?: string
+}) => {
+	return fetchClientWithToken(`/user/${type}`, {
+		method: "PUT",
+		body,
+		headers: {
+			"Content-Type": "multipart/form-data",
+		},
+	})
+}
