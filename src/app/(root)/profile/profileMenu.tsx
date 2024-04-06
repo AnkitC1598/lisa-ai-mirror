@@ -7,12 +7,26 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import cookieService from "@/services/cookie"
+import useAIStore from "@/store"
 import { EllipsisVerticalIcon } from "@heroicons/react/16/solid"
 import { useTheme } from "next-themes"
 import Link from "next/link"
+import posthog from "posthog-js"
 
 const ProfileMenu = () => {
 	const { theme, setTheme } = useTheme()
+	const dispatch = useAIStore(store => store.dispatch)
+
+	const logout = () => {
+		cookieService.removeTokens()
+		dispatch({
+			type: "SET_STATE",
+			payload: { user: null },
+		})
+		posthog.reset()
+		window.location.href = "/auth"
+	}
 
 	return (
 		<>
@@ -51,7 +65,7 @@ const ProfileMenu = () => {
 					</DropdownMenuItem>
 					<DropdownMenuItem asChild>
 						<div
-							onClick={() => (window.location.href = "/auth")}
+							onClick={logout}
 							className="flex items-center gap-2"
 						>
 							<span>Logout</span>

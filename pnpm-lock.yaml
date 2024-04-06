@@ -11,6 +11,9 @@ dependencies:
   '@hookform/resolvers':
     specifier: ^3.3.4
     version: 3.3.4(react-hook-form@7.51.1)
+  '@jam.dev/sdk':
+    specifier: ^0.0.5
+    version: 0.0.5
   '@langchain/core':
     specifier: ^0.1.52
     version: 0.1.52
@@ -1535,6 +1538,10 @@ packages:
       strip-ansi-cjs: /strip-ansi@6.0.1
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: /wrap-ansi@7.0.0
+
+  /@jam.dev/sdk@0.0.5:
+    resolution: {integrity: sha512-unBHvOPfoTeniOoaLFHjhvdqL1vdJkMoYBguTrujW1CGKK+cEScb4WrNu51G/h+o6rEprJ0S8F1ofCq/1ii/mw==}
+    dev: false
 
   /@jridgewell/gen-mapping@0.3.5:
     resolution: {integrity: sha512-IzL8ZoEDIBRWEzlCcRhOaCupYyN5gdIK+Q6fbFdPDg6HqX6jpkItn7DFIpW9LQzXG6Df9sA7+OKnq0qlz/GaQg==}

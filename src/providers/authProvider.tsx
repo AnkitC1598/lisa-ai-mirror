@@ -6,9 +6,12 @@ import Loading from "@/components/atoms/Loading"
 import { clientEnv } from "@/env/client"
 import cookieService from "@/services/cookie"
 import useAIStore from "@/store"
+import { jam } from "@jam.dev/sdk"
+import * as Sentry from "@sentry/nextjs"
 import { addMinutes, fromUnixTime, isAfter } from "date-fns"
 import { jwtDecode } from "jwt-decode"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import posthog from "posthog-js"
 import { useEffect, useState } from "react"
 
 interface IAuthProvider {
@@ -57,6 +60,23 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 									type: "SET_USER",
 									payload: user,
 								})
+
+								const userMetaData = {
+									_id: user._id,
+									uid: user.uid,
+									fullname: user.fullname,
+									email: user.email,
+									username: user.username,
+								}
+
+								Sentry.setUser(userMetaData)
+								jam.metadata(() => userMetaData)
+								posthog.identify(
+									user.uid, // Replace 'distinct_id' with your user's unique identifier
+									userMetaData // optional: set additional user properties
+								)
+								posthog.group("org", window.location.host)
+
 								const userOnboarded = user.interestsAdded
 
 								if (searchParams.has("launchCode"))
