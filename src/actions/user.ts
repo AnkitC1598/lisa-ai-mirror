@@ -17,3 +17,10 @@ export const onboardUser = async ({ body }: { body: IUserOnboarding }) => {
 		body: JSON.stringify(body),
 	})
 }
+
+export const updateUser = async ({ body }: { body: IUser }) => {
+	await fetchClientWithToken("/user/profile", {
+		method: "PUT",
+		body: JSON.stringify(body),
+	})
+}

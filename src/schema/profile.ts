@@ -72,9 +72,9 @@ export const profileSchema = z.object({
 		phoneNumber: z.number(),
 	}),
 	username: z.string().min(1, { message: "Username is required" }),
-	description: z.string().min(1, { message: "Description is required" }),
-	profileImage: z.string().min(1, { message: "Profile image is required" }),
-	coverImage: z.string().min(1, { message: "Cover image is required" }),
+	description: z.string().nullable().optional(),
+	profileImage: z.string().nullable().optional(),
+	coverImage: z.string().nullable().optional(),
 	gender: z.string().min(1, { message: "Gender is required" }),
 	dob: z.string().min(1, { message: "Date of birth is required" }),
 	location: z.object({
@@ -82,10 +82,10 @@ export const profileSchema = z.object({
 		city: z.string().min(1, { message: "City is required" }),
 	}),
 	socials: z.object({
-		github: z.string().min(1, { message: "Github is required" }),
-		instagram: z.string().min(1, { message: "Instagram is required" }),
-		linkedIn: z.string().min(1, { message: "LinkedIn is required" }),
-		twitter: z.string().min(1, { message: "Twitter is required" }),
+		github: z.string().nullable().optional(),
+		instagram: z.string().nullable().optional(),
+		linkedIn: z.string().nullable().optional(),
+		twitter: z.string().nullable().optional(),
 	}),
 	interests: preferenceSchema.shape.interests,
 })

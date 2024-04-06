@@ -1,5 +1,6 @@
 "use client"
 
+import { updateUser } from "@/actions/user"
 import logo from "@/app/favicon.ico"
 import OnboardingOption from "@/components/organisms/OnboardingOption"
 import { Button } from "@/components/ui/button"
@@ -16,15 +17,17 @@ import { Input } from "@/components/ui/input"
 import { Preferences } from "@/constants/Preferences"
 import { profileSchema } from "@/schema/profile"
 import useAIStore from "@/store"
-import { IFormUser } from "@/types/user"
+import { IFormUser, IUser } from "@/types/user"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
 import Head from "next/head"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 const EditProfile = () => {
+	const router = useRouter()
 	const user = useAIStore(store => store.user) as IFormUser
 
 	const form = useForm<z.infer<typeof profileSchema>>({
@@ -35,11 +38,16 @@ const EditProfile = () => {
 		},
 	})
 
+	const { isDirty, isValid } = form.formState
+
 	function onSubmit(values: z.infer<typeof profileSchema>) {
 		// Do something with the form values.
 		// ✅ This will be type-safe and validated.
-		console.log("done", values)
-		// router.push(`/profile`)
+		const { data } = profileSchema.safeParse(values) as {
+			success: boolean
+			data: IUser
+		}
+		updateUser({ body: data }).then(() => router.push(`/profile`))
 		// form.reset()
 	}
 
@@ -391,6 +399,7 @@ const EditProfile = () => {
 								<Button
 									type="submit"
 									className="w-full bg-purple-500 text-neutral-50 hover:bg-purple-500/90 dark:bg-purple-900 dark:text-neutral-50 dark:hover:bg-purple-900/90"
+									disabled={!(isDirty && isValid)}
 								>
 									Save
 								</Button>
