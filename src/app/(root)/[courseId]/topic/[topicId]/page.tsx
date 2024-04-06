@@ -3,15 +3,19 @@
 import { getSlides, translateSlides } from "@/actions/hierarchy"
 import ContentControls from "@/components/organisms/ContentControls"
 import Slides, { SlidesSkeletonLoader } from "@/components/organisms/Slides"
+import { getInterestStatements } from "@/lib/promptHelpers"
 import { fetchClientWithToken } from "@/services/fetch"
 import useAIStore from "@/store"
 import { ISlideSet } from "@/types/topic"
+import { IUser } from "@/types/user"
 import { useChat } from "ai/react"
+import { differenceInCalendarYears } from "date-fns"
 import { useParams } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
 
 const TopicContent = () => {
 	const currentTopic = useAIStore(store => store.currentTopic)
+	const user = useAIStore(store => store.user) as IUser
 	const [slidesData, setSlidesData] = useState<{
 		[key: string]: ISlideSet
 	} | null>(null)
@@ -22,14 +26,31 @@ const TopicContent = () => {
 		topicId: string
 	}>()
 
-	const context = useMemo(() => {
-		if (!currentTopic) return undefined
-		return `I am Abhishek, a 22-year-old student based in ratlam, madhya pradesh. I enjoys coding during my free time and love listening to bollywood music. I love indian street food and enjoy tom cruise movies. Mission impossible is my all time fav movie. I like to play cricket.`
-	}, [currentTopic])
+	const userContext = useMemo(() => {
+		let interestString = ""
+		Object.entries(user.interests).forEach(([key, value]) => {
+			interestString += value.length
+				? getInterestStatements(key, value.join(", ")) + " "
+				: ""
+		})
 
-	const prompt = useMemo(() => {
+		return `I am ${user?.firstname}, a ${
+			user?.dob
+				? differenceInCalendarYears(new Date(), new Date(user.dob))
+				: "20"
+		}-year-old ${user?.preferences.profession || "student"} based in ${(user?.location.city || "Mumbai", ",", user?.location.country || "India")}. ${interestString}`
+	}, [user])
+
+	const hierarchyContext = useMemo(() => {
 		if (!currentTopic) return undefined
-		return `explain topic ${currentTopic.title} in ${currentTopic.cohort.title}`
+		const { cohort, subject, chapter, title } = currentTopic
+
+		let string = `explain topic ${title} `
+		if (chapter) string += `in ${chapter.title} `
+		else if (subject) string += `in ${subject.title} `
+		string += `under ${cohort.title} course.`
+
+		return string
 	}, [currentTopic])
 
 	const {
@@ -39,7 +60,10 @@ const TopicContent = () => {
 	} = useChat({
 		api: "/lisa-ai/api/chat-with-functions",
 		body: {
-			body: { type: "explain_topic", userContext: true, context },
+			body: {
+				type: "explain_topic",
+				userContext: userContext,
+			},
 		},
 		async onFinish(message) {
 			const { slides, quiz } = JSON.parse(message.content)
@@ -76,15 +100,15 @@ const TopicContent = () => {
 			setSlidesData(data?.slides ?? null)
 			if (slidesData || data?.slides) return
 
-			if (prompt && !aiIsLoading) {
-				setInput(prompt)
+			if (hierarchyContext && !aiIsLoading) {
+				setInput(hierarchyContext)
 				setTimeout(() => {
 					document.getElementById("submit")?.click()
 				}, 1000)
 			}
 		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [prompt, setInput, currentTopic])
+	}, [currentTopic])
 
 	useEffect(() => {
 		if (

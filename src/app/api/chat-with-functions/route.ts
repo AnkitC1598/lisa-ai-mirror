@@ -131,11 +131,11 @@ export async function POST(req: Request) {
 				role: "system",
 				content: getSystemMessage(body.type),
 			},
-			...(body.userContext
+			...(!!body.userContext
 				? [
 						{
 							role: "user",
-							content: body.context,
+							content: body.userContext,
 						},
 					]
 				: []),

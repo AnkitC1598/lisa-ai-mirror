@@ -24,8 +24,16 @@ const PracticeQuestions = () => {
 
 	// const [isLoading, setIsLoading] = useState(false)
 
-	const prompt = useMemo(() => {
-		return `Generate 10 Practice questions for: ${currentTopic?.title} in ${currentTopic?.cohort?.title}`
+	const hierarchyContext = useMemo(() => {
+		if (!currentTopic) return undefined
+		const { cohort, subject, chapter, title } = currentTopic
+
+		let string = `Generate 10 Practice questions for: ${title} `
+		if (chapter) string += `in ${chapter.title} `
+		else if (subject) string += `in ${subject.title} `
+		string += `under ${cohort.title} course.`
+
+		return string
 	}, [currentTopic])
 
 	const {
@@ -64,8 +72,8 @@ const PracticeQuestions = () => {
 		}).then(data => {
 			setPracticeQuestions(data?.questions ?? null)
 			if (practiceQuestions || data?.questions) return
-			if (prompt && !aiIsLoading) {
-				setInput(prompt)
+			if (hierarchyContext && !aiIsLoading) {
+				setInput(hierarchyContext)
 				setTimeout(() => {
 					document.getElementById("submit")?.click()
 				}, 1000)
