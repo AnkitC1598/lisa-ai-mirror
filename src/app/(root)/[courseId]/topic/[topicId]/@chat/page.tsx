@@ -84,7 +84,7 @@ const Chat = () => {
 					<ScrollAnchor trackVisibility={true} />
 					{isLoading ? (
 						<AiMessage
-							loader={true}
+							loader
 							params={{ courseId, topicId }}
 							// @ts-ignore
 							message={{

@@ -2,7 +2,6 @@
 
 import logo from "@/app/favicon.ico"
 import { Button } from "@/components/ui/button"
-import useTextToSpeech from "@/hooks/useTextToSpeech"
 import { handleCopy, handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import useAIStore from "@/store"
@@ -68,8 +67,8 @@ export const AiMessage: React.FC<IMessage> = ({
 	const [vote, setVote] = useState<number>(0)
 	const [copy, setCopy] = useState<number>(0)
 
-	const { subscribe, handleAudio, unsubscribe, audioState } =
-		useTextToSpeech()
+	// const { subscribe, handleAudio, unsubscribe, audioState } =
+	// 	useTextToSpeech()
 
 	const resetVote = () => setVote(0)
 
@@ -90,16 +89,16 @@ export const AiMessage: React.FC<IMessage> = ({
 		})
 	}
 
-	useEffect(() => {
-		if (!message.content) return
+	// useEffect(() => {
+	// 	if (!message.content) return
 
-		subscribe(message.content)
+	// 	subscribe(message.content)
 
-		return () => {
-			unsubscribe()
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [message.content, subscribe])
+	// 	return () => {
+	// 		unsubscribe()
+	// 	}
+	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// }, [message.content, subscribe])
 
 	return (
 		<>
