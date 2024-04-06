@@ -6,7 +6,6 @@ import Loading from "@/components/atoms/Loading"
 import { clientEnv } from "@/env/client"
 import cookieService from "@/services/cookie"
 import useAIStore from "@/store"
-import { jam } from "@jam.dev/sdk"
 import * as Sentry from "@sentry/nextjs"
 import { addMinutes, fromUnixTime, isAfter } from "date-fns"
 import { jwtDecode } from "jwt-decode"
@@ -71,7 +70,6 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 								}
 
 								Sentry.setUser(userMetaData)
-								jam.metadata(() => userMetaData)
 								posthog.identify(
 									user.uid, // Replace 'distinct_id' with your user's unique identifier
 									userMetaData // optional: set additional user properties
