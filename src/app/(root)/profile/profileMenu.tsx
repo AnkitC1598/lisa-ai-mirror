@@ -20,6 +20,7 @@ const ProfileMenu = () => {
 
 	const logout = () => {
 		cookieService.removeTokens()
+		posthog.capture("user_logged_out")
 		dispatch({
 			type: "SET_STATE",
 			payload: { user: null },

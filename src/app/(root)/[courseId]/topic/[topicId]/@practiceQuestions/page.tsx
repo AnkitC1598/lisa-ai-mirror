@@ -10,6 +10,7 @@ import useAIStore from "@/store"
 import { IPracticeQuestion } from "@/types/topic"
 import { useChat } from "ai/react"
 import { useParams } from "next/navigation"
+import posthog from "posthog-js"
 import { useEffect, useMemo, useState } from "react"
 
 const PracticeQuestions = () => {
@@ -56,6 +57,7 @@ const PracticeQuestions = () => {
 					}),
 				}
 			)
+			posthog.capture("questions_generated")
 			setPracticeQuestions(
 				resp?.results?.data?.questions ?? {
 					questions,

@@ -61,7 +61,10 @@ const Onboarding = () => {
 	const onSubmit = async (values: z.infer<typeof preferenceSchema>) => {
 		// Do something with the form values.
 		// ✅ This will be type-safe and validated.
-		onboardUser({ body: values }).then(() => router.push(`/`))
+		onboardUser({ body: values }).then(() => {
+			posthog.capture("user_onboarded")
+			router.push(`/`)
+		})
 	}
 
 	return (

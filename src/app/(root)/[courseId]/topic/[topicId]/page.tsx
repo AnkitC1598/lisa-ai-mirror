@@ -11,6 +11,7 @@ import { IUser } from "@/types/user"
 import { useChat } from "ai/react"
 import { differenceInCalendarYears } from "date-fns"
 import { useParams } from "next/navigation"
+import posthog from "posthog-js"
 import { useEffect, useMemo, useState } from "react"
 
 const TopicContent = () => {
@@ -79,6 +80,8 @@ const TopicContent = () => {
 					}),
 				}
 			)
+
+			posthog.capture("explanation_generated")
 			setSlidesData(
 				resp?.results?.data?.slides ?? {
 					en: {
