@@ -18,8 +18,9 @@ import {
 	SpeakerWaveIcon as SpeakerWaveIconSolid,
 } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useInView } from "react-intersection-observer"
+import Confetti from "../atoms/Confetti"
 import { Button } from "../ui/button"
 import { Skeleton } from "../ui/skeleton"
 import ContentPagination from "./ContentPagination"
@@ -136,6 +137,7 @@ const Slide: React.FC<ISlideProps> = ({
 		body?: string
 		isCorrect?: boolean
 	}>()
+	const confettiRef = useRef<{ run: () => void }>()
 
 	const { subscribe, handleAudio, unsubscribe, audioState } =
 		useTextToSpeech()
@@ -157,6 +159,7 @@ const Slide: React.FC<ISlideProps> = ({
 
 	const handleAnswer = (answer: IAnswer) => {
 		setAnswerState(answer)
+		if (confettiRef.current && answer.isCorrect) confettiRef.current.run()
 		answerQuiz({
 			courseId: courseId,
 			topicId,
@@ -353,7 +356,9 @@ const Slide: React.FC<ISlideProps> = ({
 						)}
 					</Button>
 				</div>
-			) : null}
+			) : (
+				<Confetti forwardedRef={confettiRef} />
+			)}
 			<span
 				ref={ref}
 				className="absolute inset-x-0 z-0 opacity-0"
