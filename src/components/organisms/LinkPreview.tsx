@@ -145,8 +145,8 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 							}}
 						/>
 					</div>
-					<div className="flex w-full items-center justify-between">
-						<div className="flex items-center gap-3">
+					<div className="flex w-full items-center justify-between gap-2">
+						<div className="flex w-[calc(100%-48px)] items-center gap-3">
 							<div className="relative flex h-[30px] w-[30px] shrink-0 items-center justify-center overflow-hidden rounded-md border bg-neutral-50">
 								<div className="relative h-[20px] w-[20px] rounded">
 									<Image
@@ -158,11 +158,11 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 									/>
 								</div>
 							</div>
-							<div className="flex flex-col gap-0.5">
-								<p className="line-clamp-1 text-xs text-gray-500">
+							<div className="flex w-[calc(100%-40px)] flex-col gap-0.5">
+								<p className="truncate text-xs text-gray-500">
 									{resource.profile.name}
 								</p>
-								<p className="line-clamp-1 text-xs text-gray-500">
+								<p className="truncate text-xs text-gray-500">
 									{resource.url}
 								</p>
 							</div>
