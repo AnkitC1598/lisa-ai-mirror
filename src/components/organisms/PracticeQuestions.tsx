@@ -11,6 +11,7 @@ import {
 	AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
+import HierarchyConstants from "@/constants/Hierarchy"
 import HierarchyTypes from "@/constants/HierarchyTypes"
 import useTextToSpeech from "@/hooks/useTextToSpeech"
 import { handleVote } from "@/lib/interactions"
@@ -178,23 +179,23 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 		const hierarchyArr = HierarchyTypes[currentHierarchy].slice(-2)
 		let route: {
 			icon: string | null
-			breadcrumbs: { color: string; title: string; _id: string }[]
+			breadcrumbs: {
+				color: { border: string; bg: string }
+				title: string
+				_id: string
+			}[]
 		} = { icon: question.cohort.icon, breadcrumbs: [] }
 
 		hierarchyArr.forEach((h, i) => {
 			const hierarchyKey = h === "course" ? "cohort" : h
-			if (i === 0)
-				route.breadcrumbs.push({
-					color: "",
-					title: question.cohort.title,
-					_id: question.cohort._id,
-				})
-			else
-				route.breadcrumbs.push({
-					color: "",
-					title: question[hierarchyKey].title,
-					_id: question[hierarchyKey]._id,
-				})
+			const {
+				colors: { peek: color },
+			} = HierarchyConstants[hierarchyKey]
+			route.breadcrumbs.push({
+				color,
+				title: question[hierarchyKey].title,
+				_id: question[hierarchyKey]._id,
+			})
 		})
 
 		return route

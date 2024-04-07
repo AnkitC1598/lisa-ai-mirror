@@ -4,6 +4,7 @@ import {
 	addResourceBookmark,
 	removeResourceBookmark,
 } from "@/actions/bookmarks"
+import HierarchyConstants from "@/constants/Hierarchy"
 import HierarchyTypes from "@/constants/HierarchyTypes"
 import { cn } from "@/lib"
 import { Resource } from "@/types/topic"
@@ -90,23 +91,23 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 		const hierarchyArr = HierarchyTypes[currentHierarchy].slice(-2)
 		let route: {
 			icon: string | null
-			breadcrumbs: { color: string; title: string; _id: string }[]
+			breadcrumbs: {
+				color: { border: string; bg: string }
+				title: string
+				_id: string
+			}[]
 		} = { icon: resource.cohort.icon, breadcrumbs: [] }
 
 		hierarchyArr.forEach((h, i) => {
 			const hierarchyKey = h === "course" ? "cohort" : h
-			if (i === 0)
-				route.breadcrumbs.push({
-					color: "",
-					title: resource.cohort.title,
-					_id: resource.cohort._id,
-				})
-			else
-				route.breadcrumbs.push({
-					color: "",
-					title: resource[hierarchyKey].title,
-					_id: resource[hierarchyKey]._id,
-				})
+			const {
+				colors: { peek: color },
+			} = HierarchyConstants[hierarchyKey]
+			route.breadcrumbs.push({
+				color,
+				title: resource[hierarchyKey].title,
+				_id: resource[hierarchyKey]._id,
+			})
 		})
 
 		return route

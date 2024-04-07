@@ -24,6 +24,10 @@ const HierarchyConstants: IHierarchyConstant = {
 				lightText: "text-pink-200",
 			},
 			badge: "bg-pink-50 ring-pink-700/10 dark:bg-pink-400/10 dark:ring-pink-400/30 text-pink-800 dark:text-pink-400",
+			peek: {
+				border: "stroke-pink-300 dark:stroke-pink-600",
+				bg: "fill-pink-100 dark:fill-pink-950",
+			},
 		},
 	},
 	term: {
@@ -45,6 +49,10 @@ const HierarchyConstants: IHierarchyConstant = {
 				lightText: "text-pink-200",
 			},
 			badge: "bg-pink-50 ring-pink-700/10 dark:bg-pink-400/10 dark:ring-pink-400/30 text-pink-800 dark:text-pink-400",
+			peek: {
+				border: "stroke-pink-300 dark:stroke-pink-600",
+				bg: "fill-pink-100 dark:fill-pink-950",
+			},
 		},
 	},
 	subject: {
@@ -66,6 +74,10 @@ const HierarchyConstants: IHierarchyConstant = {
 				lightText: "text-purple-200",
 			},
 			badge: "bg-purple-50 ring-purple-700/10 dark:bg-purple-400/10 dark:ring-purple-400/30 text-purple-800 dark:text-purple-400",
+			peek: {
+				border: "stroke-purple-300 dark:stroke-purple-600",
+				bg: "fill-purple-100 dark:fill-purple-950",
+			},
 		},
 	},
 	chapter: {
@@ -87,6 +99,10 @@ const HierarchyConstants: IHierarchyConstant = {
 				lightText: "text-blue-200",
 			},
 			badge: "bg-blue-50 ring-blue-700/10 dark:bg-blue-400/10 dark:ring-blue-400/30 text-blue-800 dark:text-blue-400",
+			peek: {
+				border: "stroke-blue-300 dark:stroke-blue-600",
+				bg: "fill-blue-100 dark:fill-blue-950",
+			},
 		},
 	},
 	topic: {
@@ -108,6 +124,10 @@ const HierarchyConstants: IHierarchyConstant = {
 				lightText: "text-rose-200",
 			},
 			badge: "bg-rose-50 ring-rose-700/10 dark:bg-rose-400/10 dark:ring-rose-400/30 text-rose-800 dark:text-rose-400",
+			peek: {
+				border: "stroke-rose-300 dark:stroke-rose-600",
+				bg: "fill-rose-100 dark:fill-rose-950",
+			},
 		},
 	},
 	default: {
@@ -129,6 +149,10 @@ const HierarchyConstants: IHierarchyConstant = {
 				lightText: "text-neutral-200",
 			},
 			badge: "bg-neutral-50 ring-neutral-700/10 dark:bg-neutral-400/10 dark:ring-neutral-400/30 text-neutral-800 dark:text-neutral-400",
+			peek: {
+				border: "stroke-neutral-300 dark:stroke-neutral-600",
+				bg: "fill-neutral-100 dark:fill-neutral-950",
+			},
 		},
 	},
 }

@@ -16,7 +16,11 @@ export interface IColors {
 	card: ICard
 	content: IContent
 	form: IForm
-	badge?: string
+	badge: string
+	peek: {
+		border: string
+		bg: string
+	}
 }
 
 export interface ICard {

@@ -1,5 +1,6 @@
 "use client" // Error components must be Client Components
 
+import { Button } from "@/components/ui/button"
 import { useEffect } from "react"
 
 interface IErrorView {
@@ -16,14 +17,15 @@ const ErrorView: React.FC<IErrorView> = ({ error, reset }) => {
 	return (
 		<div className="flex h-full w-full flex-col items-center justify-center gap-2 py-8">
 			<h2>Something went wrong!</h2>
-			<button
+			<Button
+				variant="destructive"
 				onClick={
 					// Attempt to recover by trying to re-render the segment
 					() => reset()
 				}
 			>
 				Try again
-			</button>
+			</Button>
 		</div>
 	)
 }

@@ -88,35 +88,30 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 				icon: "",
 				breadcrumbs: [],
 			}
-		let hierarchyArr = HierarchyTypes[currentHierarchy]
+		let hierarchyArr: THierarchyType[] = HierarchyTypes[currentHierarchy]
 		hierarchyArr = hierarchyArr
 			.slice(0, hierarchyArr.indexOf(hierarchy.type))
 			.slice(-2)
+
 		let route: {
 			icon: string | null
-			breadcrumbs: { color: string; title: string; _id: string }[]
+			breadcrumbs: {
+				color: { border: string; bg: string }
+				title: string
+				_id: string
+			}[]
 		} = { icon: hierarchy.cohort.icon, breadcrumbs: [] }
 
 		hierarchyArr.forEach((h, i) => {
 			const hierarchyKey = h === "course" ? "cohort" : h
-			if (i === 0)
-				route.breadcrumbs.push({
-					color: "",
-					title: hierarchy.cohort.title,
-					_id: hierarchy.cohort._id,
-				})
-			else if (i === hierarchyArr.length - 1)
-				route.breadcrumbs.push({
-					color: "",
-					title: hierarchy.title,
-					_id: hierarchy._id,
-				})
-			else
-				route.breadcrumbs.push({
-					color: "",
-					title: hierarchy[hierarchyKey].title,
-					_id: hierarchy[hierarchyKey]._id,
-				})
+			const {
+				colors: { peek: color },
+			} = HierarchyConstants[hierarchyKey]
+			route.breadcrumbs.push({
+				color,
+				title: hierarchy[hierarchyKey].title,
+				_id: hierarchy.cohort._id,
+			})
 		})
 
 		return route

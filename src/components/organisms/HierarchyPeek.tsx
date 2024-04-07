@@ -7,7 +7,11 @@ interface IHierarchyPeek {
 	peekIndex: number
 	peekValue: {
 		icon: string | null
-		breadcrumbs: { color: string; title: string; _id: string }[]
+		breadcrumbs: {
+			color: { border: string; bg: string }
+			title: string
+			_id: string
+		}[]
 	}
 }
 
@@ -25,8 +29,8 @@ const HierarchyPeek: React.FC<IHierarchyPeek> = ({ peekIndex, peekValue }) => {
 					}}
 				>
 					<Peek
-						border="stroke-purple-300 dark:stroke-purple-600"
-						bg="fill-purple-100 dark:fill-purple-900"
+						border="stroke-neutral-300 dark:stroke-neutral-600"
+						bg="fill-neutral-100 dark:fill-neutral-900"
 						className="!h-8 !w-8 origin-top-left scale-125"
 						style={{
 							zIndex: peekIndex + 10 + -1 * 1,
@@ -52,8 +56,14 @@ const HierarchyPeek: React.FC<IHierarchyPeek> = ({ peekIndex, peekValue }) => {
 						}}
 					>
 						<Peek
-							border="stroke-purple-300 dark:stroke-purple-600"
-							bg="fill-purple-100 dark:fill-purple-900"
+							border={
+								breadcrumb.color.border ??
+								"stroke-purple-300 dark:stroke-purple-600"
+							}
+							bg={
+								breadcrumb.color.bg ??
+								"fill-purple-100 dark:fill-purple-900"
+							}
 							className="!h-8 !w-32"
 							style={{
 								zIndex: peekIndex + 10 + -1 * (idx + 2),
