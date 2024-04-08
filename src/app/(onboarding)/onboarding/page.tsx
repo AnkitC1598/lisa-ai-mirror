@@ -246,13 +246,18 @@ const Onboarding = () => {
 								</p>
 							) : (
 								<div className="text-xs">
-									Choose atleast 7 interests
+									Choose minimum 7 interests
 								</div>
 							)}
 							<Button
-								variant="secondary"
-								className="w-full bg-purple-600 text-sm text-neutral-50 hover:bg-purple-500/90 dark:bg-purple-900 dark:text-neutral-50 dark:hover:bg-purple-900/90"
-								disabled={!(isDirty && isValid)}
+								variant={isDirty ? "default" : "secondary"}
+								className={cn(
+									"w-full text-sm",
+									isDirty
+										? "bg-purple-600 text-neutral-50 hover:bg-purple-500/90 dark:bg-purple-900 dark:text-neutral-50 dark:hover:bg-purple-900/90"
+										: ""
+								)}
+								disabled={!isDirty}
 							>
 								Start Learning &nbsp; 🎉
 							</Button>
