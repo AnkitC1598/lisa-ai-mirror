@@ -122,7 +122,8 @@ const Profile = async () => {
 							</div>
 						) : null}
 					</div>
-					{Object.values(user.socials).filter(Boolean).length ? (
+					{user.hasOwnProperty("socials") &&
+					Object.values(user.socials).filter(Boolean).length ? (
 						<div className="flex flex-col gap-1 pt-4">
 							<span className="text-sm font-medium text-gray-700 dark:text-gray-300">
 								Social Profiles

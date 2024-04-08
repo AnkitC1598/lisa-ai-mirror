@@ -11,7 +11,7 @@ interface IErrorView {
 const ErrorView: React.FC<IErrorView> = ({ error, reset }) => {
 	useEffect(() => {
 		// Log the error to an error reporting service
-		console.error(error)
+		console.error("Error:", error)
 	}, [error])
 
 	return (
