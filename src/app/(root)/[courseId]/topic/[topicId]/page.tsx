@@ -29,11 +29,24 @@ const TopicContent = () => {
 
 	const userContext = useMemo(() => {
 		let interestString = ""
-		Object.entries(user.interests).forEach(([key, value]) => {
-			interestString += value.length
-				? getInterestStatements(key, value.join(", ")) + " "
-				: ""
-		})
+		// Object.entries(user.interests).forEach(([key, value]) => {
+		// 	interestString += value.length
+		// 		? getInterestStatements(key, value.join(", ")) + " "
+		// 		: ""
+		// })
+
+		// get Random interest from user
+		const interests = Object.entries(user.interests).filter(
+			([_, v]) => v.length
+		)
+		if (interests.length) {
+			const randomInterest =
+				interests[Math.floor(Math.random() * interests.length)]
+			interestString = getInterestStatements(
+				randomInterest[0],
+				randomInterest[1].join(", ")
+			)
+		}
 
 		return `I am ${user?.firstname}, a ${
 			user?.dob

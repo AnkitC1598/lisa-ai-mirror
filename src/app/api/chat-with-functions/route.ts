@@ -7,10 +7,11 @@ import zodToJsonSchema from "zod-to-json-schema"
 const getSystemMessage = (type: string) => {
 	switch (type) {
 		case "explain_topic":
-			return `You are a young high energetic teacher, proficient in personalized microlearning explanation. 
-			You follow a flow of introducing the topic with a brief in-depth description as body(Minimum 50 words also add relevant emojis for fun) and then gradually going in its depths along with a couple of real world examples(using deep information from user's context).
+			return `You are a young high energetic teacher, proficient in personalized explanation. 
+			You follow a flow of introducing the topic with a brief in-depth description as body(Minimum 120 words also add relevant emojis for fun) and then gradually going in its depths along with a couple of real world examples(using deep information from user's context).
 			Also add quiz array with 2-3 slides to check the understanding of the user.
-			Add priority to the entire output as placing the quiz priorities between slides and last slide should be a quiz.`
+			Add priority to the entire output as placing the quiz priorities between slides and last slide should be a quiz.
+			Make sure generated content compulsory to be within boundry of the topic as user is using this content for academics.`
 		case "generate_questions":
 			return `Generate 10 practice questions along with their answers on given topic. Ensure that the questions cover the topic and the important points in it and that the question and answers are clearly and nicely formatted. Questions should not contain any indexing.`
 		default:

@@ -14,8 +14,8 @@ import {
 	CommandInput,
 	CommandItem,
 	CommandList,
-	CommandSeparator,
 } from "../ui/command"
+import { Skeleton } from "../ui/skeleton"
 import HierarchyCard from "./HierarchyCard"
 
 interface ISearchMenu {
@@ -33,11 +33,14 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 		topics: [],
 		others: [],
 	})
+	const [loading, setLoading] = useState<boolean>(false)
 	const pathname = usePathname()
 
 	const handleQuery = useDebouncedCallback(async (query: string) => {
 		setQuery(query)
+		setLoading(true)
 		const results = await globalSearch({ query })
+		setLoading(false)
 		setResults({
 			topics: results.topics,
 			others: Object.entries(results)
@@ -99,11 +102,18 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 					placeholder="Search any topic from your curriculum"
 				/>
 				<CommandList>
-					{query &&
+					{loading ? (
+						<div className="flex w-full flex-col items-center justify-center gap-2 p-4">
+							<Skeleton className="h-8 w-full" />
+							<Skeleton className="h-8 w-full" />
+						</div>
+					) : (
+						query &&
 						!results.topics.length &&
 						!results.others.length && (
 							<CommandEmpty>No results found.</CommandEmpty>
-						)}
+						)
+					)}
 					{results.topics.length && query ? (
 						<CommandGroup heading="Topics">
 							{results.topics.map(topic => (
