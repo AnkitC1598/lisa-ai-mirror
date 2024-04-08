@@ -66,7 +66,7 @@ const PracticeQuestions = () => {
 			)
 		},
 		onError(e: Error) {
-			console.log("chat-with-functions Error:", e)
+			console.error("chat-with-functions Error:", e)
 		},
 	})
 

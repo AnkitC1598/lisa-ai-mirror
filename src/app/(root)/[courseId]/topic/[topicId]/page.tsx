@@ -93,7 +93,7 @@ const TopicContent = () => {
 			)
 		},
 		onError(e: Error) {
-			console.log("chat-with-functions Error:", e.message)
+			console.error("chat-with-functions Error:", e.message)
 		},
 	})
 
