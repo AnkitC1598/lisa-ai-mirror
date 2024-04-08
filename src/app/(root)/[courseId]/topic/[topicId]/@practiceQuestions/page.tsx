@@ -65,6 +65,9 @@ const PracticeQuestions = () => {
 				}
 			)
 		},
+		onError(e: Error) {
+			console.log("chat-with-functions Error:", e)
+		},
 	})
 
 	useEffect(() => {

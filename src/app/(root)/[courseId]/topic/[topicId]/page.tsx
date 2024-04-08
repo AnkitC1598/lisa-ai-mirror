@@ -92,6 +92,9 @@ const TopicContent = () => {
 				}
 			)
 		},
+		onError(e: Error) {
+			console.log("chat-with-functions Error:", e.message)
+		},
 	})
 
 	useEffect(() => {
