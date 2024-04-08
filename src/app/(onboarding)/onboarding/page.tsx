@@ -37,7 +37,11 @@ const Onboarding = () => {
 		resolver: zodResolver(preferenceSchema),
 		defaultValues: async () => {
 			let ipInfo
-			if (!user.location.city && !user.location.country) {
+			if (
+				!user.location &&
+				!user.location.city &&
+				!user.location.country
+			) {
 				const ipdata = new IPData(clientEnv.NEXT_PUBLIC_IPDATA_API_KEY)
 				ipInfo = await ipdata.lookup()
 			} else {
