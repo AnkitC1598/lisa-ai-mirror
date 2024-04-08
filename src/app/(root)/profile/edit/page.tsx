@@ -1,6 +1,6 @@
 "use client"
 
-import { updateUser } from "@/actions/user"
+import { updateImage, updateUser } from "@/actions/user"
 import logo from "@/app/favicon.ico"
 import OnboardingOption from "@/components/organisms/OnboardingOption"
 import { Button } from "@/components/ui/button"
@@ -63,16 +63,12 @@ const EditProfile = () => {
 	}) => {
 		const target = e.target as HTMLInputElement
 		let fileList: FileList | null = target.files
-		// if (fileList && fileList.length) {
-		// 	const formData = new FormData()
-		// 	formData.append(type, fileList[0])
-		// 	updateImage({ body: formData, type }).then(resp => {
-		// 		console.log(resp)
-		// 		onChange(resp)
-		// 	})
-		// }
+		if (fileList && fileList.length) {
+			const formData = new FormData()
+			formData.append(type, fileList[0])
+			updateImage({ body: formData, type }).then(resp => onChange(resp))
+		}
 	}
-	console.log(form.getValues("profileImage"))
 
 	return (
 		<>
@@ -98,10 +94,10 @@ const EditProfile = () => {
 
 						<FormField
 							control={form.control}
-							name="profileImage"
+							name="coverImage"
 							render={({ field }) => (
-								<FormItem className="absolute bottom-2 right-2 z-50 flex cursor-pointer">
-									<FormLabel className="rounded-md bg-rose-50 p-1.5 text-sm font-semibold text-rose-800 shadow-sm ring-1 ring-inset ring-rose-200 hover:cursor-pointer">
+								<FormItem className="absolute bottom-4 right-4 z-50 flex cursor-pointer">
+									<FormLabel className="rounded-md border border-neutral-300 bg-neutral-50 p-1.5 text-sm font-semibold text-gray-800 shadow-sm hover:cursor-pointer dark:border-neutral-600">
 										{false ? (
 											<div
 												style={{
@@ -127,7 +123,7 @@ const EditProfile = () => {
 											onChange={e =>
 												handleImage({
 													e,
-													type: "profileImage",
+													type: "coverImage",
 													onChange: field.onChange,
 												})
 											}
@@ -142,7 +138,7 @@ const EditProfile = () => {
 						/>
 					</div>
 					<div className="flex flex-col gap-4 divide-y divide-neutral-200 p-4 dark:divide-neutral-800">
-						<div className="relative z-10 -mt-16 flex h-24 w-24 rounded-md border-4 border-white bg-white dark:bg-neutral-800">
+						<div className="relative z-10 -mt-16 flex h-24 w-24 rounded-md bg-white dark:bg-neutral-800">
 							<Image
 								src={form.getValues("profileImage") ?? logo}
 								alt={form.getValues("firstname")}
@@ -152,8 +148,8 @@ const EditProfile = () => {
 								control={form.control}
 								name="profileImage"
 								render={({ field }) => (
-									<FormItem className="absolute -bottom-2 -right-4 z-50 flex hover:cursor-pointer">
-										<FormLabel className="rounded-md bg-rose-50 p-1.5 text-sm font-semibold text-rose-800 shadow-sm ring-1 ring-inset ring-rose-200 hover:cursor-pointer">
+									<FormItem className="absolute -bottom-4 -right-4 z-50 flex hover:cursor-pointer">
+										<FormLabel className="rounded-md border border-neutral-300 bg-neutral-50 p-1.5 text-sm font-semibold text-gray-800 shadow-sm hover:cursor-pointer dark:border-neutral-600">
 											{false ? (
 												<div
 													style={{

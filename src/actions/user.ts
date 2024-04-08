@@ -2,10 +2,12 @@
 
 import { fetchClientWithToken } from "@/services/fetch"
 import { IUser, IUserOnboarding } from "@/types/user"
+import { revalidateTag } from "next/cache"
 
 export const getUser = async (): Promise<IUser> => {
 	const resp = await fetchClientWithToken("/user/profile", {
 		method: "GET",
+		next: { tags: ["user"] },
 	})
 
 	return resp.results.data
@@ -19,10 +21,13 @@ export const onboardUser = async ({ body }: { body: IUserOnboarding }) => {
 }
 
 export const updateUser = async ({ body }: { body: IUser }) => {
-	await fetchClientWithToken("/user/profile", {
+	const resp = await fetchClientWithToken("/user/profile", {
 		method: "PUT",
 		body: JSON.stringify(body),
 	})
+	revalidateTag("user")
+
+	return resp
 }
 export const updateImage = async ({
 	body,
@@ -30,12 +35,12 @@ export const updateImage = async ({
 }: {
 	body: FormData
 	type?: string
-}) => {
-	return fetchClientWithToken(`/user/${type}`, {
+}): Promise<string> => {
+	const resp = await fetchClientWithToken(`/user/${type}`, {
 		method: "PUT",
 		body,
-		headers: {
-			"Content-Type": "multipart/form-data",
-		},
+		noContentType: true,
 	})
+
+	return resp.results.data[type]
 }

@@ -6,6 +6,7 @@ import { cookies, headers } from "next/headers"
 
 interface RequestOptions extends RequestInit {
 	headers?: Record<string, string>
+	noContentType?: boolean
 	// Add more properties if needed
 }
 
@@ -22,14 +23,21 @@ const getToken = (tokenType: TTokenType) => {
 const customFetch = async (
 	baseUrl: string,
 	endpoint: string,
-	options: RequestOptions = {},
+	options: RequestOptions = { headers: {}, noContentType: false },
 	tokenType: TTokenType = "access"
 ): Promise<any> => {
 	return new Promise(async (resolve, reject) => {
 		try {
-			options.headers = {
-				"Content-Type": "application/json",
-				...options.headers,
+			if (!options.noContentType) {
+				if (
+					options.headers &&
+					options.headers.hasOwnProperty("Content-Type")
+				)
+					delete options.headers["Content-Type"]
+				options.headers = {
+					"Content-Type": "application/json",
+					...options.headers,
+				}
 			}
 
 			if (tokenType !== null) {
@@ -40,7 +48,6 @@ const customFetch = async (
 					Authorization: `Bearer ${token}`,
 				}
 			}
-
 			let res = await fetch(`${baseUrl}${endpoint}`, options)
 
 			if (!res.ok || res.status !== 200) {
