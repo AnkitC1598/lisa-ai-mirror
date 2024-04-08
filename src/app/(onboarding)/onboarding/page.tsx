@@ -38,9 +38,8 @@ const Onboarding = () => {
 		defaultValues: async () => {
 			let ipInfo
 			if (
-				!user.location &&
-				!user.location.city &&
-				!user.location.country
+				!user.hasOwnProperty("location") ||
+				(!user.location.city && !user.location.country)
 			) {
 				const ipdata = new IPData(clientEnv.NEXT_PUBLIC_IPDATA_API_KEY)
 				ipInfo = await ipdata.lookup()
