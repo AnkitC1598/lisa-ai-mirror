@@ -8,6 +8,7 @@ export const getUser = async (): Promise<IUser> => {
 	const resp = await fetchClientWithToken("/user/profile", {
 		method: "GET",
 		next: { tags: ["user"] },
+		cache: "no-store",
 	})
 
 	return resp.results.data
