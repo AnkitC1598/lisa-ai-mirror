@@ -1,5 +1,5 @@
-import Loading from "@/components/atoms/Loading"
 import Navbar from "@/components/organisms/Navbar"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Suspense } from "react"
 
 interface IRootLayout {
@@ -11,8 +11,10 @@ const RootLayout: React.FC<Readonly<IRootLayout>> = ({ children }) => {
 		<>
 			<Suspense
 				fallback={
-					<div className="flex h-16 w-full items-center justify-center">
-						<Loading icon />
+					<div className="flex h-16 w-full items-center justify-between p-4">
+						<Skeleton className="h-full w-10" />
+						<Skeleton className="h-full w-1/4" />
+						<Skeleton className="h-full w-10" />
 					</div>
 				}
 			>
