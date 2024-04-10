@@ -64,6 +64,9 @@ const Chat = () => {
 				})
 			},
 			initialMessages: oldChats,
+			onError(e: Error) {
+				console.error("chat Error:", e)
+			},
 		})
 
 	return (

@@ -105,6 +105,9 @@ const TopicContent = () => {
 				}
 			)
 		},
+		onError(e: Error) {
+			console.error("chat-with-functions Error:", e.message)
+		},
 	})
 
 	useEffect(() => {

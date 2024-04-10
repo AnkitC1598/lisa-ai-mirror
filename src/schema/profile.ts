@@ -28,34 +28,12 @@ export const preferenceSchema = z.object({
 			valuesTraits: z.string().array(),
 		})
 		.refine(
+			data => calculateTotal(data) >= 7,
 			data => {
-				const {
-					creativity = [],
-					goingOut = [],
-					stayingIn = [],
-					filmTv = [],
-					reading = [],
-					music = [],
-					foodDrinking = [],
-					traveling = [],
-					pets = [],
-					valuesTraits = [],
-				} = data
-				const totalValues =
-					creativity.length +
-					goingOut.length +
-					stayingIn.length +
-					filmTv.length +
-					reading.length +
-					music.length +
-					foodDrinking.length +
-					traveling.length +
-					pets.length +
-					valuesTraits.length
-				return totalValues >= 7
-			},
-			{
-				message: "At least 7 interests must be selected",
+				const diff = 7 - calculateTotal(data)
+				return {
+					message: `Choose ${diff} more interest${diff > 1 ? "s" : ""}`,
+				}
 			}
 		),
 })
@@ -89,3 +67,30 @@ export const profileSchema = z.object({
 	}),
 	interests: preferenceSchema.shape.interests,
 })
+
+const calculateTotal = (data: any): number => {
+	const {
+		creativity = [],
+		goingOut = [],
+		stayingIn = [],
+		filmTv = [],
+		reading = [],
+		music = [],
+		foodDrinking = [],
+		traveling = [],
+		pets = [],
+		valuesTraits = [],
+	} = data
+	return (
+		creativity.length +
+		goingOut.length +
+		stayingIn.length +
+		filmTv.length +
+		reading.length +
+		music.length +
+		foodDrinking.length +
+		traveling.length +
+		pets.length +
+		valuesTraits.length
+	)
+}
