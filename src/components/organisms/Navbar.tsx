@@ -1,20 +1,19 @@
-import { getUser } from "@/actions/user"
 import icon from "@/app/favicon.ico"
 import { cn } from "@/lib/utils"
 import { SparklesIcon } from "@heroicons/react/16/solid"
 import Image from "next/image"
 import Link from "next/link"
-import { Button } from "../ui/button"
+import { Suspense } from "react"
+import { Skeleton } from "../ui/skeleton"
 import NavbarPrimaryActions from "./NavbarPrimaryActions"
+import ProfileLink from "./ProfileLink"
 import SearchMenu from "./SearchMenu"
 
 interface INavbar {
 	logoOnly?: boolean
 }
 
-const Navbar: React.FC<INavbar> = async ({ logoOnly = false }) => {
-	const user = await getUser()
-
+const Navbar: React.FC<INavbar> = ({ logoOnly = false }) => {
 	return (
 		<>
 			<div
@@ -48,21 +47,9 @@ const Navbar: React.FC<INavbar> = async ({ logoOnly = false }) => {
 				{logoOnly ? null : (
 					<div className="flex items-center justify-end gap-2">
 						<SearchMenu />
-						<Button
-							variant="link"
-							asChild
-						>
-							<Link
-								href="/profile"
-								className="relative aspect-square h-8 overflow-hidden rounded-full border border-gray-400 !p-0 "
-							>
-								<Image
-									src={user.profileImage ?? icon}
-									alt={user.fullname}
-									fill
-								/>
-							</Link>
-						</Button>
+						<Suspense fallback={<Skeleton className="h-8 w-8" />}>
+							<ProfileLink />
+						</Suspense>
 					</div>
 				)}
 			</div>

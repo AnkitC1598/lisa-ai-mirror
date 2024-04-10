@@ -2,9 +2,9 @@
 
 import { getHierarchyData } from "@/actions/hierarchy"
 import icon from "@/app/favicon.ico"
-import Loading from "@/components/atoms/Loading"
 import HierarchyCard from "@/components/organisms/HierarchyCard"
 import Search from "@/components/organisms/Search"
+import { Skeleton } from "@/components/ui/skeleton"
 import HierarchyConstants from "@/constants/Hierarchy"
 import useGetHierarchy from "@/hooks/useGetHierarchy"
 import { cn } from "@/lib/utils"
@@ -71,9 +71,25 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 
 	if (!hierarchyData)
 		return (
-			<div className="flex h-full w-full items-center justify-center py-8">
-				<Loading icon />
-			</div>
+			<PageTransitionProvider>
+				<div className="flex h-full flex-col gap-4 overflow-hidden pt-4">
+					<div className="flex flex-col gap-4 px-4">
+						<div className="flex flex-col justify-center gap-4">
+							<Skeleton className="h-4 w-1/3" />
+							<Skeleton className="h-4 w-1/2" />
+						</div>
+						<Search placeholder={`Search`} />
+						<div className="mt-2 flex items-center justify-between text-sm">
+							<Skeleton className="h-4 w-1/4" />
+						</div>
+					</div>
+					<div className="flex flex-col gap-4 overflow-auto px-4 pb-4 scrollbar">
+						<Skeleton className="h-12 w-full" />
+						<Skeleton className="h-12 w-full" />
+						<Skeleton className="h-12 w-full" />
+					</div>
+				</div>
+			</PageTransitionProvider>
 		)
 
 	return (
@@ -128,18 +144,20 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 						)}
 					</div>
 					<div className="flex flex-col gap-4 overflow-auto px-4 pb-4 scrollbar">
-						{filteredHierarchyChildren.length
-							? filteredHierarchyChildren.map(
-									(hierarchy: any) => (
-										<HierarchyCard
-											type={currentView}
-											cohortId={slug[0]}
-											hierarchy={hierarchy}
-											key={hierarchy._id}
-										/>
-									)
-								)
-							: null}
+						{filteredHierarchyChildren.length ? (
+							filteredHierarchyChildren.map((hierarchy: any) => (
+								<HierarchyCard
+									type={currentView}
+									cohortId={slug[0]}
+									hierarchy={hierarchy}
+									key={hierarchy._id}
+								/>
+							))
+						) : (
+							<div className="flex h-full w-full items-center justify-center py-8">
+								No {currentView} found
+							</div>
+						)}
 					</div>
 				</div>
 			</PageTransitionProvider>

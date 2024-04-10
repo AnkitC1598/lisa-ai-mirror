@@ -1,5 +1,4 @@
 import { getBookmarks } from "@/actions/bookmarks"
-import Loading from "@/components/atoms/Loading"
 import BookmarkFilters from "@/components/organisms/BookmarkFilters"
 import HierarchyCard from "@/components/organisms/HierarchyCard"
 import LinkPreview from "@/components/organisms/LinkPreview"
@@ -8,7 +7,6 @@ import Search from "@/components/organisms/Search"
 import { Accordion } from "@/components/ui/accordion"
 import PageTransitionProvider from "@/providers/pageTransitionProvider"
 import { IPracticeQuestion, Resource } from "@/types/topic"
-import { Suspense } from "react"
 
 type TBookmarkFilters = "topics" | "resources" | "questions"
 
@@ -31,6 +29,7 @@ const Bookmarks: React.FC<IBookmarks> = async ({ searchParams }) => {
 		page,
 		filter: filter.replace(/s\b/g, ""),
 	})
+
 	return (
 		<>
 			<PageTransitionProvider>
@@ -44,24 +43,8 @@ const Bookmarks: React.FC<IBookmarks> = async ({ searchParams }) => {
 						) : null}
 					</div>
 					<div className="flex flex-col gap-4 px-4">
-						<Suspense
-							fallback={
-								<div className="flex h-full w-full items-center justify-center py-8">
-									<Loading />
-								</div>
-							}
-						>
-							<BookmarkFilters />
-						</Suspense>
-						<Suspense
-							fallback={
-								<div className="flex h-full w-full items-center justify-center py-8">
-									<Loading />
-								</div>
-							}
-						>
-							<Search />
-						</Suspense>
+						<BookmarkFilters />
+						<Search />
 					</div>
 					<div className="mt-2 flex h-full flex-col gap-5 overflow-y-auto px-4 pb-4 scrollbar">
 						{bookmarks
