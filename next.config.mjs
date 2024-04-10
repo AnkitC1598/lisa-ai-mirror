@@ -42,6 +42,11 @@ const nextConfig = withPWA({
 			},
 		],
 	},
+	logging: {
+		fetches: {
+			fullUrl: true,
+		},
+	},
 })
 
 let config = nextConfig

@@ -125,7 +125,7 @@ export async function POST(req: Request) {
 	const { messages, body } = await req.json()
 
 	const response = await openai.chat.completions.create({
-		model: "gpt-4",
+		model: "gpt-3.5-turbo",
 		stream: true,
 		messages: [
 			{
@@ -146,9 +146,8 @@ export async function POST(req: Request) {
 	})
 
 	const stream = OpenAIStream(response, {
-		experimental_onFunctionCall: async ({ name, arguments: args }) => {
-			return JSON.stringify(args)
-		},
+		experimental_onFunctionCall: async ({ arguments: args }) =>
+			JSON.stringify(args),
 	})
 	return new StreamingTextResponse(stream)
 }
