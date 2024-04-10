@@ -40,7 +40,6 @@ export const getHierarchyData = async ({
 	idType: string
 	id: string
 }): Promise<IHierarchy> => {
-	console.log(`/cohort/${cohortId}/${hierarchy}s?id=${id}&idType=${idType}`)
 	const resp = await fetchClientWithToken(
 		`/cohort/${cohortId}/${hierarchy}s?id=${id}&idType=${idType}`,
 		{

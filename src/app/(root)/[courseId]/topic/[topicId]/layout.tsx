@@ -4,6 +4,7 @@ import { getCourse, getTopicDetails } from "@/actions/hierarchy"
 import Loading from "@/components/atoms/Loading"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import HierarchyTypes from "@/constants/HierarchyTypes"
+import { cn } from "@/lib"
 import PageTransitionProvider from "@/providers/pageTransitionProvider"
 import useAIStore from "@/store"
 import { THierarchyType } from "@/types/hierarchy"
@@ -27,6 +28,38 @@ import {
 } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
 
+const TABS = [
+	{
+		label: "Explanation",
+		icon: { solid: QueueListIconSolid, outline: QueueListIconOutline },
+		key: "explanation",
+	},
+	{
+		label: "Resources",
+		icon: {
+			solid: RectangleStackIconSolid,
+			outline: RectangleStackIconOutline,
+		},
+		key: "resources",
+	},
+	{
+		label: "Questions",
+		icon: {
+			solid: Bars3BottomLeftIconSolid,
+			outline: Bars3BottomLeftIconOutline,
+		},
+		key: "practiceQuestions",
+	},
+	{
+		label: "Chat",
+		icon: {
+			solid: ChatBubbleLeftEllipsisIconSolid,
+			outline: ChatBubbleLeftEllipsisIconOutline,
+		},
+		key: "chat",
+	},
+]
+
 interface ITopicContentLayout {
 	children: React.ReactNode
 	chat: React.ReactNode
@@ -44,8 +77,15 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = ({
 	const currentTopic = useAIStore(store => store.currentTopic)
 	const currentHierarchy = useAIStore(store => store.currentHierarchy)
 
+	const Components: Record<string, React.ReactNode> = {
+		explanation: children,
+		chat: chat,
+		practiceQuestions: practiceQuestions,
+		resources: resources,
+	}
+
 	const searchParams = useSearchParams()
-	const tab: string = searchParams.get("tab") ?? "home"
+	const currentTab: string = searchParams.get("tab") ?? "explanation"
 	const pathname = usePathname()
 	const { replace } = useRouter()
 	const { courseId: cohortId, topicId } = useParams<{
@@ -56,7 +96,7 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = ({
 
 	const handleTabSwitch = (tab: string) => {
 		const params = new URLSearchParams(searchParams)
-		if (tab !== "home") params.set("tab", tab)
+		if (tab !== "explanation") params.set("tab", tab)
 		else params.delete("tab")
 
 		replace(`${pathname}?${params.toString()}`)
@@ -108,9 +148,7 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = ({
 			?.title
 	}, [currentHierarchy, currentTopic])
 
-	if (!currentTopic) return null
-
-	if (loading)
+	if (!currentTopic || loading)
 		return (
 			<div className="flex h-full w-full items-center justify-center py-8">
 				<Loading icon />
@@ -129,97 +167,48 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = ({
 					</p>
 				</div>
 				<Tabs
-					defaultValue={tab}
+					defaultValue={currentTab}
 					className="flex h-full flex-col-reverse overflow-hidden"
 				>
 					<TabsList className="h-[unset] justify-between p-4">
-						<TabsTrigger
-							value="home"
-							className="flex items-center justify-center gap-1 rounded-full px-4 py-2.5 data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-700 dark:data-[state=active]:text-purple-100"
-							onClick={() => handleTabSwitch("home")}
-						>
-							{tab === "home" ? (
-								<>
-									<QueueListIconSolid className="h-5 w-5 opacity-70" />
-									<span className="text-xs">Explanation</span>
-								</>
-							) : (
-								<QueueListIconOutline className="h-5 w-5 opacity-70" />
-							)}
-						</TabsTrigger>
-						<TabsTrigger
-							value="resources"
-							className="flex gap-1 rounded-full px-4 py-2.5 data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-700 dark:data-[state=active]:text-purple-100"
-							onClick={() => handleTabSwitch("resources")}
-						>
-							{tab === "resources" ? (
-								<>
-									<RectangleStackIconSolid className="h-5 w-5 opacity-70" />
-									<span className="text-xs">Resources</span>
-								</>
-							) : (
-								<RectangleStackIconOutline className="h-5 w-5 opacity-70" />
-							)}
-						</TabsTrigger>
-						<TabsTrigger
-							value="practiceQuestions"
-							className="flex gap-1 rounded-full px-4 py-2.5 data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-700 dark:data-[state=active]:text-purple-100"
-							onClick={() => handleTabSwitch("practiceQuestions")}
-						>
-							{tab === "practiceQuestions" ? (
-								<>
-									<Bars3BottomLeftIconSolid className="h-5 w-5 opacity-70" />
-									<span className="text-xs">Questions</span>
-								</>
-							) : (
-								<Bars3BottomLeftIconOutline className="h-5 w-5 opacity-70" />
-							)}
-						</TabsTrigger>
-						<TabsTrigger
-							value="chat"
-							className="flex gap-1 rounded-full px-4 py-2.5 data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-700 dark:data-[state=active]:text-purple-100"
-							onClick={() => handleTabSwitch("chat")}
-						>
-							{tab === "chat" ? (
-								<>
-									<ChatBubbleLeftEllipsisIconSolid className="h-5 w-5 opacity-70" />
-									<span className="text-xs">Chat</span>
-								</>
-							) : (
-								<ChatBubbleLeftEllipsisIconOutline className="h-5 w-5 opacity-70" />
-							)}
-						</TabsTrigger>
+						{TABS.map(tab => (
+							<TabsTrigger
+								key={`${tab.key}_tab`}
+								value={tab.key}
+								className="flex items-center justify-center gap-1 rounded-full px-4 py-2.5 data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-700 dark:data-[state=active]:text-purple-100"
+								onClick={() => handleTabSwitch(tab.key)}
+							>
+								{currentTab === tab.key ? (
+									<>
+										<tab.icon.solid className="h-5 w-5 opacity-70" />
+										<span className="text-xs">
+											{tab.label}
+										</span>
+									</>
+								) : (
+									<tab.icon.outline className="h-5 w-5 opacity-70" />
+								)}
+							</TabsTrigger>
+						))}
 					</TabsList>
-					<TabsContent
-						value="home"
-						className="mt-0 h-bottomNavScreen flex-1 overflow-hidden"
-					>
-						<PageTransitionProvider>
-							{children}
-						</PageTransitionProvider>
-					</TabsContent>
-					<TabsContent
-						value="resources"
-						className="mt-0 h-bottomNavScreen flex-1 overflow-y-auto pb-4 scrollbar"
-					>
-						<PageTransitionProvider>
-							{resources}
-						</PageTransitionProvider>
-					</TabsContent>
-					<TabsContent
-						value="practiceQuestions"
-						className="mt-0 h-bottomNavScreen flex-1 overflow-y-auto pb-4 scrollbar"
-					>
-						<PageTransitionProvider>
-							{practiceQuestions}
-						</PageTransitionProvider>
-					</TabsContent>
-					<TabsContent
-						value="chat"
-						className="mt-0 h-bottomNavScreen flex-1 overflow-hidden pb-4"
-					>
-						<PageTransitionProvider>{chat}</PageTransitionProvider>
-					</TabsContent>
+					{TABS.map((tab, idx) => (
+						<TabsContent
+							key={`${tab.key}_content`}
+							value={tab.key}
+							className={cn(
+								"mt-0 h-bottomNavScreen flex-1",
+								idx === 0
+									? "overflow-hidden"
+									: idx === TABS.length - 1
+										? "overflow-hidden pb-4"
+										: "overflow-y-auto pb-4 scrollbar"
+							)}
+						>
+							<PageTransitionProvider>
+								{Components[tab.key]}
+							</PageTransitionProvider>
+						</TabsContent>
+					))}
 				</Tabs>
 			</div>
 		</>

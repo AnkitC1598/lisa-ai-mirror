@@ -19,7 +19,7 @@ const nextConfig = withPWA({
 		return [
 			// Basic redirect
 			{
-				source: "/topic",
+				source: "/:courseId/topic",
 				destination: "/",
 				permanent: true,
 			},
