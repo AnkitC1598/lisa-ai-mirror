@@ -41,12 +41,7 @@ const nextConfig = withPWA({
 				hostname: "imgs.search.brave.com",
 			},
 		],
-	},
-	logging: {
-		fetches: {
-			fullUrl: true,
-		},
-	},
+	}
 })
 
 let config = nextConfig
