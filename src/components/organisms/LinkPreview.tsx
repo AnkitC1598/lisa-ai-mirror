@@ -168,7 +168,7 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 							</div>
 						</div>
 						<Button
-							variant="ghost"
+							variant="outline"
 							size="icon"
 							onClick={handleBookmark}
 							className="relative shrink-0"

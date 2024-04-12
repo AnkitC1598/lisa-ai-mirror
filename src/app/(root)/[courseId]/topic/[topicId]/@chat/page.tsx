@@ -72,7 +72,7 @@ const Chat = () => {
 	return (
 		<>
 			<div className="flex h-full flex-col gap-4">
-				<div className="scrollbar-both-edges flex flex-1 flex-col divide-y divide-neutral-200 overflow-y-auto scrollbar dark:divide-neutral-800">
+				<div className="scrollbar-both-edges flex flex-1 flex-col divide-y divide-neutral-200 overflow-y-auto bg-[#FAE9FF] scrollbar dark:divide-neutral-800 dark:bg-[#160D1D]">
 					{messages.map(message => {
 						const MessageComponent =
 							message.role === "user" ? UserMessage : AiMessage
@@ -105,7 +105,7 @@ const Chat = () => {
 					<div className="relative">
 						<Input
 							placeholder="Ask me anything..."
-							className="pr-8"
+							className="border-0 pl-0 pr-8 ring-0 focus-visible:ring-0"
 							value={input}
 							onChange={handleInputChange}
 							disabled={isLoading}

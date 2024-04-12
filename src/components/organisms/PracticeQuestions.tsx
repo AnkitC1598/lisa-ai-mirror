@@ -231,7 +231,7 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 						<div className="flex items-center justify-between">
 							<div className="flex gap-2">
 								{/* <Button
-								variant={vote === 1 ? "outline" : "ghost"}
+								variant={vote === 1 ? "outline" : "outline"}
 								size="icon"
 								onClick={() => {
 									handleFeedback(1)
@@ -249,7 +249,7 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 								)}
 							</Button>
 							<Button
-								variant={vote === -1 ? "outline" : "ghost"}
+								variant={vote === -1 ? "outline" : "outline"}
 								size="icon"
 								onClick={() => handleFeedback(-1)}
 								className={cn(
@@ -265,9 +265,7 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 								)}
 							</Button> */}
 								<Button
-									variant={
-										audioState === 1 ? "outline" : "ghost"
-									}
+									variant="outline"
 									size="icon"
 									className={cn(
 										audioState === 1
@@ -284,7 +282,7 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 								</Button>
 							</div>
 							<Button
-								variant={bookmarked ? "outline" : "ghost"}
+								variant="outline"
 								size="icon"
 								onClick={handleBookmark}
 								className={cn(
@@ -297,7 +295,7 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 								{bookmarked ? (
 									<BookmarkIconSolid className="h-4 w-4 shrink-0 fill-yellow-500 dark:fill-yellow-400" />
 								) : (
-									<BookmarkIconOutline className="h-4 w-4 shrink-0" />
+									<BookmarkIconOutline className="h-4 w-4 shrink-0 opacity-70" />
 								)}
 							</Button>
 						</div>

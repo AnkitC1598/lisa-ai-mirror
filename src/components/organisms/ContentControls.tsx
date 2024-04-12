@@ -44,7 +44,7 @@ const ContentControls: React.FC<IContentControls> = ({
 	return (
 		<div className="flex items-center justify-between px-4">
 			<Button
-				variant={bookmarked ? "outline" : "ghost"}
+				variant="outline"
 				size="icon"
 				onClick={handleBookmark}
 				className={cn(

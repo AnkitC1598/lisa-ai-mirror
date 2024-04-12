@@ -304,7 +304,7 @@ const Slide: React.FC<ISlideProps> = ({
 				<div className="flex items-center justify-between p-4">
 					<div className="flex gap-2">
 						<Button
-							variant={vote === 1 ? "outline" : "ghost"}
+							variant="outline"
 							size="icon"
 							onClick={() => {
 								handleFeedback(1)
@@ -322,7 +322,7 @@ const Slide: React.FC<ISlideProps> = ({
 							)}
 						</Button>
 						<Button
-							variant={vote === -1 ? "outline" : "ghost"}
+							variant="outline"
 							size="icon"
 							onClick={() => handleFeedback(-1)}
 							className={cn(
@@ -339,7 +339,7 @@ const Slide: React.FC<ISlideProps> = ({
 						</Button>
 					</div>
 					<Button
-						variant={audioState === 1 ? "outline" : "ghost"}
+						variant="outline"
 						size="icon"
 						className={cn(
 							audioState === 1

@@ -60,7 +60,7 @@ const LanguageSwitcher: React.FC<ILanguageSwitcher> = ({
 		>
 			<PopoverTrigger asChild>
 				<Button
-					variant="ghost"
+					variant="outline"
 					size="icon"
 					className="relative"
 					disabled={disabled}
