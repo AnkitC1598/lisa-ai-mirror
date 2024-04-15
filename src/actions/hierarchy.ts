@@ -217,3 +217,11 @@ export const getRecentTopics = async (): Promise<ITopic | null> => {
 
 	return resp.results.data
 }
+
+export const getSuggestedTopics = async (): Promise<ITopic[]> => {
+	const resp = await fetchClientWithToken(`/ai/suggested/topics`, {
+		method: "GET",
+	})
+
+	return resp.results.data
+}
