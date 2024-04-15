@@ -21,12 +21,14 @@ export const serverEnv = createEnv({
 			"❌ Invalid server environment variables:",
 			error.flatten().fieldErrors
 		)
-		throw new Error("Invalid server environment variables")
+		throw new Error(
+			`❌ Invalid server environment variables: ${error.flatten().fieldErrors}`
+		)
 	},
 	// Called when server variables are accessed on the client.
 	onInvalidAccess: (variable: string) => {
 		throw new Error(
-			"❌ Attempted to access a server-side environment variable on the client"
+			`❌ Attempted to access "${variable}" a server-side environment variable on the client`
 		)
 	},
 })

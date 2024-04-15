@@ -34,6 +34,8 @@ export const clientEnv = createEnv({
 			"❌ Invalid client environment variables:",
 			error.flatten().fieldErrors
 		)
-		throw new Error("Invalid client environment variables")
+		throw new Error(
+			`❌ Invalid client environment variables: ${error.flatten().fieldErrors}`
+		)
 	},
 })
