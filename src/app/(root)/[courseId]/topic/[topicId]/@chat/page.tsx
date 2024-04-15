@@ -40,7 +40,7 @@ const Chat = () => {
 
 	const { messages, input, handleInputChange, handleSubmit, isLoading } =
 		useChat({
-			api: "/lisa-ai/api/chat",
+			api: `${process.env.BASE_PATH}/api/chat`,
 			body: {
 				topic_boundary: `${currentTopic?.title} in ${currentTopic?.cohort?.title}`,
 			},

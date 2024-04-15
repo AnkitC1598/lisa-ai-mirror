@@ -18,7 +18,7 @@ const Loading: React.FC<ILoadingProps> = ({
 		{icon ? (
 			<Image
 				alt="Loading..."
-				src="/lisa-ai/favicon.ico"
+				src={`${process.env.BASE_PATH}/favicon.ico`}
 				className="animate-spin"
 				width={iconWidth}
 				height={iconHeight}

@@ -43,7 +43,7 @@ const PracticeQuestions = () => {
 		setInput,
 		handleSubmit,
 	} = useChat({
-		api: "/lisa-ai/api/chat-with-functions",
+		api: `${process.env.BASE_PATH}/api/chat-with-functions`,
 		body: {
 			body: { type: "generate_questions", userContext: false },
 		},
