@@ -53,7 +53,7 @@ const AppLayout: React.FC<Readonly<IAppLayout>> = ({ children }) => {
 							<Suspense>
 								<PostHogPageView />
 							</Suspense>
-							<div className="relative flex w-full max-w-md flex-col overflow-hidden bg-[url(/lisa-ai/starry-night-light.png)] bg-cover dark:bg-[url(/lisa-ai/starry-night-dark.png)] md:rounded-md md:border md:border-neutral-500">
+							<div className="relative flex w-full max-w-md flex-col overflow-hidden bg-[url('/lisa-ai/white-gridlines.png')] bg-cover dark:bg-[url('/lisa-ai/starry-sky.png')] md:rounded-md md:border md:border-neutral-500">
 								<Suspense
 									fallback={
 										<div className="flex h-full w-full items-center justify-center py-8">

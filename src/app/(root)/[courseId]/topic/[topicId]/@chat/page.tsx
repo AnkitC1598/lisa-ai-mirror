@@ -72,7 +72,7 @@ const Chat = () => {
 	return (
 		<>
 			<div className="flex h-full flex-col gap-4">
-				<div className="scrollbar-both-edges flex flex-1 flex-col divide-y divide-neutral-200 overflow-y-auto bg-[#FAE9FF] scrollbar dark:divide-neutral-800 dark:bg-[#160D1D]">
+				<div className="scrollbar-both-edges flex flex-1 flex-col divide-y divide-neutral-200 overflow-y-auto scrollbar dark:divide-neutral-800">
 					{messages.map(message => {
 						const MessageComponent =
 							message.role === "user" ? UserMessage : AiMessage

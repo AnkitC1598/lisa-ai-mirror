@@ -39,7 +39,7 @@ const PracticeQuestions: React.FC<IPracticeQuestions> = ({ questions }) => {
 
 	return (
 		<>
-			<div className="px-4">
+			<div className="px-4 pb-4">
 				<Accordion
 					type="single"
 					collapsible
