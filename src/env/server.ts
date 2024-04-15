@@ -22,7 +22,7 @@ export const serverEnv = createEnv({
 			error.flatten().fieldErrors
 		)
 		throw new Error(
-			`❌ Invalid server environment variables: ${error.flatten().fieldErrors}`
+			`❌ Invalid server environment variables: ${JSON.stringify(error.flatten().fieldErrors, null, 4)}`
 		)
 	},
 	// Called when server variables are accessed on the client.
