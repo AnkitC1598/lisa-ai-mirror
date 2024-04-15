@@ -99,7 +99,7 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 					<div className="flex flex-col gap-4 px-4">
 						<div className="flex gap-4">
 							{currentLevel.idType !== "cohort" ? null : (
-								<div className="relative h-14 w-14 shrink-0 rounded-md p-2 ring-1 ring-inset ring-neutral-200 dark:ring-neutral-800">
+								<div className="relative h-14 w-14 shrink-0 rounded-md bg-neutral-50 p-2 ring-1 ring-inset ring-neutral-200 dark:bg-neutral-950 dark:ring-neutral-800">
 									<div className="relative h-10 w-10 overflow-hidden rounded-md">
 										<Image
 											src={hierarchyData.icon ?? icon}
