@@ -3,6 +3,7 @@
 import { getDriveFiles, getHierarchyData } from "@/actions/hierarchy"
 import icon from "@/app/favicon.ico"
 import DriveFile from "@/components/organisms/DriveFile"
+import HierarchyCard from "@/components/organisms/HierarchyCard"
 import Search from "@/components/organisms/Search"
 import { Skeleton } from "@/components/ui/skeleton"
 import HierarchyConstants from "@/constants/Hierarchy"
@@ -163,7 +164,7 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 								</span>
 							</div>
 						)}
-						{/* {filteredHierarchyChildren.length ? (
+						{filteredHierarchyChildren.length ? (
 							filteredHierarchyChildren.map((hierarchy: any) => (
 								<HierarchyCard
 									type={currentView}
@@ -176,7 +177,7 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 							<div className="flex h-full w-full items-center justify-center py-8">
 								No {currentView} found
 							</div>
-						)} */}
+						)}
 						<div className="mt-2 flex items-center justify-start gap-2 text-sm">
 							<span>All Files</span>
 							<span
