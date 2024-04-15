@@ -89,13 +89,21 @@ const DriveFile: React.FC<IDriveFileProps> = ({ file }) => {
 		<>
 			<div className="relative flex items-center justify-between gap-4 rounded-md bg-gray-50 p-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-none dark:ring-neutral-500/20">
 				<div className="flex flex-1 items-center gap-4 truncate">
-					<div className="mb-1.5 h-6 min-h-6 w-6 min-w-6 text-slate-400">
+					<div className="mb-1.5 h-8 min-h-8 w-8 min-w-8 text-slate-400">
 						<FileIcon
 							extension={fileExt}
 							{...fileIconStyles}
 						/>
 					</div>
-					<p className="truncate text-sm">{file.title}</p>
+					<div className="5 flex flex-col gap-1">
+						<p className="truncate text-sm">{file.title}</p>
+						<p className="truncate text-xs text-neutral-500 dark:text-neutral-400">
+							{formatRelative(
+								new Date(),
+								new Date(file.updatedAt)
+							)}
+						</p>
+					</div>
 				</div>
 				<div className="flex items-center gap-1">
 					<Button
