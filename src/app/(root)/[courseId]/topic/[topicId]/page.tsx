@@ -60,7 +60,7 @@ const TopicContent = () => {
 		if (!currentTopic) return undefined
 		const { cohort, subject, chapter, title } = currentTopic
 
-		let string = `explain topic ${title} `
+		let string = `Generate 10 slides to explain ${title} `
 		if (chapter) string += `in ${chapter.title} `
 		else if (subject) string += `in ${subject.title} `
 		string += `under ${cohort.title} course.`
