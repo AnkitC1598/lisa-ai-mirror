@@ -172,3 +172,15 @@ export interface IHierarchy {
 	}
 	[key: string]: any
 }
+
+export interface IDriveFile {
+	_id: string
+	createdAt: string
+	updatedAt: string
+	url: string
+	title: string
+	cohortId: string
+	orgId: string
+	isVisible: boolean
+	fileType?: string
+}

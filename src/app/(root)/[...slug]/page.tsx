@@ -1,8 +1,8 @@
 "use client"
 
-import { getHierarchyData } from "@/actions/hierarchy"
+import { getDriveFiles, getHierarchyData } from "@/actions/hierarchy"
 import icon from "@/app/favicon.ico"
-import HierarchyCard from "@/components/organisms/HierarchyCard"
+import DriveFile from "@/components/organisms/DriveFile"
 import Search from "@/components/organisms/Search"
 import { Skeleton } from "@/components/ui/skeleton"
 import HierarchyConstants from "@/constants/Hierarchy"
@@ -10,7 +10,12 @@ import useGetHierarchy from "@/hooks/useGetHierarchy"
 import { cn } from "@/lib/utils"
 import PageTransitionProvider from "@/providers/pageTransitionProvider"
 import { NonNullable } from "@/types"
-import { IHierarchy, ILevel, THierarchyType } from "@/types/hierarchy"
+import {
+	IDriveFile,
+	IHierarchy,
+	ILevel,
+	THierarchyType,
+} from "@/types/hierarchy"
 import Image from "next/image"
 import { useEffect, useMemo, useState } from "react"
 
@@ -29,6 +34,7 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 }) => {
 	const query = searchParams?.query || ""
 	const [hierarchyData, setHierarchyData] = useState<IHierarchy | null>(null)
+	const [driveFiles, setDriveFiles] = useState<IDriveFile[] | [] | null>(null)
 
 	const { prevLevel, currentLevel, currentView } = useGetHierarchy() as {
 		prevLevel: NonNullable<ILevel>
@@ -57,6 +63,14 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 		)
 	}, [hierarchyData, query])
 
+	const filteredDriveFiles = useMemo(() => {
+		if (!driveFiles || !driveFiles.length) return []
+
+		return driveFiles.filter(file =>
+			file.title.toLowerCase().includes(query.toLowerCase())
+		)
+	}, [driveFiles, query])
+
 	useEffect(() => {
 		if (!currentLevel.id || !currentLevel.idType) return
 
@@ -65,11 +79,14 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 			cohortId: slug[0],
 			...currentLevel,
 		}).then(resp => setHierarchyData(resp))
+		getDriveFiles({ cohortId: slug[0], ...currentLevel }).then(resp =>
+			setDriveFiles(resp)
+		)
 	}, [slug, currentView, currentLevel])
 
 	const { colors } = HierarchyConstants[currentView]
 
-	if (!hierarchyData)
+	if (!hierarchyData || !driveFiles)
 		return (
 			<PageTransitionProvider>
 				<div className="flex h-full flex-col gap-4 overflow-hidden pt-4">
@@ -79,11 +96,13 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 							<Skeleton className="h-4 w-1/2" />
 						</div>
 						<Search placeholder={`Search`} />
-						<div className="mt-2 flex items-center justify-between text-sm">
-							<Skeleton className="h-4 w-1/4" />
-						</div>
 					</div>
 					<div className="flex flex-col gap-4 overflow-auto px-4 pb-4 scrollbar">
+						<Skeleton className="h-4 w-1/4" />
+						<Skeleton className="h-12 w-full" />
+						<Skeleton className="h-12 w-full" />
+						<Skeleton className="h-12 w-full" />
+						<Skeleton className="h-4 w-1/4" />
 						<Skeleton className="h-12 w-full" />
 						<Skeleton className="h-12 w-full" />
 						<Skeleton className="h-12 w-full" />
@@ -121,6 +140,8 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 							</div>
 						</div>
 						<Search placeholder={`Search ${currentView}s`} />
+					</div>
+					<div className="flex flex-col gap-4 overflow-auto px-4 pb-4 scrollbar">
 						{currentView === "topic" ? (
 							<div className="mt-2 flex items-center justify-between text-sm">
 								<span>All Topics</span>
@@ -142,9 +163,7 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 								</span>
 							</div>
 						)}
-					</div>
-					<div className="flex flex-col gap-4 overflow-auto px-4 pb-4 scrollbar">
-						{filteredHierarchyChildren.length ? (
+						{/* {filteredHierarchyChildren.length ? (
 							filteredHierarchyChildren.map((hierarchy: any) => (
 								<HierarchyCard
 									type={currentView}
@@ -156,6 +175,29 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 						) : (
 							<div className="flex h-full w-full items-center justify-center py-8">
 								No {currentView} found
+							</div>
+						)} */}
+						<div className="mt-2 flex items-center justify-start gap-2 text-sm">
+							<span>All Files</span>
+							<span
+								className={cn(
+									"inline-flex h-5 select-none items-center gap-1 whitespace-nowrap  rounded-md px-1.5 py-0.5 text-xs font-medium capitalize ring-1 ring-inset",
+									colors.badge
+								)}
+							>
+								{`${String(driveFiles.length).padStart(2, "0")}`}
+							</span>
+						</div>
+						{filteredDriveFiles.length ? (
+							filteredDriveFiles.map(file => (
+								<DriveFile
+									key={file._id}
+									file={file}
+								/>
+							))
+						) : (
+							<div className="flex h-full w-full items-center justify-center py-8">
+								No files found
 							</div>
 						)}
 					</div>

@@ -1,7 +1,7 @@
 "use server"
 
 import { fetchClientWithToken } from "@/services/fetch"
-import { ICourse, IHierarchy, ITopic } from "@/types/hierarchy"
+import { ICourse, IDriveFile, IHierarchy, ITopic } from "@/types/hierarchy"
 import {
 	IChatResponse,
 	IPracticeQuestion,
@@ -224,4 +224,23 @@ export const getSuggestedTopics = async (): Promise<ITopic[]> => {
 	})
 
 	return resp.results.data
+}
+
+export const getDriveFiles = async ({
+	cohortId,
+	idType,
+	id,
+}: {
+	cohortId: string
+	idType: string
+	id: string
+}): Promise<IDriveFile[] | []> => {
+	const resp = await fetchClientWithToken(
+		`/drive/resource/${cohortId}/${idType}/${id}`,
+		{
+			method: "GET",
+		}
+	)
+
+	return resp.results.data.files
 }
