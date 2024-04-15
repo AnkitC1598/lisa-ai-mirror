@@ -105,7 +105,7 @@ const Chat = () => {
 					<div className="relative">
 						<Input
 							placeholder="Ask me anything..."
-							className="pr-8"
+							className="border-0 pl-0 pr-8 ring-0 focus-visible:ring-0"
 							value={input}
 							onChange={handleInputChange}
 							disabled={isLoading}

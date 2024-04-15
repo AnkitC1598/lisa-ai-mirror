@@ -170,7 +170,7 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = ({
 					defaultValue={currentTab}
 					className="flex h-full flex-col-reverse overflow-hidden"
 				>
-					<TabsList className="h-[unset] justify-between p-4">
+					<TabsList className="h-[unset] justify-between bg-neutral-50 p-4 dark:bg-neutral-950">
 						{TABS.map(tab => (
 							<TabsTrigger
 								key={`${tab.key}_tab`}

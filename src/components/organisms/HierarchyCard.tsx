@@ -135,7 +135,7 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 				) : null}
 				<div
 					className={
-						"relative flex items-center justify-between gap-4 rounded-md bg-gray-50 p-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-none dark:ring-neutral-500/20"
+						"relative flex items-center justify-between gap-4 rounded-md bg-neutral-50 p-4 shadow ring-1 ring-inset ring-neutral-200 dark:bg-neutral-900 dark:shadow-none dark:ring-neutral-500/20"
 					}
 					style={{ zIndex: peekIndex + 20 }}
 				>
