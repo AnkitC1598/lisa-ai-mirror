@@ -3,6 +3,7 @@
 import { getChats } from "@/actions/hierarchy"
 import { AiMessage, UserMessage } from "@/components/organisms/Message"
 import { Input } from "@/components/ui/input"
+import { clientEnv } from "@/env/client"
 import { fetchClientWithToken } from "@/services/fetch"
 import useAIStore from "@/store"
 import { IChat } from "@/types/topic"
@@ -40,7 +41,7 @@ const Chat = () => {
 
 	const { messages, input, handleInputChange, handleSubmit, isLoading } =
 		useChat({
-			api: `${process.env.BASE_PATH}/api/chat`,
+			api: `${clientEnv.NEXT_PUBLIC_BASE_PATH}/api/chat`,
 			body: {
 				topic_boundary: `${currentTopic?.title} in ${currentTopic?.cohort?.title}`,
 			},
