@@ -38,6 +38,10 @@ const nextConfig = withPWA({
 			},
 			{
 				protocol: "https",
+				hostname: "static.lisaapp.in",
+			},
+			{
+				protocol: "https",
 				hostname: "imgs.search.brave.com",
 			},
 		],
