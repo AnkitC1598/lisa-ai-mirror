@@ -13,7 +13,7 @@ export const clientEnv = createEnv({
 		NEXT_PUBLIC_MAINTENANCE_END_DATE: z.string().optional(),
 		NEXT_PUBLIC_SOCKET_URL: z.string(),
 		NEXT_PUBLIC_HOST_DOMAIN: z.string(),
-		NEXT_PUBLIC_APP_DOMAIN: z.string(),
+		NEXT_PUBLIC_APP_DOMAIN: z.string().optional(),
 		NEXT_PUBLIC_IPDATA_API_KEY: z.string(),
 		NEXT_PUBLIC_POSTHOG_KEY: z.string(),
 		NEXT_PUBLIC_POSTHOG_HOST: z.string().url(),
