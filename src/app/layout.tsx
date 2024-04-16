@@ -1,5 +1,6 @@
 import "@/app/globals.css"
 import Loading from "@/components/atoms/Loading"
+import { serverEnv } from "@/env/server"
 // import PostHogPageView from "@/components/organisms/PostHog/PageView"
 import { cn } from "@/lib/utils"
 import AuthProvider from "@/providers/authProvider"
@@ -24,7 +25,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
 	title: "lisa AI",
 	description: "lisa AI",
-	manifest: "/lisa-ai/manifest.json",
+	manifest: `${serverEnv.BASE_PATH}/manifest.json`,
 }
 
 interface IAppLayout {
