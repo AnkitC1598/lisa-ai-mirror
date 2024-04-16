@@ -3,6 +3,7 @@
 import { getSlides, translateSlides } from "@/actions/hierarchy"
 import ContentControls from "@/components/organisms/ContentControls"
 import Slides, { SlidesSkeletonLoader } from "@/components/organisms/Slides"
+import { clientEnv } from "@/env/client"
 import { getInterestStatements } from "@/lib/promptHelpers"
 import { fetchClientWithToken } from "@/services/fetch"
 import useAIStore from "@/store"
@@ -73,7 +74,7 @@ const TopicContent = () => {
 		setInput,
 		handleSubmit,
 	} = useChat({
-		api: `${process.env.BASE_PATH}/api/chat-with-functions`,
+		api: `${clientEnv.NEXT_PUBLIC_BASE_PATH}/api/chat-with-functions`,
 		body: {
 			body: {
 				type: "explain_topic",

@@ -1,3 +1,4 @@
+import { clientEnv } from "@/env/client"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 
@@ -18,7 +19,7 @@ const Loading: React.FC<ILoadingProps> = ({
 		{icon ? (
 			<Image
 				alt="Loading..."
-				src={`${process.env.BASE_PATH}/favicon.ico`}
+				src={`${clientEnv.NEXT_PUBLIC_BASE_PATH}/favicon.ico`}
 				className="animate-spin"
 				width={iconWidth}
 				height={iconHeight}

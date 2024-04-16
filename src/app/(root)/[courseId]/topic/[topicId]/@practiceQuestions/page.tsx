@@ -5,6 +5,7 @@ import {
 	PracticeQuestionsSkeletonLoader,
 	default as QuestionsArray,
 } from "@/components/organisms/PracticeQuestions"
+import { clientEnv } from "@/env/client"
 import { fetchClientWithToken } from "@/services/fetch"
 import useAIStore from "@/store"
 import { IPracticeQuestion } from "@/types/topic"
@@ -43,7 +44,7 @@ const PracticeQuestions = () => {
 		setInput,
 		handleSubmit,
 	} = useChat({
-		api: `${process.env.BASE_PATH}/api/chat-with-functions`,
+		api: `${clientEnv.NEXT_PUBLIC_BASE_PATH}/api/chat-with-functions`,
 		body: {
 			body: { type: "generate_questions", userContext: false },
 		},

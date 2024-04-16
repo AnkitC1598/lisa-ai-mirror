@@ -3,6 +3,7 @@ import { z, ZodError } from "zod"
 
 export const clientEnv = createEnv({
 	client: {
+		NEXT_PUBLIC_BASE_PATH: z.string(),
 		NEXT_PUBLIC_COOKIE_KEY: z.string(),
 		NEXT_PUBLIC_SHOW_MAINTENANCE: z
 			.string()
@@ -18,6 +19,7 @@ export const clientEnv = createEnv({
 		NEXT_PUBLIC_POSTHOG_HOST: z.string().url(),
 	},
 	runtimeEnv: {
+		NEXT_PUBLIC_BASE_PATH: process.env.NEXT_PUBLIC_BASE_PATH,
 		NEXT_PUBLIC_COOKIE_KEY: process.env.NEXT_PUBLIC_COOKIE_KEY,
 		NEXT_PUBLIC_SHOW_MAINTENANCE: process.env.NEXT_PUBLIC_SHOW_MAINTENANCE,
 		NEXT_PUBLIC_MAINTENANCE_END_DATE:
