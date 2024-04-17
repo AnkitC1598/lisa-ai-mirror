@@ -110,6 +110,7 @@ const Chat = () => {
 							value={input}
 							onChange={handleInputChange}
 							disabled={isLoading}
+							autoFocus
 						/>
 						<button
 							type="submit"

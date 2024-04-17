@@ -28,7 +28,7 @@ const Home = async () => {
 								Continue Learning
 							</div>
 							<HierarchyCard
-								key={recent._id}
+								key={recent._id + "-recent"}
 								type="topic"
 								showHierarchy
 								hierarchy={recent}
@@ -43,7 +43,7 @@ const Home = async () => {
 							</div>
 							{suggestedTopics.map(suggested => (
 								<HierarchyCard
-									key={suggested._id}
+									key={suggested._id + "-suggested"}
 									type="topic"
 									showHierarchy
 									hierarchy={suggested}

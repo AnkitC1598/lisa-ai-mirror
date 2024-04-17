@@ -34,7 +34,7 @@ export const UserMessage: React.FC<IMessage> = ({ message }) => {
 	const profileImage = useAIStore(store => store.user?.profileImage)
 	return (
 		<>
-			<div className="flex flex-col gap-2 bg-[#f9fafb] p-4 text-right text-sm dark:bg-[#0a0a0a]">
+			<div className="flex select-none flex-col gap-2 bg-[#f9fafb] p-4 text-right text-sm dark:bg-[#0a0a0a]">
 				<div className="flex items-center justify-between text-gray-500">
 					<span className="text-xs">
 						{formatDistance(
@@ -104,7 +104,7 @@ export const AiMessage: React.FC<IMessage> = ({
 
 	return (
 		<>
-			<div className="flex flex-col gap-2 bg-[linear-gradient(180deg,_rgba(250,_231,_255,_0.9)_33.09%,_rgba(250,_231,_255,_0.46)_100%)] p-4 dark:bg-[linear-gradient(180deg,_rgb(88_28_135_/_15%)_33.09%,_rgb(59_7_100_/_20%)_100%)]">
+			<div className="flex select-none flex-col gap-2 bg-[linear-gradient(180deg,_rgba(250,_231,_255,_0.9)_33.09%,_rgba(250,_231,_255,_0.46)_100%)] p-4 dark:bg-[linear-gradient(180deg,_rgb(88_28_135_/_15%)_33.09%,_rgb(59_7_100_/_20%)_100%)]">
 				<div className="flex items-center justify-between text-sm text-gray-500">
 					<div className="flex items-center gap-1">
 						<div className="relative h-5 w-5 overflow-hidden rounded-md">
