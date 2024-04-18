@@ -51,7 +51,11 @@ const customFetch = async (
 			let res = await fetch(`${baseUrl}${endpoint}`, options)
 
 			if (!res.ok || res.status !== 200) {
-				reject(new Error(`${res.statusText}! Status: ${res.status}`))
+				reject(
+					new Error(
+						`${baseUrl}${endpoint}: ${res.statusText}! Status: ${res.status}`
+					)
+				)
 			}
 
 			if (res.status === 401) {
