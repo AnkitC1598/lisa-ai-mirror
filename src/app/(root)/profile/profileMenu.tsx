@@ -3,9 +3,14 @@
 import { Button } from "@/components/ui/button"
 import {
 	DropdownMenu,
+	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuPortal,
 	DropdownMenuSeparator,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import cookieService from "@/services/cookie"
@@ -14,6 +19,7 @@ import {
 	EllipsisVerticalIcon,
 	PencilSquareIcon,
 } from "@heroicons/react/16/solid"
+import { DesktopIcon } from "@radix-ui/react-icons"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import { usePostHog } from "posthog-js/react"
@@ -59,14 +65,43 @@ const ProfileMenu = () => {
 						</Link>
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
-					<DropdownMenuItem
-						className="px-4"
-						onClick={() =>
-							setTheme(theme === "dark" ? "light" : "dark")
-						}
-					>
-						{theme === "dark" ? "Disable" : "Enable"} Dark Mode
-					</DropdownMenuItem>
+					<DropdownMenuSub>
+						<DropdownMenuSubTrigger className="gap-2 px-4">
+							<DesktopIcon />
+							<span>Theme</span>
+						</DropdownMenuSubTrigger>
+						<DropdownMenuPortal>
+							<DropdownMenuSubContent>
+								<DropdownMenuCheckboxItem
+									className="gap-2"
+									checked={theme === "system"}
+									onCheckedChange={value =>
+										value ? setTheme("system") : false
+									}
+								>
+									<span>System</span>
+								</DropdownMenuCheckboxItem>
+								<DropdownMenuCheckboxItem
+									className="gap-2"
+									checked={theme === "light"}
+									onCheckedChange={value =>
+										value ? setTheme("light") : false
+									}
+								>
+									<span>Light</span>
+								</DropdownMenuCheckboxItem>
+								<DropdownMenuCheckboxItem
+									className="gap-2"
+									checked={theme === "dark"}
+									onCheckedChange={value =>
+										value ? setTheme("dark") : false
+									}
+								>
+									<span>Dark</span>
+								</DropdownMenuCheckboxItem>
+							</DropdownMenuSubContent>
+						</DropdownMenuPortal>
+					</DropdownMenuSub>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem
 						className="px-4"

@@ -137,7 +137,7 @@ const EditProfile = () => {
 							)}
 						/>
 					</div>
-					<div className="flex flex-col gap-4 divide-y divide-neutral-200 p-4 dark:divide-neutral-800">
+					<div className="flex flex-col gap-4 p-4">
 						<div className="relative z-10 -mt-16 flex h-24 w-24 rounded-md bg-white dark:bg-neutral-800">
 							<Image
 								src={form.getValues("profileImage") ?? logo}
