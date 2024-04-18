@@ -72,7 +72,7 @@ const FormatText = ({ text = "", customStyles = ``, allowSelect = false }) => {
 		<>
 			<root.span>
 				{parse(
-					`<span class="break-words  ${
+					`<span class="break-words ${
 						allowSelect ? "select-text" : ""
 					}">${createLinks(formatTextCode(text))}</span>`
 				)}

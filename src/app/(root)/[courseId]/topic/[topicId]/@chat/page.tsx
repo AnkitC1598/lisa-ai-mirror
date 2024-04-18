@@ -13,6 +13,12 @@ import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import ScrollAnchor from "./ScrollAnchor"
 
+const baseMessages = [
+	"Hey can you brief me about this topic?",
+	"Give a few examples of this topic",
+	"What can you help me with?",
+]
+
 const Chat = () => {
 	const currentTopic = useAIStore(store => store.currentTopic)
 	const [oldChats, setOldChats] = useState<IChat[] | []>([])
@@ -39,36 +45,42 @@ const Chat = () => {
 		})
 	}, [courseId, currentTopic, topicId])
 
-	const { messages, input, handleInputChange, handleSubmit, isLoading } =
-		useChat({
-			api: `${clientEnv.NEXT_PUBLIC_BASE_PATH}/api/chat`,
-			body: {
-				topic_boundary: `${currentTopic?.title} in ${currentTopic?.cohort?.title}`,
-			},
-			id: topicId,
-			async onFinish(message) {
-				await fetchClientWithToken(`/ai/chat/${courseId}/${topicId}`, {
-					method: "POST",
-					body: JSON.stringify({
-						isLisaAi: true,
-						body: message.content,
-					}),
-				})
-			},
-			async onResponse(message) {
-				await fetchClientWithToken(`/ai/chat/${courseId}/${topicId}`, {
-					method: "POST",
-					body: JSON.stringify({
-						isLisaAi: false,
-						body: input,
-					}),
-				})
-			},
-			initialMessages: oldChats,
-			onError(e: Error) {
-				console.error("chat Error:", e)
-			},
-		})
+	const {
+		messages,
+		input,
+		setInput,
+		handleInputChange,
+		handleSubmit,
+		isLoading,
+	} = useChat({
+		api: `${clientEnv.NEXT_PUBLIC_BASE_PATH}/api/chat`,
+		body: {
+			topic_boundary: `${currentTopic?.title} in ${currentTopic?.cohort?.title}`,
+		},
+		id: topicId,
+		async onFinish(message) {
+			await fetchClientWithToken(`/ai/chat/${courseId}/${topicId}`, {
+				method: "POST",
+				body: JSON.stringify({
+					isLisaAi: true,
+					body: message.content,
+				}),
+			})
+		},
+		async onResponse(message) {
+			await fetchClientWithToken(`/ai/chat/${courseId}/${topicId}`, {
+				method: "POST",
+				body: JSON.stringify({
+					isLisaAi: false,
+					body: input,
+				}),
+			})
+		},
+		initialMessages: oldChats,
+		onError(e: Error) {
+			console.error("chat Error:", e)
+		},
+	})
 
 	return (
 		<>
@@ -97,6 +109,27 @@ const Chat = () => {
 								createdAt: new Date(),
 							}}
 						/>
+					) : !messages.length ? (
+						<div className="mt-auto grid grid-cols-2 gap-2 px-4">
+							{baseMessages.map(message => (
+								<button
+									key={message}
+									className="flex cursor-pointer flex-col rounded-lg border border-neutral-200 bg-white p-4 transition-all hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-950 dark:hover:bg-neutral-900"
+									onClick={() => {
+										setInput(message)
+										setTimeout(() => {
+											document
+												.getElementById("submit")
+												?.click()
+										}, 100)
+									}}
+								>
+									<div className="text-left text-sm">
+										{message}
+									</div>
+								</button>
+							))}
+						</div>
 					) : null}
 				</div>
 				<form
@@ -114,6 +147,7 @@ const Chat = () => {
 						/>
 						<button
 							type="submit"
+							id="submit"
 							disabled={isLoading}
 							className="absolute inset-y-0 right-2 flex items-center"
 						>
