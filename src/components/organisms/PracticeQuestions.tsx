@@ -27,6 +27,7 @@ import {
 } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
+import FormatText from "../atoms/FormatText"
 import { Skeleton } from "../ui/skeleton"
 import HierarchyPeek from "./HierarchyPeek"
 
@@ -222,7 +223,7 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 				>
 					<AccordionTrigger>
 						<div className="text-left text-sm">
-							{question.question}
+							<FormatText text={question.question} />
 						</div>
 					</AccordionTrigger>
 					<AccordionContent>

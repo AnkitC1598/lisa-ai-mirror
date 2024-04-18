@@ -20,6 +20,7 @@ import { Message } from "ai/react"
 import { formatDistance } from "date-fns"
 import Image from "next/image"
 import { useState } from "react"
+import ReadMore from "../atoms/ReadMore"
 import { Skeleton } from "../ui/skeleton"
 
 interface IMessage {
@@ -54,7 +55,10 @@ export const UserMessage: React.FC<IMessage> = ({ message }) => {
 					</div>
 				</div>
 				<p className="text-gray-900 dark:text-neutral-200">
-					{message.content}
+					<ReadMore
+						allowSelect={true}
+						text={message.content}
+					/>
 				</p>
 			</div>
 		</>
@@ -134,7 +138,7 @@ export const AiMessage: React.FC<IMessage> = ({
 					</div>
 				) : (
 					<p className="text-sm text-gray-900 dark:text-neutral-200">
-						{message.content}
+						<ReadMore text={message.content} />
 					</p>
 				)}
 				<div className="flex items-center gap-2">
