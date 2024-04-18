@@ -96,7 +96,7 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 							<Skeleton className="h-4 w-1/3" />
 							<Skeleton className="h-4 w-1/2" />
 						</div>
-						<Search placeholder={`Search`} />
+						<Skeleton className="h-9 w-full" />
 					</div>
 					<div className="flex flex-col gap-4 overflow-auto px-4 pb-4 scrollbar">
 						<Skeleton className="h-4 w-1/4" />
