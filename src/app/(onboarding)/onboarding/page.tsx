@@ -17,14 +17,19 @@ import { clientEnv } from "@/env/client"
 import { cn } from "@/lib/utils"
 import { preferenceSchema } from "@/schema/profile"
 import useAIStore from "@/store"
+import { InterestCategory } from "@/types/preferences"
 import { IUserOnboarding } from "@/types/user"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons"
 import { getYear } from "date-fns"
+import { motion } from "framer-motion"
 import IPData from "ipdata"
 import { useRouter } from "next/navigation"
 import { usePostHog } from "posthog-js/react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+
 const Onboarding = () => {
 	const router = useRouter()
 
@@ -218,18 +223,10 @@ const Onboarding = () => {
 												{title}
 											</FormLabel>
 											<FormControl>
-												<div className="flex flex-wrap gap-4">
-													{options.map(option => (
-														<OnboardingOption
-															key={`${option.value}_${option.label}`}
-															option={option}
-															value={field.value}
-															onChange={
-																field.onChange
-															}
-														/>
-													))}
-												</div>
+												<OptionsContainer
+													options={options}
+													field={field}
+												/>
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -270,3 +267,46 @@ const Onboarding = () => {
 }
 
 export default Onboarding
+
+const OptionsContainer = ({
+	options,
+	field,
+}: {
+	options: InterestCategory[]
+	field: any
+}) => {
+	const [isExpanded, setIsExpanded] = useState<boolean>(false)
+
+	return (
+		<>
+			<motion.div
+				initial={false}
+				animate={{
+					height: options.length <= 11 || isExpanded ? "auto" : 152,
+				}}
+				transition={{ duration: 0.5 }}
+				className="flex flex-wrap gap-4 overflow-hidden"
+			>
+				{options.map(option => (
+					<OnboardingOption
+						key={`${option.value}_${option.label}`}
+						option={option}
+						value={field.value}
+						onChange={field.onChange}
+					/>
+				))}
+			</motion.div>
+			{options.length > 11 ? (
+				<Button
+					type="button"
+					variant="base"
+					className="mx-auto w-min gap-2 rounded-full border-0"
+					onClick={() => setIsExpanded(!isExpanded)}
+				>
+					<span>Show {isExpanded ? "Less" : "More"}</span>
+					{isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
+				</Button>
+			) : null}
+		</>
+	)
+}
