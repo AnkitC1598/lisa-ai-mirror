@@ -13,19 +13,29 @@ import {
 	FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select"
 import { Preferences } from "@/constants/Preferences"
 import { profileSchema } from "@/schema/profile"
 import useAIStore from "@/store"
+import { InterestCategory } from "@/types/preferences"
 import { IFormUser, IUser } from "@/types/user"
 import { CameraIcon } from "@heroicons/react/16/solid"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons"
 import { format } from "date-fns"
+import { motion } from "framer-motion"
 import Head from "next/head"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
 const EditProfile = () => {
 	const router = useRouter()
 	const user = useAIStore(store => store.user) as IFormUser
@@ -183,7 +193,7 @@ const EditProfile = () => {
 								)}
 							/>
 						</div>
-						<div className="space-y-2 divide-y divide-neutral-200 dark:divide-neutral-800">
+						<div className="space-y-4 divide-y divide-neutral-200 dark:divide-neutral-800">
 							<div className="flex flex-col gap-4 pt-4">
 								<span className="text-sm font-medium text-gray-700 dark:text-gray-300">
 									Personal details
@@ -277,9 +287,29 @@ const EditProfile = () => {
 												<FormLabel className="text-sm font-medium text-gray-600 dark:text-gray-400">
 													Gender
 												</FormLabel>
-												<FormControl>
-													<Input {...field} />
-												</FormControl>
+												<Select
+													onValueChange={
+														field.onChange
+													}
+													defaultValue={field.value}
+												>
+													<FormControl>
+														<SelectTrigger className="border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-neutral-200/75 focus:ring-offset-0 dark:border-neutral-800 dark:bg-neutral-950 dark:ring-offset-neutral-950 dark:focus:ring-neutral-700">
+															<SelectValue placeholder="Select your gender" />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														<SelectItem value="male">
+															Male
+														</SelectItem>
+														<SelectItem value="female">
+															Female
+														</SelectItem>
+														<SelectItem value="others">
+															Others
+														</SelectItem>
+													</SelectContent>
+												</Select>
 												<FormMessage />
 											</FormItem>
 										)}
@@ -434,20 +464,10 @@ const EditProfile = () => {
 													{title}
 												</FormLabel>
 												<FormControl>
-													<div className="flex flex-wrap gap-4">
-														{options.map(option => (
-															<OnboardingOption
-																key={`${option.value}_${option.label}`}
-																option={option}
-																value={
-																	field.value
-																}
-																onChange={
-																	field.onChange
-																}
-															/>
-														))}
-													</div>
+													<OptionsContainer
+														options={options}
+														field={field}
+													/>
 												</FormControl>
 												<FormMessage />
 											</FormItem>
@@ -473,3 +493,46 @@ const EditProfile = () => {
 }
 
 export default EditProfile
+
+const OptionsContainer = ({
+	options,
+	field,
+}: {
+	options: InterestCategory[]
+	field: any
+}) => {
+	const [isExpanded, setIsExpanded] = useState<boolean>(false)
+
+	return (
+		<>
+			<motion.div
+				initial={false}
+				animate={{
+					height: options.length <= 11 || isExpanded ? "auto" : 152,
+				}}
+				transition={{ duration: 0.5 }}
+				className="flex flex-wrap gap-4 overflow-hidden"
+			>
+				{options.map(option => (
+					<OnboardingOption
+						key={`${option.value}_${option.label}`}
+						option={option}
+						value={field.value}
+						onChange={field.onChange}
+					/>
+				))}
+			</motion.div>
+			{options.length > 11 ? (
+				<Button
+					type="button"
+					variant="base"
+					className="mx-auto w-min gap-2 rounded-full border-0"
+					onClick={() => setIsExpanded(!isExpanded)}
+				>
+					<span>Show {isExpanded ? "Less" : "More"}</span>
+					{isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
+				</Button>
+			) : null}
+		</>
+	)
+}
