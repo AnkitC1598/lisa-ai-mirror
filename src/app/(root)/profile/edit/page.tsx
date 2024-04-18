@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import {
 	Form,
 	FormControl,
-	FormDescription,
 	FormField,
 	FormItem,
 	FormLabel,
@@ -129,9 +128,6 @@ const EditProfile = () => {
 											}
 										/>
 									</FormControl>
-									<FormDescription className="sr-only hover:cursor-pointer">
-										Cover Image
-									</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}
@@ -182,9 +178,6 @@ const EditProfile = () => {
 												}
 											/>
 										</FormControl>
-										<FormDescription className="sr-only hover:cursor-pointer">
-											Profile Image
-										</FormDescription>
 										<FormMessage />
 									</FormItem>
 								)}
@@ -207,10 +200,6 @@ const EditProfile = () => {
 												<FormControl>
 													<Input {...field} />
 												</FormControl>
-												<FormDescription>
-													This is your public test
-													name.
-												</FormDescription>
 												<FormMessage />
 											</FormItem>
 										)}
@@ -226,10 +215,6 @@ const EditProfile = () => {
 												<FormControl>
 													<Input {...field} />
 												</FormControl>
-												<FormDescription>
-													This is your public test
-													name.
-												</FormDescription>
 												<FormMessage />
 											</FormItem>
 										)}
@@ -246,9 +231,6 @@ const EditProfile = () => {
 											<FormControl>
 												<Input {...field} />
 											</FormControl>
-											<FormDescription>
-												This is your public test name.
-											</FormDescription>
 											<FormMessage />
 										</FormItem>
 									)}
@@ -264,9 +246,6 @@ const EditProfile = () => {
 											<FormControl>
 												<Input {...field} />
 											</FormControl>
-											<FormDescription>
-												This is your public test name.
-											</FormDescription>
 											<FormMessage />
 										</FormItem>
 									)}
@@ -286,10 +265,6 @@ const EditProfile = () => {
 														type="date"
 													/>
 												</FormControl>
-												<FormDescription>
-													This is your public test
-													name.
-												</FormDescription>
 												<FormMessage />
 											</FormItem>
 										)}
@@ -305,10 +280,6 @@ const EditProfile = () => {
 												<FormControl>
 													<Input {...field} />
 												</FormControl>
-												<FormDescription>
-													This is your public test
-													name.
-												</FormDescription>
 												<FormMessage />
 											</FormItem>
 										)}
@@ -326,10 +297,6 @@ const EditProfile = () => {
 												<FormControl>
 													<Input {...field} />
 												</FormControl>
-												<FormDescription>
-													This is your public test
-													name.
-												</FormDescription>
 												<FormMessage />
 											</FormItem>
 										)}
@@ -345,10 +312,6 @@ const EditProfile = () => {
 												<FormControl>
 													<Input {...field} />
 												</FormControl>
-												<FormDescription>
-													This is your public test
-													name.
-												</FormDescription>
 												<FormMessage />
 											</FormItem>
 										)}
@@ -363,11 +326,11 @@ const EditProfile = () => {
 												Email
 											</FormLabel>
 											<FormControl>
-												<Input {...field} />
+												<Input
+													{...field}
+													disabled
+												/>
 											</FormControl>
-											<FormDescription>
-												This is your public test name.
-											</FormDescription>
 											<FormMessage />
 										</FormItem>
 									)}
@@ -381,11 +344,11 @@ const EditProfile = () => {
 												Phone Number
 											</FormLabel>
 											<FormControl>
-												<Input {...field} />
+												<Input
+													{...field}
+													disabled
+												/>
 											</FormControl>
-											<FormDescription>
-												This is your public test name.
-											</FormDescription>
 											<FormMessage />
 										</FormItem>
 									)}
@@ -406,9 +369,6 @@ const EditProfile = () => {
 											<FormControl>
 												<Input {...field} />
 											</FormControl>
-											<FormDescription>
-												This is your public test name.
-											</FormDescription>
 											<FormMessage />
 										</FormItem>
 									)}
@@ -424,9 +384,6 @@ const EditProfile = () => {
 											<FormControl>
 												<Input {...field} />
 											</FormControl>
-											<FormDescription>
-												This is your public test name.
-											</FormDescription>
 											<FormMessage />
 										</FormItem>
 									)}
@@ -442,9 +399,6 @@ const EditProfile = () => {
 											<FormControl>
 												<Input {...field} />
 											</FormControl>
-											<FormDescription>
-												This is your public test name.
-											</FormDescription>
 											<FormMessage />
 										</FormItem>
 									)}
@@ -460,9 +414,6 @@ const EditProfile = () => {
 											<FormControl>
 												<Input {...field} />
 											</FormControl>
-											<FormDescription>
-												This is your public test name.
-											</FormDescription>
 											<FormMessage />
 										</FormItem>
 									)}
