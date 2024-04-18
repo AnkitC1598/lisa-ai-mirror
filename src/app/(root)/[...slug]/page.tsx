@@ -18,6 +18,7 @@ import {
 	THierarchyType,
 } from "@/types/hierarchy"
 import Image from "next/image"
+import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
 
 interface IHierarchySlugs {
@@ -131,9 +132,12 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 							)}
 							<div className="flex flex-col justify-center gap-1">
 								{currentLevel.idType !== "cohort" ? (
-									<p className="line-clamp-1 text-sm text-gray-500">
+									<Link
+										href={`/${slug.slice(0, -1).join("/")}`}
+										className="line-clamp-1 text-sm text-gray-500"
+									>
 										{lastTitle}
-									</p>
+									</Link>
 								) : null}
 								<p className="flex items-center gap-2 text-base font-medium">
 									{hierarchyData.title}

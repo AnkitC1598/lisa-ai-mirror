@@ -3,11 +3,11 @@
 import { getCourse, getTopicDetails } from "@/actions/hierarchy"
 import Loading from "@/components/atoms/Loading"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import HierarchyTypes from "@/constants/HierarchyTypes"
+import { CohortHierarchyTypes } from "@/constants/HierarchyTypes"
 import { cn } from "@/lib"
 import PageTransitionProvider from "@/providers/pageTransitionProvider"
 import useAIStore from "@/store"
-import { THierarchyType } from "@/types/hierarchy"
+import { TCohortHierarchyType } from "@/types/hierarchy"
 import {
 	Bars3BottomLeftIcon as Bars3BottomLeftIconSolid,
 	ChatBubbleLeftEllipsisIcon as ChatBubbleLeftEllipsisIconSolid,
@@ -20,6 +20,7 @@ import {
 	QueueListIcon as QueueListIconOutline,
 	RectangleStackIcon as RectangleStackIconOutline,
 } from "@heroicons/react/24/outline"
+import Link from "next/link"
 import {
 	useParams,
 	usePathname,
@@ -137,15 +138,22 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = ({
 		}
 	}, [cohortId, topicId, dispatch])
 
-	const prevTitle = useMemo(() => {
+	const prevHierarchy = useMemo(() => {
 		if (!currentHierarchy || !currentTopic) return
 
-		const prevLevel = HierarchyTypes[currentHierarchy].at(
+		const prevLevel = CohortHierarchyTypes[currentHierarchy].at(
 			-2
-		) as THierarchyType
-
-		return currentTopic[prevLevel === "course" ? "cohort" : prevLevel]
-			?.title
+		) as TCohortHierarchyType
+		let prevRoute = [""]
+		CohortHierarchyTypes[currentHierarchy].forEach((level: string) =>
+			currentTopic[level]
+				? prevRoute.push(currentTopic[level]?._id)
+				: null
+		)
+		return {
+			title: currentTopic[prevLevel]?.title,
+			route: prevRoute.join("/"),
+		}
 	}, [currentHierarchy, currentTopic])
 
 	if (!currentTopic || loading)
@@ -159,9 +167,12 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = ({
 		<>
 			<div className="flex h-full flex-col gap-4 overflow-hidden">
 				<div className="flex flex-col justify-center gap-1 p-4 pb-0">
-					<p className="line-clamp-1 text-sm text-gray-500">
-						{prevTitle}
-					</p>
+					<Link
+						href={prevHierarchy?.route ?? "/"}
+						className="line-clamp-1 text-sm text-gray-500"
+					>
+						{prevHierarchy?.title}
+					</Link>
 					<p className="flex items-center gap-2 text-base font-medium">
 						{currentTopic.title}
 					</p>

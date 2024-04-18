@@ -2,6 +2,12 @@ import { ISVGIconProps } from "./svg"
 
 export type TCurrentHierarchy = "ctsct" | "csct" | "cst" | "ct" | null
 export type THierarchyType = "course" | "term" | "subject" | "chapter" | "topic"
+export type TCohortHierarchyType =
+	| "cohort"
+	| "term"
+	| "subject"
+	| "chapter"
+	| "topic"
 
 export interface IHierarchyConstant {
 	[key: string]: IHierarchyConstantData

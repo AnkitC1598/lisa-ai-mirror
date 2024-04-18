@@ -297,7 +297,10 @@ const Slide: React.FC<ISlideProps> = ({
 					</div>
 				) : (
 					<p className="h-full overflow-auto text-sm leading-7 text-gray-900 scrollbar dark:text-neutral-200">
-						<ReadMore text={slide.body} />
+						<ReadMore
+							minLength={500}
+							text={slide.body}
+						/>
 					</p>
 				)}
 			</div>
