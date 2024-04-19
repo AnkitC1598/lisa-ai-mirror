@@ -2,6 +2,7 @@
 
 import { getDriveFiles, getHierarchyData } from "@/actions/hierarchy"
 import icon from "@/app/favicon.ico"
+import Placeholder from "@/components/atoms/Placeholder"
 import DriveFile from "@/components/organisms/DriveFile"
 import HierarchyCard from "@/components/organisms/HierarchyCard"
 import Search from "@/components/organisms/Search"
@@ -17,6 +18,7 @@ import {
 	ILevel,
 	THierarchyType,
 } from "@/types/hierarchy"
+import { FolderIcon } from "@heroicons/react/20/solid"
 import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
@@ -86,7 +88,7 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 		)
 	}, [slug, currentView, currentLevel])
 
-	const { colors } = HierarchyConstants[currentView]
+	const { colors, icon: Icon } = HierarchyConstants[currentView]
 
 	if (!hierarchyData || !driveFiles)
 		return (
@@ -179,10 +181,14 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 							))
 						) : (
 							<div className="flex h-full w-full items-center justify-center py-8">
-								No {currentView} found
+								{/* No {currentView} found */}
+								<Placeholder
+									icon={Icon}
+									text={`No ${currentView}s`}
+								/>
 							</div>
 						)}
-						<div className="mt-2 flex items-center justify-start gap-2 text-sm">
+						<div className="mt-4 flex items-center justify-start gap-2 text-sm">
 							<span>All Files</span>
 							<span
 								className={cn(
@@ -202,7 +208,10 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 							))
 						) : (
 							<div className="flex h-full w-full items-center justify-center py-8">
-								No files found
+								<Placeholder
+									icon={FolderIcon}
+									text="No files uploaded"
+								/>
 							</div>
 						)}
 					</div>
