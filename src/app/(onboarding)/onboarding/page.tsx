@@ -1,6 +1,7 @@
 "use client"
 
 import { onboardUser } from "@/actions/user"
+import Loading from "@/components/atoms/Loading"
 import OnboardingOption from "@/components/organisms/OnboardingOption"
 import { Button } from "@/components/ui/button"
 import {
@@ -32,6 +33,7 @@ import { z } from "zod"
 
 const Onboarding = () => {
 	const router = useRouter()
+	const [isLoading, setIsLoading] = useState(false)
 
 	const user = useAIStore(store => store.user) as IUserOnboarding & {
 		dob: string
@@ -70,10 +72,17 @@ const Onboarding = () => {
 	const onSubmit = async (values: z.infer<typeof preferenceSchema>) => {
 		// Do something with the form values.
 		// ✅ This will be type-safe and validated.
-		onboardUser({ body: values }).then(() => {
-			posthog.capture("user_onboarded")
-			router.push(`/`)
-		})
+		setIsLoading(true)
+		onboardUser({ body: values })
+			.then(() => {
+				posthog.capture("user_onboarded")
+				router.push(`/`)
+				setIsLoading(false)
+			})
+			.catch(error => {
+				console.debug(`🚀 ~ onSubmit ~ error:`, error)
+				setIsLoading(false)
+			})
 	}
 
 	return (
@@ -254,9 +263,13 @@ const Onboarding = () => {
 										? "bg-purple-600 text-neutral-50 hover:bg-purple-500/90 dark:bg-purple-900 dark:text-neutral-50 dark:hover:bg-purple-900/90"
 										: ""
 								)}
-								disabled={!isDirty}
+								disabled={!isDirty || isLoading}
 							>
-								Start Learning &nbsp; 🎉
+								{isLoading ? (
+									<Loading className="text-purple-200" />
+								) : (
+									<>Start Learning &nbsp; 🎉</>
+								)}
 							</Button>
 						</div>
 					</form>

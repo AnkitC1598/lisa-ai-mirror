@@ -2,6 +2,7 @@
 
 import { getDriveFiles, getHierarchyData } from "@/actions/hierarchy"
 import icon from "@/app/favicon.ico"
+import Placeholder from "@/components/atoms/Placeholder"
 import DriveFile from "@/components/organisms/DriveFile"
 import HierarchyCard from "@/components/organisms/HierarchyCard"
 import Search from "@/components/organisms/Search"
@@ -17,7 +18,9 @@ import {
 	ILevel,
 	THierarchyType,
 } from "@/types/hierarchy"
+import { FolderIcon } from "@heroicons/react/20/solid"
 import Image from "next/image"
+import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
 
 interface IHierarchySlugs {
@@ -85,7 +88,7 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 		)
 	}, [slug, currentView, currentLevel])
 
-	const { colors } = HierarchyConstants[currentView]
+	const { colors, icon: Icon } = HierarchyConstants[currentView]
 
 	if (!hierarchyData || !driveFiles)
 		return (
@@ -96,7 +99,7 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 							<Skeleton className="h-4 w-1/3" />
 							<Skeleton className="h-4 w-1/2" />
 						</div>
-						<Search placeholder={`Search`} />
+						<Skeleton className="h-9 w-full" />
 					</div>
 					<div className="flex flex-col gap-4 overflow-auto px-4 pb-4 scrollbar">
 						<Skeleton className="h-4 w-1/4" />
@@ -131,9 +134,12 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 							)}
 							<div className="flex flex-col justify-center gap-1">
 								{currentLevel.idType !== "cohort" ? (
-									<p className="line-clamp-1 text-sm text-gray-500">
+									<Link
+										href={`/${slug.slice(0, -1).join("/")}`}
+										className="line-clamp-1 text-sm text-gray-500"
+									>
 										{lastTitle}
-									</p>
+									</Link>
 								) : null}
 								<p className="flex items-center gap-2 text-base font-medium">
 									{hierarchyData.title}
@@ -175,10 +181,14 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 							))
 						) : (
 							<div className="flex h-full w-full items-center justify-center py-8">
-								No {currentView} found
+								{/* No {currentView} found */}
+								<Placeholder
+									icon={Icon}
+									text={`No ${currentView}s`}
+								/>
 							</div>
 						)}
-						<div className="mt-2 flex items-center justify-start gap-2 text-sm">
+						<div className="mt-4 flex items-center justify-start gap-2 text-sm">
 							<span>All Files</span>
 							<span
 								className={cn(
@@ -198,7 +208,10 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 							))
 						) : (
 							<div className="flex h-full w-full items-center justify-center py-8">
-								No files found
+								<Placeholder
+									icon={FolderIcon}
+									text="No files uploaded"
+								/>
 							</div>
 						)}
 					</div>

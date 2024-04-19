@@ -1,5 +1,4 @@
 import BookmarkFilters from "@/components/organisms/BookmarkFilters"
-import Search from "@/components/organisms/Search"
 import { Skeleton } from "@/components/ui/skeleton"
 
 const Loader = () => {
@@ -11,7 +10,7 @@ const Loader = () => {
 				</div>
 				<div className="flex flex-col gap-4 px-4">
 					<BookmarkFilters />
-					<Search />
+					<Skeleton className="h-9 w-full" />
 				</div>
 				<div className="mt-2 flex h-full flex-col gap-5 overflow-y-auto px-4 pb-4 scrollbar">
 					<Skeleton className="h-12 w-full" />

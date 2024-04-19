@@ -125,7 +125,7 @@ const TopicContent = () => {
 				setInput(hierarchyContext)
 				setTimeout(() => {
 					document.getElementById("submit")?.click()
-				}, 1000)
+				}, 100)
 			}
 		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps

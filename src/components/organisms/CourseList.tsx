@@ -43,12 +43,26 @@ const CourseList: React.FC<ICourseList> = ({ courses }) => {
 						loop: true,
 					}}
 				>
-					<CarouselContent className="-ml-2 pb-2">
+					<CarouselContent
+						className={cn(
+							"-ml-2 pb-2",
+							courses.length === 1
+								? "px-4"
+								: courses.length === 2
+									? "mr-2 px-4"
+									: ""
+						)}
+					>
 						{courses.map(({ cohort: course }) =>
 							course ? (
 								<CarouselItem
 									key={course._id}
-									className="basis-11/12 pl-2"
+									className={cn(
+										"pl-2",
+										courses.length > 2
+											? "basis-11/12"
+											: "basis-full"
+									)}
 								>
 									<Link
 										href={`/${course._id}`}
