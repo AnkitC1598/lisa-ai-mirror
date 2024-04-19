@@ -152,18 +152,29 @@ export const getQuestions = async ({
 export const getChats = async ({
 	courseId,
 	topicId,
+	page = 1,
+	limit = 10,
 }: {
 	courseId: string
 	topicId: string
-}): Promise<IChatResponse[]> => {
+	page?: number
+	limit?: number
+}): Promise<{
+	data: IChatResponse[]
+	pagination: {
+		total: number
+		next: number
+		previous: number
+	}
+}> => {
 	const resp = await fetchClientWithToken(
-		`/ai/chat/${courseId}/${topicId}?page=1&limit=10`,
+		`/ai/chat/${courseId}/${topicId}?page=${page}&limit=${limit}`,
 		{
 			method: "GET",
 		}
 	)
 
-	return resp.results.data
+	return resp.results
 }
 
 export const translateSlides = async ({
