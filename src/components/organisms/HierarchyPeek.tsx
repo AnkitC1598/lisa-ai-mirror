@@ -49,7 +49,7 @@ const HierarchyPeek: React.FC<IHierarchyPeek> = ({ peekIndex, peekValue }) => {
 				</div>
 				{peekValue.breadcrumbs.map((breadcrumb, idx) => (
 					<div
-						key={breadcrumb._id}
+						key={breadcrumb._id + "-hierarchy-peek-" + idx}
 						className="relative h-full"
 						style={{
 							zIndex: peekIndex + 10 + -1 * (idx + 2),

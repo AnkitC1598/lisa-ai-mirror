@@ -20,6 +20,7 @@ import { Message } from "ai/react"
 import { formatDistance } from "date-fns"
 import Image from "next/image"
 import { useState } from "react"
+import ReadMore from "../atoms/ReadMore"
 import { Skeleton } from "../ui/skeleton"
 
 interface IMessage {
@@ -34,7 +35,7 @@ export const UserMessage: React.FC<IMessage> = ({ message }) => {
 	const profileImage = useAIStore(store => store.user?.profileImage)
 	return (
 		<>
-			<div className="flex flex-col gap-2 bg-[#f9fafb] p-4 text-right text-sm dark:bg-[#0a0a0a]">
+			<div className="flex select-none flex-col gap-2 bg-[#f9fafb] p-4 text-right text-sm dark:bg-[#0a0a0a]">
 				<div className="flex items-center justify-between text-gray-500">
 					<span className="text-xs">
 						{formatDistance(
@@ -54,7 +55,10 @@ export const UserMessage: React.FC<IMessage> = ({ message }) => {
 					</div>
 				</div>
 				<p className="text-gray-900 dark:text-neutral-200">
-					{message.content}
+					<ReadMore
+						allowSelect={true}
+						text={message.content}
+					/>
 				</p>
 			</div>
 		</>
@@ -104,7 +108,7 @@ export const AiMessage: React.FC<IMessage> = ({
 
 	return (
 		<>
-			<div className="flex flex-col gap-2 bg-[linear-gradient(180deg,_rgba(250,_231,_255,_0.9)_33.09%,_rgba(250,_231,_255,_0.46)_100%)] p-4 dark:bg-[linear-gradient(180deg,_rgb(88_28_135_/_15%)_33.09%,_rgb(59_7_100_/_20%)_100%)]">
+			<div className="flex select-none flex-col gap-2 bg-[linear-gradient(180deg,_rgba(250,_231,_255,_0.9)_33.09%,_rgba(250,_231,_255,_0.46)_100%)] p-4 dark:bg-[linear-gradient(180deg,_rgb(88_28_135_/_15%)_33.09%,_rgb(59_7_100_/_20%)_100%)]">
 				<div className="flex items-center justify-between text-sm text-gray-500">
 					<div className="flex items-center gap-1">
 						<div className="relative h-5 w-5 overflow-hidden rounded-md">
@@ -134,7 +138,7 @@ export const AiMessage: React.FC<IMessage> = ({
 					</div>
 				) : (
 					<p className="text-sm text-gray-900 dark:text-neutral-200">
-						{message.content}
+						<ReadMore text={message.content} />
 					</p>
 				)}
 				<div className="flex items-center gap-2">

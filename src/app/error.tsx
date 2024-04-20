@@ -1,17 +1,41 @@
-"use client" // Error components must be Client Components
+"use client"
 
 import { Button } from "@/components/ui/button"
 import { useEffect } from "react"
 
+type TErrorWithDigest = Error & { digest?: string }
+
 interface IErrorView {
-	error: Error & { digest?: string }
+	error: TErrorWithDigest
 	reset: () => void
 }
 
 const ErrorView: React.FC<IErrorView> = ({ error, reset }) => {
-	useEffect(() => {
-		// Log the error to an error reporting service
+	const handleReset = () => {
+		const resetAttempts = Number(
+			localStorage.getItem("resetAttempts") || "0"
+		)
+		localStorage.setItem("resetAttempts", (resetAttempts + 1).toString())
+		reset()
+	}
+
+	const handleResetOnMultipleErrors = () => {
+		const resetAttempts = Number(
+			localStorage.getItem("resetAttempts") || "0"
+		)
+		if (resetAttempts >= 2) {
+			localStorage.setItem("resetAttempts", "0")
+			window.location.reload()
+		}
+	}
+
+	const reportError = (error: TErrorWithDigest) => {
 		console.error("Error:", error)
+	}
+
+	useEffect(() => {
+		handleResetOnMultipleErrors()
+		reportError(error)
 	}, [error])
 
 	return (
@@ -19,10 +43,7 @@ const ErrorView: React.FC<IErrorView> = ({ error, reset }) => {
 			<h2>Something went wrong!</h2>
 			<Button
 				variant="destructive"
-				onClick={
-					// Attempt to recover by trying to re-render the segment
-					() => reset()
-				}
+				onClick={handleReset}
 			>
 				Try again
 			</Button>

@@ -1,6 +1,7 @@
 "use client"
 
 import { onboardUser } from "@/actions/user"
+import Loading from "@/components/atoms/Loading"
 import OnboardingOption from "@/components/organisms/OnboardingOption"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,16 +18,22 @@ import { clientEnv } from "@/env/client"
 import { cn } from "@/lib/utils"
 import { preferenceSchema } from "@/schema/profile"
 import useAIStore from "@/store"
+import { InterestCategory } from "@/types/preferences"
 import { IUserOnboarding } from "@/types/user"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons"
 import { getYear } from "date-fns"
+import { motion } from "framer-motion"
 import IPData from "ipdata"
 import { useRouter } from "next/navigation"
 import { usePostHog } from "posthog-js/react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+
 const Onboarding = () => {
 	const router = useRouter()
+	const [isLoading, setIsLoading] = useState(false)
 
 	const user = useAIStore(store => store.user) as IUserOnboarding & {
 		dob: string
@@ -65,10 +72,17 @@ const Onboarding = () => {
 	const onSubmit = async (values: z.infer<typeof preferenceSchema>) => {
 		// Do something with the form values.
 		// ✅ This will be type-safe and validated.
-		onboardUser({ body: values }).then(() => {
-			posthog.capture("user_onboarded")
-			router.push(`/`)
-		})
+		setIsLoading(true)
+		onboardUser({ body: values })
+			.then(() => {
+				posthog.capture("user_onboarded")
+				router.push(`/`)
+				setIsLoading(false)
+			})
+			.catch(error => {
+				console.debug(`🚀 ~ onSubmit ~ error:`, error)
+				setIsLoading(false)
+			})
 	}
 
 	return (
@@ -218,18 +232,10 @@ const Onboarding = () => {
 												{title}
 											</FormLabel>
 											<FormControl>
-												<div className="flex flex-wrap gap-4">
-													{options.map(option => (
-														<OnboardingOption
-															key={`${option.value}_${option.label}`}
-															option={option}
-															value={field.value}
-															onChange={
-																field.onChange
-															}
-														/>
-													))}
-												</div>
+												<OptionsContainer
+													options={options}
+													field={field}
+												/>
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -257,9 +263,13 @@ const Onboarding = () => {
 										? "bg-purple-600 text-neutral-50 hover:bg-purple-500/90 dark:bg-purple-900 dark:text-neutral-50 dark:hover:bg-purple-900/90"
 										: ""
 								)}
-								disabled={!isDirty}
+								disabled={!isDirty || isLoading}
 							>
-								Start Learning &nbsp; 🎉
+								{isLoading ? (
+									<Loading className="text-purple-200" />
+								) : (
+									<>Start Learning &nbsp; 🎉</>
+								)}
 							</Button>
 						</div>
 					</form>
@@ -270,3 +280,46 @@ const Onboarding = () => {
 }
 
 export default Onboarding
+
+const OptionsContainer = ({
+	options,
+	field,
+}: {
+	options: InterestCategory[]
+	field: any
+}) => {
+	const [isExpanded, setIsExpanded] = useState<boolean>(false)
+
+	return (
+		<>
+			<motion.div
+				initial={false}
+				animate={{
+					height: options.length <= 11 || isExpanded ? "auto" : 152,
+				}}
+				transition={{ duration: 0.5 }}
+				className="flex flex-wrap gap-4 overflow-hidden"
+			>
+				{options.map(option => (
+					<OnboardingOption
+						key={`${option.value}_${option.label}`}
+						option={option}
+						value={field.value}
+						onChange={field.onChange}
+					/>
+				))}
+			</motion.div>
+			{options.length > 11 ? (
+				<Button
+					type="button"
+					variant="base"
+					className="mx-auto w-min gap-2 rounded-full border-0"
+					onClick={() => setIsExpanded(!isExpanded)}
+				>
+					<span>Show {isExpanded ? "Less" : "More"}</span>
+					{isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
+				</Button>
+			) : null}
+		</>
+	)
+}

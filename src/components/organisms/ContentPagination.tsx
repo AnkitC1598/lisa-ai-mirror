@@ -35,8 +35,8 @@ const ContentPagination: React.FC<IContentPagination> = ({
 								: "",
 							slideState.current === i
 								? vertical
-									? "my-2 flex-[2] border-emerald-600 dark:border-emerald-500"
-									: "mx-2 flex-[2] border-emerald-600 dark:border-emerald-500"
+									? "my-1 flex-[2] border-emerald-600 dark:border-emerald-500"
+									: "mx-1 flex-[2] border-emerald-600 dark:border-emerald-500"
 								: "flex-1"
 						)}
 					></div>

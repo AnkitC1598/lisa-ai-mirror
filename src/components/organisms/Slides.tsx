@@ -21,6 +21,7 @@ import { useParams } from "next/navigation"
 import React, { useEffect, useRef, useState } from "react"
 import { useInView } from "react-intersection-observer"
 import Confetti from "../atoms/Confetti"
+import ReadMore from "../atoms/ReadMore"
 import { Button } from "../ui/button"
 import { Skeleton } from "../ui/skeleton"
 import ContentPagination from "./ContentPagination"
@@ -224,7 +225,7 @@ const Slide: React.FC<ISlideProps> = ({
 		<div
 			id={`slide-${idx}`}
 			className={cn(
-				"relative flex h-full w-full snap-center snap-always flex-col justify-center overflow-hidden rounded-md bg-white shadow-md ring-1 ring-inset ring-neutral-200 scrollbar-hide dark:bg-neutral-900 dark:shadow-none dark:ring-neutral-500/20"
+				"relative flex h-full w-full select-none snap-center snap-always flex-col justify-center overflow-hidden rounded-md bg-white shadow-md ring-1 ring-inset ring-neutral-200 scrollbar-hide dark:bg-neutral-900 dark:shadow-none dark:ring-neutral-500/20"
 			)}
 		>
 			<div className="flex flex-1 flex-col gap-4 overflow-hidden p-4 pb-0">
@@ -296,7 +297,10 @@ const Slide: React.FC<ISlideProps> = ({
 					</div>
 				) : (
 					<p className="h-full overflow-auto text-sm leading-7 text-gray-900 scrollbar dark:text-neutral-200">
-						{slide.body}
+						<ReadMore
+							minLength={500}
+							text={slide.body}
+						/>
 					</p>
 				)}
 			</div>
