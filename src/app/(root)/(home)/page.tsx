@@ -6,6 +6,13 @@ import {
 import CourseList from "@/components/organisms/CourseList"
 import HierarchyCard from "@/components/organisms/HierarchyCard"
 import PageTransitionProvider from "@/providers/pageTransitionProvider"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+	title: "Dashboard - Begin Learning",
+	description:
+		"Dive into learning with Lisa AI Dashboard. Start exploring all courses tailored to your learning style. Click a course or topuc to begin your learning journey today!",
+}
 
 const Home = async () => {
 	const courses = await getCourses()

@@ -7,6 +7,20 @@ import Search from "@/components/organisms/Search"
 import { Accordion } from "@/components/ui/accordion"
 import PageTransitionProvider from "@/providers/pageTransitionProvider"
 import { IPracticeQuestion, Resource } from "@/types/topic"
+import type { Metadata } from "next"
+
+export async function generateMetadata({
+	searchParams,
+}: {
+	searchParams: { filter: string }
+}): Promise<Metadata> {
+	const { filter } = searchParams
+	return {
+		title: `Bookmarks | ${filter ?? "all"}`,
+		description:
+			"Access your saved content on Lisa AI's Bookmarks page. Revisit your bookmarked topics, resources or modules and continue learning at your own pace. Click to view your bookmarks now!",
+	}
+}
 
 type TBookmarkFilters = "topics" | "resources" | "questions"
 

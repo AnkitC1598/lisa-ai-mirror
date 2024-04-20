@@ -1,5 +1,12 @@
 import { Button } from "@/components/ui/button"
+import { Metadata } from "next"
 import Link from "next/link"
+
+export const metadata: Metadata = {
+	title: "Lisa AI - 404 Error - Page does not exist",
+	description:
+		"Oops! The page you’re looking for doesn’t exist. But don’t worry, Lisa AI is here to guide you to be back on track. Simply click ‘Back-to-Dashboard’ to begin learning.",
+}
 
 export default function NotFound() {
 	return (

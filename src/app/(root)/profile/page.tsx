@@ -10,8 +10,15 @@ import {
 	TwitterLogoIcon,
 } from "@radix-ui/react-icons"
 import { differenceInCalendarYears, format } from "date-fns"
+import type { Metadata } from "next"
 import Image from "next/image"
 import ProfileMenu from "./profileMenu"
+
+export const metadata: Metadata = {
+	title: "Profile",
+	description:
+		"View and edit your profile details, preferences, and social profiles.",
+}
 
 const Profile = async () => {
 	const user = await getUser()

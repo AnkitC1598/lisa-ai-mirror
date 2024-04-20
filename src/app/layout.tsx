@@ -23,8 +23,11 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-	title: "lisa AI",
-	description: "lisa AI",
+	title: {
+		template: "lisa AI - %s",
+		default: "lisa AI - Start Learning",
+	},
+	description: "Dive into learning with Lisa AI",
 	manifest: `${serverEnv.BASE_PATH}/manifest.json`,
 }
 
