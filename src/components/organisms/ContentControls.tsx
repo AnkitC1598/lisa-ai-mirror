@@ -3,9 +3,11 @@
 import { addTopicBookmark, removeTopicBookmark } from "@/actions/bookmarks"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import useAIStore from "@/store"
 import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/24/outline"
 import { BookmarkIcon as BookmarkIconSolid } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
+import { usePostHog } from "posthog-js/react"
 import { useState } from "react"
 import LanguageSwitcher from "./LanguageSwitcher"
 
@@ -26,17 +28,46 @@ const ContentControls: React.FC<IContentControls> = ({
 		courseId: string
 		topicId: string
 	}>()
+	const currentTopic = useAIStore(store => store.currentTopic)
 	const [bookmarked, setBookmarked] = useState<boolean>(bookmarkState)
+
+	const posthog = usePostHog()
 
 	const handleBookmark = () => {
 		setBookmarked(prev => !prev)
 		if (bookmarked) {
 			removeTopicBookmark({ cohortId, topicId }).then(code => {
-				if (code === 200) setBookmarked(false)
+				if (code === 200) {
+					setBookmarked(false)
+					posthog.capture("bookmark_toggle", {
+						hierarchy: {
+							type: "topic",
+							id: currentTopic?._id ?? topicId,
+							title: currentTopic?.title,
+							priority: currentTopic?.priority ?? null,
+						},
+						type: "topic",
+						id: topicId,
+						action: "removed",
+					})
+				}
 			})
 		} else {
 			addTopicBookmark({ cohortId, topicId }).then(code => {
-				if (code === 200) setBookmarked(true)
+				if (code === 200) {
+					setBookmarked(true)
+					posthog.capture("bookmark_toggle", {
+						hierarchy: {
+							type: "topic",
+							id: currentTopic?._id ?? topicId,
+							title: currentTopic?.title,
+							priority: currentTopic?.priority ?? null,
+						},
+						type: "topic",
+						id: topicId,
+						action: "added",
+					})
+				}
 			})
 		}
 	}

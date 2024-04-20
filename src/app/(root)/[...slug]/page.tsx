@@ -21,6 +21,7 @@ import {
 import { FolderIcon } from "@heroicons/react/20/solid"
 import Image from "next/image"
 import Link from "next/link"
+import { usePostHog } from "posthog-js/react"
 import { useEffect, useMemo, useState } from "react"
 
 interface IHierarchySlugs {
@@ -39,6 +40,8 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 	const query = searchParams?.query || ""
 	const [hierarchyData, setHierarchyData] = useState<IHierarchy | null>(null)
 	const [driveFiles, setDriveFiles] = useState<IDriveFile[] | [] | null>(null)
+
+	const posthog = usePostHog()
 
 	const { prevLevel, currentLevel, currentView } = useGetHierarchy() as {
 		prevLevel: NonNullable<ILevel>
@@ -78,14 +81,34 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 	useEffect(() => {
 		if (!currentLevel.id || !currentLevel.idType) return
 
+		if (searchParams.query) {
+			posthog.capture("hierarchy_search", {
+				type: currentView,
+				query: searchParams.query || null,
+			})
+		}
+
 		getHierarchyData({
 			hierarchy: currentView,
 			cohortId: slug[0],
 			...currentLevel,
-		}).then(resp => setHierarchyData(resp))
+		}).then(resp => {
+			setHierarchyData(resp)
+
+			posthog.capture("hierarchy_opened", {
+				type:
+					currentLevel.idType === "cohort"
+						? "course"
+						: currentLevel.idType,
+				id: resp._id,
+				title: resp.title,
+				query: searchParams.query || null,
+			})
+		})
 		getDriveFiles({ cohortId: slug[0], ...currentLevel }).then(resp =>
 			setDriveFiles(resp)
 		)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [slug, currentView, currentLevel])
 
 	const { colors, icon: Icon } = HierarchyConstants[currentView]
@@ -162,7 +185,7 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 								<span>{`All ${currentView}s`}</span>{" "}
 								<span
 									className={cn(
-										"inline-flex h-5 select-none items-center gap-1 whitespace-nowrap  rounded-md px-1.5 py-0.5 text-xs font-medium capitalize ring-1 ring-inset",
+										"inline-flex h-5 select-none items-center gap-1 whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs font-medium capitalize ring-1 ring-inset",
 										colors.badge
 									)}
 								>
@@ -192,7 +215,7 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 							<span>All Files</span>
 							<span
 								className={cn(
-									"inline-flex h-5 select-none items-center gap-1 whitespace-nowrap  rounded-md px-1.5 py-0.5 text-xs font-medium capitalize ring-1 ring-inset",
+									"inline-flex h-5 select-none items-center gap-1 whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs font-medium capitalize ring-1 ring-inset",
 									colors.badge
 								)}
 							>
@@ -204,6 +227,8 @@ const HierarchySlugs: React.FC<IHierarchySlugs> = ({
 								<DriveFile
 									key={file._id}
 									file={file}
+									hierarchy={hierarchyData}
+									hierarchyType={currentView}
 								/>
 							))
 						) : (

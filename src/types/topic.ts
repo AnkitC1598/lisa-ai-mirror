@@ -89,6 +89,7 @@ export interface IChatResponse {
 	body: string
 	isLisaAi: boolean
 	createdAt: Date
+	feedback?: string
 }
 
 export interface IChat {

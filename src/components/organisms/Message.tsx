@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { handleCopy, handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
 import useAIStore from "@/store"
+import { ITopic } from "@/types/hierarchy"
 import { SparklesIcon } from "@heroicons/react/16/solid"
 import {
 	ClipboardDocumentIcon as ClipboardDocumentIconOutline,
@@ -19,6 +20,7 @@ import {
 import { Message } from "ai/react"
 import { formatDistance } from "date-fns"
 import Image from "next/image"
+import { usePostHog } from "posthog-js/react"
 import { useState } from "react"
 import ReadMore from "../atoms/ReadMore"
 import { Skeleton } from "../ui/skeleton"
@@ -26,8 +28,9 @@ import { Skeleton } from "../ui/skeleton"
 interface IMessage {
 	message: Message & {
 		createdAt?: Date | string | number
+		feedback?: string
 	}
-	params: { courseId: string; topicId: string }
+	params: { courseId: string; topicId: string; currentTopic: ITopic | null }
 	loader?: boolean
 }
 
@@ -67,11 +70,19 @@ export const UserMessage: React.FC<IMessage> = ({ message }) => {
 
 export const AiMessage: React.FC<IMessage> = ({
 	message,
-	params: { courseId, topicId },
+	params: { courseId, topicId, currentTopic },
 	loader = false,
 }) => {
-	const [vote, setVote] = useState<number>(0)
+	const [vote, setVote] = useState<number>(
+		message.feedback === "like"
+			? 1
+			: message.feedback === "dislike"
+				? -1
+				: 0
+	)
 	const [copy, setCopy] = useState<number>(0)
+
+	const posthog = usePostHog()
 
 	// const { subscribe, handleAudio, unsubscribe, audioState } =
 	// 	useTextToSpeech()
@@ -79,11 +90,26 @@ export const AiMessage: React.FC<IMessage> = ({
 	const resetVote = () => setVote(0)
 
 	const handleFeedback = (feedback: number) => {
+		let vote = ""
+		if (feedback === 1) vote = "like"
+		if (feedback === -1) vote = "dislike"
+
+		posthog.capture("feedback", {
+			hierarchy: {
+				type: "topic",
+				id: currentTopic?._id,
+				title: currentTopic?.title,
+				priority: currentTopic?.priority ?? null,
+			},
+			id: message.id,
+			priority: null,
+			action: vote,
+			type: "chat",
+		})
 		setVote(feedback)
 		handleVote({
 			body: {
-				feedback:
-					feedback === 1 ? "like" : feedback === -1 ? "dislike" : "",
+				feedback: vote,
 			},
 			meta: {
 				courseId,
@@ -93,6 +119,20 @@ export const AiMessage: React.FC<IMessage> = ({
 			},
 			resetVote,
 		})
+	}
+
+	const handleMessageCopy = ({}) => {
+		posthog.capture("chat_message", {
+			hierarchy: {
+				type: "topic",
+				id: currentTopic?._id,
+				title: currentTopic?.title,
+				priority: currentTopic?.priority ?? null,
+			},
+			id: message.id,
+			action: "copied",
+		})
+		handleCopy({ text: message.content, setCopy })
 	}
 
 	// useEffect(() => {
@@ -187,9 +227,7 @@ export const AiMessage: React.FC<IMessage> = ({
 								? "border-blue-600/20 bg-blue-600/10 dark:border-blue-600/20 dark:bg-blue-600/10"
 								: ""
 						)}
-						onClick={() =>
-							handleCopy({ text: message.content, setCopy })
-						}
+						onClick={handleMessageCopy}
 					>
 						{copy === 1 ? (
 							<ClipboardDocumentIconSolid className="h-4 w-4 fill-blue-500" />

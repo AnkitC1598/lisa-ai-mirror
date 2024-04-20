@@ -9,9 +9,11 @@ import usePaginatedAction from "@/hooks/usePaginatedAction"
 import { cn } from "@/lib/utils"
 import { fetchClientWithToken } from "@/services/fetch"
 import useAIStore from "@/store"
+import { IChatResponse } from "@/types/topic"
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid"
 import { useChat } from "ai/react"
 import { useParams } from "next/navigation"
+import { usePostHog } from "posthog-js/react"
 import { useEffect, useRef } from "react"
 import { useInView } from "react-intersection-observer"
 import ScrollAnchor from "./ScrollAnchor"
@@ -30,6 +32,8 @@ const Chat = () => {
 	}>()
 	const { ref, inView } = useInView()
 	const containerRef = useRef<HTMLDivElement>(null)
+
+	const posthog = usePostHog()
 
 	const {
 		data: oldChats,
@@ -80,17 +84,43 @@ const Chat = () => {
 			})
 		},
 		async onResponse() {
-			await fetchClientWithToken(`/ai/chat/${courseId}/${topicId}`, {
-				method: "POST",
-				body: JSON.stringify({
-					isLisaAi: false,
-					body: input,
-				}),
+			let resp = await fetchClientWithToken(
+				`/ai/chat/${courseId}/${topicId}`,
+				{
+					method: "POST",
+					body: JSON.stringify({
+						isLisaAi: false,
+						body: input,
+					}),
+				}
+			)
+			resp = resp.results.data
+			posthog.capture("chat_message", {
+				hierarchy: {
+					type: "topic",
+					id: currentTopic?._id,
+					title: currentTopic?.title,
+					priority: currentTopic?.priority ?? null,
+				},
+				id: resp._id,
+				action: "sent",
 			})
 		},
-		initialMessages: oldChats,
-		onError(e: Error) {
-			console.error("chat Error:", e)
+		initialMessages: oldChats.toReversed().map((chat: IChatResponse) => {
+			return {
+				id: chat._id,
+				content: chat.body,
+				role: chat.isLisaAi ? "assistant" : "user",
+				createdAt: chat.createdAt,
+				feedback: chat.feedback,
+			}
+		}),
+		onError(error: Error) {
+			posthog.capture("error", {
+				error,
+				from: "chat_message",
+			})
+			console.error("chat Error:", error)
 		},
 	})
 
@@ -117,7 +147,7 @@ const Chat = () => {
 							<MessageComponent
 								key={message.id}
 								message={message}
-								params={{ courseId, topicId }}
+								params={{ courseId, topicId, currentTopic }}
 							/>
 						)
 					})}
@@ -125,7 +155,7 @@ const Chat = () => {
 					{isLoading ? (
 						<AiMessage
 							loader
-							params={{ courseId, topicId }}
+							params={{ courseId, topicId, currentTopic }}
 							message={{
 								id: "loader",
 								content: "",
@@ -134,7 +164,7 @@ const Chat = () => {
 							}}
 						/>
 					) : !messages.length ? (
-						<div className="mt-auto grid grid-cols-2 gap-2 px-4">
+						<div className="mt-auto grid grid-cols-2 gap-2 !border-t-0 px-4">
 							{baseMessages.map(message => (
 								<button
 									key={message}

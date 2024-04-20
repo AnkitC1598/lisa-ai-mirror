@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { usePostHog } from "posthog-js/react"
 
 interface IFilter {
 	label: string
@@ -33,7 +34,12 @@ const BookmarkFilters = () => {
 	const pathname = usePathname()
 	const { replace } = useRouter()
 
+	const posthog = usePostHog()
+
 	const handleFilterChange = (filter: string) => {
+		posthog.capture("bookmark_filter", {
+			type: filter,
+		})
 		const params = new URLSearchParams(searchParams)
 		if (filter !== "all") params.set("filter", filter)
 		else params.delete("filter")

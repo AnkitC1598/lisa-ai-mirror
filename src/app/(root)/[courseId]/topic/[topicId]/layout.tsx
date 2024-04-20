@@ -27,6 +27,7 @@ import {
 	useRouter,
 	useSearchParams,
 } from "next/navigation"
+import { usePostHog } from "posthog-js/react"
 import { useEffect, useMemo, useState } from "react"
 
 const TABS = [
@@ -61,6 +62,15 @@ const TABS = [
 	},
 ]
 
+type TFrom = "curriculum" | "recent" | "suggestion" | "bookmark"
+
+const sourceOptions: Record<TFrom, string> = {
+	curriculum: "Curriculum",
+	recent: "Recent Topic",
+	suggestion: "Suggestions",
+	bookmark: "Bookmarks",
+}
+
 interface ITopicContentLayout {
 	children: React.ReactNode
 	chat: React.ReactNode
@@ -87,6 +97,7 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = ({
 
 	const searchParams = useSearchParams()
 	const currentTab: string = searchParams.get("tab") ?? "explanation"
+	const from = (searchParams.get("from") ?? "curriculum") as TFrom
 	const pathname = usePathname()
 	const { replace } = useRouter()
 	const { courseId: cohortId, topicId } = useParams<{
@@ -94,6 +105,8 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = ({
 		topicId: string
 	}>()
 	const [loading, setLoading] = useState<boolean>(false)
+
+	const posthog = usePostHog()
 
 	const handleTabSwitch = (tab: string) => {
 		const params = new URLSearchParams(searchParams)
@@ -104,6 +117,9 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = ({
 	}
 
 	useEffect(() => {
+		posthog.capture("topic_page_source", {
+			source: sourceOptions[from],
+		})
 		setLoading(true)
 		getCourse({ cohortId })
 			.then(course => {
@@ -136,7 +152,7 @@ const TopicContentLayout: React.FC<Readonly<ITopicContentLayout>> = ({
 				},
 			})
 		}
-	}, [cohortId, topicId, dispatch])
+	}, [cohortId, topicId, dispatch, from, posthog])
 
 	const prevHierarchy = useMemo(() => {
 		if (!currentHierarchy || !currentTopic) return

@@ -1,7 +1,7 @@
 import FileTypes from "@/constants/FileTypes"
 import UnsupportedFileIcon from "@/svg/unsupportedFile"
 import { TCodeFileExt, TDocumentFileType, TVideoFileType } from "@/types/file"
-import { IDriveFile } from "@/types/hierarchy"
+import { IDriveFile, THierarchyType } from "@/types/hierarchy"
 import {
 	ArrowDownTrayIcon,
 	EyeIcon,
@@ -11,6 +11,7 @@ import Editor from "@monaco-editor/react"
 import { formatRelative } from "date-fns"
 import { useTheme } from "next-themes"
 import Image from "next/image"
+import { usePostHog } from "posthog-js/react"
 import { useEffect, useState } from "react"
 import { DefaultExtensionType, defaultStyles, FileIcon } from "react-file-icon"
 import Loading from "../atoms/Loading"
@@ -27,14 +28,23 @@ import {
 
 interface IDriveFileProps {
 	file: IDriveFile
+	hierarchy: { _id: string; title: string; priority?: number }
+	hierarchyType: THierarchyType
 }
 
-const DriveFile: React.FC<IDriveFileProps> = ({ file }) => {
+const DriveFile: React.FC<IDriveFileProps> = ({
+	file,
+	hierarchy,
+	hierarchyType,
+}) => {
 	const [fileData, setFileData] = useState<{
 		name: string
 		data: string
 	} | null>(null)
+
 	const { theme } = useTheme()
+
+	const posthog = usePostHog()
 
 	const fileExt = file.title.split(".").pop()
 
@@ -48,7 +58,34 @@ const DriveFile: React.FC<IDriveFileProps> = ({ file }) => {
 
 	const fileIconStyles = defaultStyles[fileExt as DefaultExtensionType]
 
+	const handlePreview = () => {
+		posthog.capture("file_interaction", {
+			hierarchy: {
+				type: hierarchyType,
+				id: hierarchy?._id,
+				title: hierarchy?.title,
+				priority: hierarchy?.priority ?? null,
+			},
+			id: file._id,
+			fileTitle: file.title,
+			ext: fileExt,
+			action: "preview",
+		})
+	}
+
 	const downloadFile = async () => {
+		posthog.capture("file_interaction", {
+			hierarchy: {
+				type: hierarchyType,
+				id: hierarchy?._id,
+				title: hierarchy?.title,
+				priority: hierarchy?.priority ?? null,
+			},
+			id: file._id,
+			fileTitle: file.title,
+			ext: fileExt,
+			action: "download",
+		})
 		try {
 			const response = await fetch(file.url)
 			const blob = await response.blob()
@@ -62,6 +99,10 @@ const DriveFile: React.FC<IDriveFileProps> = ({ file }) => {
 			// Clean up
 			window.URL.revokeObjectURL(url)
 		} catch (error) {
+			posthog.capture("error", {
+				error,
+				from: "downloadFile",
+			})
 			console.debug(`🚀 ~ downloadFile ~ error:`, error)
 		}
 	}
@@ -78,12 +119,16 @@ const DriveFile: React.FC<IDriveFileProps> = ({ file }) => {
 						data,
 					})
 				} catch (error) {
+					posthog.capture("error", {
+						error,
+						from: "fileDataError",
+					})
 					console.error("Error fetching file data:", error)
 				}
 			}
 		}
 		fetchData()
-	}, [file.url, isCode])
+	}, [file.url, isCode, posthog])
 
 	return (
 		<>
@@ -118,6 +163,7 @@ const DriveFile: React.FC<IDriveFileProps> = ({ file }) => {
 							<Button
 								variant="ghost"
 								size="icon"
+								onClick={handlePreview}
 							>
 								<EyeIcon className="h-4 w-4 shrink-0" />
 							</Button>

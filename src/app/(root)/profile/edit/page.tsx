@@ -33,12 +33,23 @@ import { motion } from "framer-motion"
 import Head from "next/head"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { usePostHog } from "posthog-js/react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+
+const getNestedKeys = (obj: any, prefix: string = ""): string[] =>
+	Object.keys(obj).flatMap(key =>
+		typeof obj[key] === "object" && obj[key] !== null
+			? getNestedKeys(obj[key], prefix ? `${prefix}.${key}` : key)
+			: [prefix ? `${prefix}.${key}` : key]
+	)
+
 const EditProfile = () => {
 	const router = useRouter()
 	const user = useAIStore(store => store.user) as IFormUser
+
+	const posthog = usePostHog()
 
 	const form = useForm<z.infer<typeof profileSchema>>({
 		resolver: zodResolver(profileSchema),
@@ -48,11 +59,15 @@ const EditProfile = () => {
 		},
 	})
 
-	const { isDirty, isValid } = form.formState
+	const { isDirty, isValid, dirtyFields } = form.formState
 
 	function onSubmit(values: z.infer<typeof profileSchema>) {
 		// Do something with the form values.
 		// ✅ This will be type-safe and validated.
+		posthog.capture("profile_edited", {
+			keys: getNestedKeys(dirtyFields),
+			trigger: "save",
+		})
 		const { data } = profileSchema.safeParse(values) as {
 			success: boolean
 			data: IUser
@@ -75,7 +90,14 @@ const EditProfile = () => {
 		if (fileList && fileList.length) {
 			const formData = new FormData()
 			formData.append(type, fileList[0])
-			updateImage({ body: formData, type }).then(resp => onChange(resp))
+			updateImage({ body: formData, type }).then(resp => {
+				onChange(resp)
+
+				posthog.capture("profile_edited", {
+					keys: [type],
+					trigger: "auto",
+				})
+			})
 		}
 	}
 

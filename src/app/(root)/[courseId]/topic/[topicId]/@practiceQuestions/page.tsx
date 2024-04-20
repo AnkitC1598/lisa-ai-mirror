@@ -10,6 +10,7 @@ import { fetchClientWithToken } from "@/services/fetch"
 import useAIStore from "@/store"
 import { IPracticeQuestion } from "@/types/topic"
 import { useChat } from "ai/react"
+import { differenceInSeconds } from "date-fns"
 import { useParams } from "next/navigation"
 import { usePostHog } from "posthog-js/react"
 import { useEffect, useMemo, useState } from "react"
@@ -19,13 +20,13 @@ const PracticeQuestions = () => {
 	const [practiceQuestions, setPracticeQuestions] = useState<
 		IPracticeQuestion[] | null
 	>(null)
+	const [time, setTime] = useState<string | number | Date | null>(null)
 	const { courseId, topicId } = useParams<{
 		courseId: string
 		topicId: string
 	}>()
-	const posthog = usePostHog()
 
-	// const [isLoading, setIsLoading] = useState(false)
+	const posthog = usePostHog()
 
 	const hierarchyContext = useMemo(() => {
 		if (!currentTopic) return undefined
@@ -49,6 +50,20 @@ const PracticeQuestions = () => {
 			body: { type: "generate_questions", userContext: false },
 		},
 		async onFinish(message) {
+			posthog.capture("ai_generated", {
+				hierarchy: {
+					type: "topic",
+					id: currentTopic?._id,
+					title: currentTopic?.title,
+					priority: currentTopic?.priority ?? null,
+				},
+				timeTaken: time
+					? differenceInSeconds(new Date(), new Date(time))
+					: 0,
+				type: "questions",
+			})
+			setTime(null)
+
 			const { questions } = JSON.parse(message.content)
 			const resp = await fetchClientWithToken(
 				`/ai/questions/${courseId}/${topicId}`,
@@ -59,17 +74,32 @@ const PracticeQuestions = () => {
 					}),
 				}
 			)
-			posthog.capture("questions_generated")
 			setPracticeQuestions(
 				resp?.results?.data?.questions ?? {
 					questions,
 				}
 			)
 		},
-		onError(e: Error) {
-			console.error("chat-with-functions Error:", e)
+		onError(error: Error) {
+			posthog.capture("error", {
+				error,
+				from: "ai_generated",
+				hierarchy: {
+					type: "topic",
+					id: currentTopic?._id,
+					title: currentTopic?.title,
+					priority: currentTopic?.priority ?? null,
+				},
+				type: "questions",
+			})
+			console.error("chat-with-functions Error:", error)
 		},
 	})
+
+	const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		setTime(new Date())
+		handleSubmit(e)
+	}
 
 	useEffect(() => {
 		if (!currentTopic) return
@@ -96,7 +126,7 @@ const PracticeQuestions = () => {
 			) : aiIsLoading ? (
 				<PracticeQuestionsSkeletonLoader />
 			) : (
-				<form onSubmit={handleSubmit}>
+				<form onSubmit={handleFormSubmit}>
 					<button
 						type="submit"
 						className="hidden"

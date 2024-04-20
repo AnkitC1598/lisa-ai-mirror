@@ -10,7 +10,7 @@ import useAIStore from "@/store"
 import { ISlideSet } from "@/types/topic"
 import { IUser } from "@/types/user"
 import { useChat } from "ai/react"
-import { differenceInCalendarYears } from "date-fns"
+import { differenceInCalendarYears, differenceInSeconds } from "date-fns"
 import { useParams } from "next/navigation"
 import { usePostHog } from "posthog-js/react"
 import { useEffect, useMemo, useState } from "react"
@@ -21,21 +21,18 @@ const TopicContent = () => {
 	const [slidesData, setSlidesData] = useState<{
 		[key: string]: ISlideSet
 	} | null>(null)
-	// const [isLoading, setIsLoading] = useState<boolean>(false)
+	const [time, setTime] = useState<string | number | Date | null>(null)
 	const [language, setLanguage] = useState<string>("en")
+	const [prevLang, setPrevLang] = useState<string>("en")
 	const { courseId, topicId } = useParams<{
 		courseId: string
 		topicId: string
 	}>()
+
 	const posthog = usePostHog()
 
 	const userContext = useMemo(() => {
 		let interestString = ""
-		// Object.entries(user.interests).forEach(([key, value]) => {
-		// 	interestString += value.length
-		// 		? getInterestStatements(key, value.join(", ")) + " "
-		// 		: ""
-		// })
 
 		// get Random interest from user
 		const interests = Object.entries(user.interests).filter(
@@ -82,6 +79,20 @@ const TopicContent = () => {
 			},
 		},
 		async onFinish(message) {
+			posthog.capture("ai_generated", {
+				hierarchy: {
+					type: "topic",
+					id: currentTopic?._id,
+					title: currentTopic?.title,
+					priority: currentTopic?.priority ?? null,
+				},
+				timeTaken: time
+					? differenceInSeconds(new Date(), new Date(time))
+					: 0,
+				type: "slides",
+			})
+			setTime(null)
+
 			const { slides, quiz } = JSON.parse(message.content)
 			const finalSlides = [...slides, ...quiz].sort(
 				(a, b) => a.priority - b.priority
@@ -95,8 +106,6 @@ const TopicContent = () => {
 					}),
 				}
 			)
-
-			posthog.capture("explanation_generated")
 			setSlidesData(
 				resp?.results?.data?.slides ?? {
 					en: {
@@ -107,10 +116,26 @@ const TopicContent = () => {
 				}
 			)
 		},
-		onError(e: Error) {
-			console.error("chat-with-functions Error:", e.message)
+		onError(error: Error) {
+			posthog.capture("error", {
+				error,
+				from: "ai_generated",
+				hierarchy: {
+					type: "topic",
+					id: currentTopic?._id,
+					title: currentTopic?.title,
+					priority: currentTopic?.priority ?? null,
+				},
+				type: "slides",
+			})
+			console.error("chat-with-functions Error:", error.message)
 		},
 	})
+
+	const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		setTime(new Date())
+		handleSubmit(e)
+	}
 
 	useEffect(() => {
 		if (!currentTopic) return
@@ -143,7 +168,22 @@ const TopicContent = () => {
 			courseId: currentTopic.cohort._id,
 			topicId: currentTopic._id,
 			langCode: language,
-		}).then(resp => setSlidesData(resp.slides))
+		}).then(resp => {
+			posthog.capture("translate", {
+				hierarchy: {
+					type: "topic",
+					id: currentTopic._id,
+					title: currentTopic.title,
+					priority: currentTopic.priority ?? null,
+				},
+				from: prevLang,
+				to: language,
+				timeTaken: 0,
+				type: "slide",
+			})
+			setPrevLang(language)
+			setSlidesData(resp.slides)
+		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [language, currentTopic])
 
@@ -164,7 +204,7 @@ const TopicContent = () => {
 			) : aiIsLoading ? (
 				<SlidesSkeletonLoader />
 			) : (
-				<form onSubmit={handleSubmit}>
+				<form onSubmit={handleFormSubmit}>
 					<button
 						type="submit"
 						className="hidden"

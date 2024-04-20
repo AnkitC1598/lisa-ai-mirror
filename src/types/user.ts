@@ -1,3 +1,5 @@
+import { JwtPayload } from "jwt-decode"
+
 export interface IUserOnboarding {
 	gender: string
 	yob: number
@@ -70,4 +72,20 @@ export interface IUser extends IFormUser {
 		favouriteSport: any[]
 	}
 	lastLoginAt: string
+}
+
+export interface IToken extends JwtPayload {
+	orgId: string
+	uid: string
+}
+
+export interface IAccessToken extends IToken {
+	email: string
+	name: string
+	roles: Array<{
+		_id: string
+		id: string
+		type: string
+		permissions: Array<string>
+	}>
 }

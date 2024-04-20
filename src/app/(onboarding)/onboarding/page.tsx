@@ -75,7 +75,7 @@ const Onboarding = () => {
 		setIsLoading(true)
 		onboardUser({ body: values })
 			.then(() => {
-				posthog.capture("user_onboarded")
+				posthog.capture("onboarded")
 				router.push(`/`)
 				setIsLoading(false)
 			})

@@ -4,6 +4,7 @@ import { globalSearch } from "@/actions/search"
 import { IGlobalSearchResult } from "@/types/search"
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid"
 import { usePathname } from "next/navigation"
+import { usePostHog } from "posthog-js/react"
 import { useEffect, useState } from "react"
 import { useDebouncedCallback } from "use-debounce"
 import { Button } from "../ui/button"
@@ -36,8 +37,14 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 	const [loading, setLoading] = useState<boolean>(false)
 	const pathname = usePathname()
 
+	const posthog = usePostHog()
+
 	const handleQuery = useDebouncedCallback(async (query: string) => {
 		setQuery(query)
+
+		posthog.capture("global_search", {
+			query,
+		})
 		setLoading(true)
 		const results = await globalSearch({ query })
 		setLoading(false)
@@ -130,6 +137,7 @@ const SearchMenu: React.FC<ISearchMenu> = ({
 										cohortId={topic.cohortId}
 										hierarchy={topic}
 										onClick={() => setOpen(false)}
+										from="globalSearch"
 									/>
 								</CommandItem>
 							))}

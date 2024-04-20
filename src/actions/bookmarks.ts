@@ -132,5 +132,6 @@ export const removeQuestionBookmark = async ({
 			method: "DELETE",
 		}
 	)
+	revalidatePath("/bookmarks")
 	return resp.code
 }
