@@ -2,6 +2,7 @@
 
 import { getBookmarks } from "@/actions/bookmarks"
 import Loading from "@/components/atoms/Loading"
+import Placeholder from "@/components/atoms/Placeholder"
 import BookmarkFilters from "@/components/organisms/BookmarkFilters"
 import HierarchyCard from "@/components/organisms/HierarchyCard"
 import LinkPreview from "@/components/organisms/LinkPreview"
@@ -12,6 +13,7 @@ import usePaginatedAction from "@/hooks/usePaginatedAction"
 import PageTransitionProvider from "@/providers/pageTransitionProvider"
 import { IBookmark } from "@/types/bookmark"
 import { IPracticeQuestion, Resource } from "@/types/topic"
+import { BookmarkIcon } from "@heroicons/react/20/solid"
 import { useEffect, useMemo, useState } from "react"
 import { useInView } from "react-intersection-observer"
 
@@ -170,9 +172,10 @@ const Bookmarks: React.FC<IBookmarks> = ({ searchParams }) => {
 							)
 						) : (
 							<div className="flex w-full items-center justify-center py-8">
-								<p className="text-base font-medium text-gray-500 dark:text-gray-400">
-									No bookmarks found
-								</p>
+								<Placeholder
+									icon={BookmarkIcon}
+									text="No bookmarks found"
+								/>
 							</div>
 						)}
 						{query ? null : (
