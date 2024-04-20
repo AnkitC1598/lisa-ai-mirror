@@ -2,6 +2,7 @@
 
 import { MagnifyingGlassIcon } from "@heroicons/react/16/solid"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useDebouncedCallback } from "use-debounce"
 import { Input } from "../ui/input"
 
 interface ISearchProps {
@@ -13,13 +14,13 @@ const Search: React.FC<ISearchProps> = ({ placeholder = "Search" }) => {
 	const pathname = usePathname()
 	const { replace } = useRouter()
 
-	const handleSearch = (query: string) => {
+	const handleSearch = useDebouncedCallback((query: string) => {
 		const params = new URLSearchParams(searchParams)
 		if (query) params.set("query", query)
 		else params.delete("query")
 
 		replace(`${pathname}?${params.toString()}`)
-	}
+	}, 500)
 
 	return (
 		<>

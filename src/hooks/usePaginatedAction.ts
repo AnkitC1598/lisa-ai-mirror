@@ -12,6 +12,7 @@ interface IusePaginatedAction {
 	error: null | Error | any
 	fetchMore: any
 	hasNextPage: boolean
+	refetch: any
 }
 
 const usePaginatedAction = ({
@@ -29,9 +30,9 @@ const usePaginatedAction = ({
 		setLoading(true)
 		try {
 			const { data: newData, pagination } = await action({
-				...meta,
 				page,
 				limit,
+				...meta,
 			})
 			setData((prev: any) => [...prev, ...newData])
 			setPage(page + 1)
@@ -44,12 +45,32 @@ const usePaginatedAction = ({
 		}
 	}
 
+	const refetch = async ({ meta }: Record<string, any>) => {
+		setLoading(true)
+		setData([])
+		try {
+			setPage(1)
+			const { data: newData, pagination } = await action({
+				page: 1,
+				limit,
+				...meta,
+			})
+			setData(newData)
+			setHasNextPage(pagination.next !== null)
+		} catch (error) {
+			console.error(`🚀 ~ refetch ~ error:`, error)
+			setError(error)
+		} finally {
+			setLoading(false)
+		}
+	}
+
 	useEffect(() => {
 		if (!loading) fetchMore()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-	return { data, loading, error, fetchMore, hasNextPage }
+	return { data, loading, error, fetchMore, hasNextPage, refetch }
 }
 
 export default usePaginatedAction

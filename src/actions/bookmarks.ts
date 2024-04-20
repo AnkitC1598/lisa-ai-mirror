@@ -2,23 +2,29 @@
 
 import { fetchClientWithToken } from "@/services/fetch"
 import { IBookmark } from "@/types/bookmark"
+import { IPagination } from "@/types/hierarchy"
 import { IPracticeQuestion, Resource } from "@/types/topic"
 import { revalidatePath } from "next/cache"
 
 export const getBookmarks = async ({
 	page,
 	filter,
+	limit,
 }: {
 	page: number
 	filter: string | null
-}): Promise<IBookmark[]> => {
+	limit: number
+}): Promise<{
+	data: IBookmark[]
+	pagination: IPagination
+}> => {
 	const resp = await fetchClientWithToken(
-		`/ai/slides/bookmarks?page=${page}&limit=15&filter=${filter}`,
+		`/ai/slides/bookmarks?page=${page}&limit=${limit}&filter=${filter}`,
 		{
 			method: "GET",
 		}
 	)
-	return resp.results.data
+	return resp.results
 }
 
 export const addTopicBookmark = async ({
