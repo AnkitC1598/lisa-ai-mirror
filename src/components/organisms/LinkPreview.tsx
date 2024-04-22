@@ -59,7 +59,7 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 					priority: currentTopic?.priority ?? null,
 				},
 				id: resource.id,
-				url: resource.url,
+				resourceUrl: resource.url,
 				type,
 			})
 		}
