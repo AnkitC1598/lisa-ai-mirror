@@ -6,6 +6,7 @@ import Loading from "@/components/atoms/Loading"
 import { clientEnv } from "@/env/client"
 import cookieService from "@/services/cookie"
 import useAIStore from "@/store"
+import { IAccessToken } from "@/types/user"
 import * as Sentry from "@sentry/nextjs"
 import { addMinutes, fromUnixTime, isAfter } from "date-fns"
 import { jwtDecode } from "jwt-decode"
@@ -55,6 +56,10 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 								accessToken,
 								refreshToken,
 							})
+							const { orgId } = jwtDecode(
+								accessToken
+							) as IAccessToken
+
 							getUser().then(user => {
 								dispatch({
 									type: "SET_USER",
@@ -67,6 +72,7 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 									fullname: user.fullname,
 									email: user.email,
 									username: user.username,
+									orgId,
 								}
 
 								Sentry.setUser(userMetaData)
@@ -74,7 +80,7 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 									user.uid, // Replace 'distinct_id' with your user's unique identifier
 									userMetaData // optional: set additional user properties
 								)
-								posthog.group("org", window.location.host)
+								// posthog.group("org", window.location.host) // Paid Feature
 
 								const userOnboarded = user.interestsAdded
 
@@ -93,8 +99,12 @@ const AuthProvider: React.FC<Readonly<IAuthProvider>> = ({ children }) => {
 								setTimeout(() => setReady(true), 500)
 							})
 						})
-						.catch((e: Error) => {
-							console.error(e)
+						.catch((error: Error) => {
+							posthog.capture("error", {
+								error,
+								from: "authProvider",
+							})
+							console.error(error)
 							cookieService.removeTokens()
 							window.location.href = "/auth"
 						})

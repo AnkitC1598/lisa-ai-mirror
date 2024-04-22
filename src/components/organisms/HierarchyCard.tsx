@@ -19,6 +19,7 @@ interface IHierarchyCard {
 	peekIndex?: number
 	showHierarchy?: boolean
 	makeRoute?: boolean
+	from?: string | null
 	[key: string]: any
 }
 
@@ -29,6 +30,7 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 	peekIndex = 0,
 	showHierarchy = false,
 	makeRoute = false,
+	from = null,
 	...props
 }) => {
 	const pathname = usePathname()
@@ -43,7 +45,9 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 		if (!hierarchy) return "/"
 		if (!makeRoute) {
 			let link = type === "topic" ? `/${cohortId}/topic` : pathname
-			return link.endsWith("/") ? link : `${link}/` + hierarchy._id
+			link = link.endsWith("/") ? link : `${link}/` + hierarchy._id
+			if (type === "topic" && from) return `${link}?from=${from}`
+			return link
 		}
 
 		if (hierarchy.type === "cohort") return `/${hierarchy._id}`
@@ -70,7 +74,7 @@ const HierarchyCard: React.FC<IHierarchyCard> = ({
 
 			return route.join("/")
 		}
-	}, [hierarchy, makeRoute, type, cohortId, pathname])
+	}, [hierarchy, makeRoute, type, cohortId, pathname, from])
 
 	const peekValue = useMemo(() => {
 		if (!showHierarchy || !hierarchy.cohort)

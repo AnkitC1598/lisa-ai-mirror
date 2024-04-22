@@ -40,6 +40,7 @@ const Home = async () => {
 								showHierarchy
 								hierarchy={recent}
 								cohortId={recent.cohortId}
+								from="recent"
 							/>
 						</div>
 					) : null}
@@ -55,6 +56,7 @@ const Home = async () => {
 									showHierarchy
 									hierarchy={suggested}
 									cohortId={suggested.cohortId}
+									from="suggestion"
 								/>
 							))}
 						</div>

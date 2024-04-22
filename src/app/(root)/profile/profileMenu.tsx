@@ -27,11 +27,27 @@ import { usePostHog } from "posthog-js/react"
 const ProfileMenu = () => {
 	const { theme, setTheme } = useTheme()
 	const dispatch = useAIStore(store => store.dispatch)
+
 	const posthog = usePostHog()
+
+	const handleThemeChange = (selectedTheme: string) => (checked: boolean) => {
+		if (checked) {
+			posthog.capture("app_theme_changed", {
+				theme: selectedTheme,
+			})
+			setTheme(selectedTheme)
+		}
+	}
+
+	const handleOrgSwitch = () => {
+		posthog.capture("org_switched")
+		window.location.href = "/auth"
+	}
 
 	const logout = () => {
 		cookieService.removeTokens()
-		posthog.capture("user_logged_out")
+
+		posthog.capture("logged_out")
 		dispatch({
 			type: "SET_STATE",
 			payload: { user: null },
@@ -75,27 +91,23 @@ const ProfileMenu = () => {
 								<DropdownMenuCheckboxItem
 									className="gap-2"
 									checked={theme === "system"}
-									onCheckedChange={value =>
-										value ? setTheme("system") : false
-									}
+									onCheckedChange={handleThemeChange(
+										"system"
+									)}
 								>
 									<span>System</span>
 								</DropdownMenuCheckboxItem>
 								<DropdownMenuCheckboxItem
 									className="gap-2"
 									checked={theme === "light"}
-									onCheckedChange={value =>
-										value ? setTheme("light") : false
-									}
+									onCheckedChange={handleThemeChange("light")}
 								>
 									<span>Light</span>
 								</DropdownMenuCheckboxItem>
 								<DropdownMenuCheckboxItem
 									className="gap-2"
 									checked={theme === "dark"}
-									onCheckedChange={value =>
-										value ? setTheme("dark") : false
-									}
+									onCheckedChange={handleThemeChange("dark")}
 								>
 									<span>Dark</span>
 								</DropdownMenuCheckboxItem>
@@ -108,7 +120,7 @@ const ProfileMenu = () => {
 						asChild
 					>
 						<div
-							onClick={() => (window.location.href = "/auth")}
+							onClick={handleOrgSwitch}
 							className="flex items-center gap-2"
 						>
 							<span>Switch organisation</span>

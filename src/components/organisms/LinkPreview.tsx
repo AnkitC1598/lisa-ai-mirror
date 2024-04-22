@@ -7,19 +7,18 @@ import {
 import HierarchyConstants from "@/constants/Hierarchy"
 import HierarchyTypes from "@/constants/HierarchyTypes"
 import { cn } from "@/lib"
+import useAIStore from "@/store"
 import { Resource } from "@/types/topic"
 import { BookmarkIcon as BookmarkIconOutline } from "@heroicons/react/24/outline"
 import { BookmarkIcon as BookmarkIconSolid } from "@heroicons/react/24/solid"
 import Image from "next/image"
 import { useParams } from "next/navigation"
+import { usePostHog } from "posthog-js/react"
 import { useMemo, useState } from "react"
 import { Button } from "../ui/button"
 import HierarchyPeek from "./HierarchyPeek"
 
-type TOrientation = "landscape" | "portrait"
-
 interface ILinkPreview {
-	orientation?: TOrientation
 	resource: Resource & {
 		[key: string]: any
 	}
@@ -31,7 +30,6 @@ interface ILinkPreview {
 }
 
 const LinkPreview: React.FC<ILinkPreview> = ({
-	orientation = "portrait",
 	resource,
 	params,
 	bookmarkState = false,
@@ -42,10 +40,30 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 	const [bookmarked, setBookmarked] = useState<boolean>(
 		resource.bookmarked ?? bookmarkState
 	)
+	const currentTopic = useAIStore(store => store.currentTopic)
 	const { courseId: cohortId, topicId } = useParams<{
 		courseId: string
 		topicId: string
 	}>()
+
+	const posthog = usePostHog()
+
+	const handleLink =
+		(type: "web" | "video" = "web") =>
+		() => {
+			posthog.capture("resource_visited", {
+				hierarchy: {
+					type: "topic",
+					id: currentTopic?._id,
+					title: currentTopic?.title,
+					priority: currentTopic?.priority ?? null,
+				},
+				id: resource.id,
+				url: resource.url,
+				type,
+			})
+		}
+
 	const handleBookmark = (
 		e: React.MouseEvent<HTMLButtonElement, MouseEvent>
 	) => {
@@ -59,7 +77,26 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 				topicId: topicId ?? params?.topicId,
 				resourceId: resource.id,
 			}).then(code => {
-				if (code === 200) setBookmarked(false)
+				if (code === 200) {
+					setBookmarked(false)
+					posthog.capture("bookmark_toggle", {
+						hierarchy: {
+							type: "topic",
+							id:
+								currentTopic?._id ??
+								resource.topic?._id ??
+								topicId,
+							title: currentTopic?.title ?? resource.topic?.title,
+							priority:
+								currentTopic?.priority ??
+								resource.topic?.priority ??
+								null,
+						},
+						type: "resource",
+						id: resource.id,
+						action: "removed",
+					})
+				}
 			})
 		} else {
 			addResourceBookmark({
@@ -67,7 +104,26 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 				topicId: topicId ?? params?.topicId,
 				body: resource,
 			}).then(code => {
-				if (code === 200) setBookmarked(true)
+				if (code === 200) {
+					setBookmarked(true)
+					posthog.capture("bookmark_toggle", {
+						hierarchy: {
+							type: "topic",
+							id:
+								currentTopic?._id ??
+								resource.topic?._id ??
+								topicId,
+							title: currentTopic?.title ?? resource.topic?.title,
+							priority:
+								currentTopic?.priority ??
+								resource.topic?.priority ??
+								null,
+						},
+						type: "resource",
+						id: resource.id,
+						action: "added",
+					})
+				}
 			})
 		}
 	}
@@ -119,7 +175,8 @@ const LinkPreview: React.FC<ILinkPreview> = ({
 				href={`${resource.url}?utm_source=lisa_ai_${comingFrom}&utm_medium=${cohortId ?? params?.courseId}&utm_content=resource_link_click`}
 				target="_blank"
 				rel="noopener noreferrer"
-				className={cn("relative w-full", {
+				onClick={handleLink()}
+				className={cn("relative w-full cursor-pointer", {
 					"mt-6": showHierarchy,
 				})}
 				style={{ zIndex: peekIndex + 10 }}

@@ -1,7 +1,13 @@
 "use server"
 
 import { fetchClientWithToken } from "@/services/fetch"
-import { ICourse, IDriveFile, IHierarchy, ITopic } from "@/types/hierarchy"
+import {
+	ICourse,
+	IDriveFile,
+	IHierarchy,
+	IPagination,
+	ITopic,
+} from "@/types/hierarchy"
 import {
 	IChatResponse,
 	IPracticeQuestion,
@@ -152,18 +158,25 @@ export const getQuestions = async ({
 export const getChats = async ({
 	courseId,
 	topicId,
+	page = 1,
+	limit = 10,
 }: {
 	courseId: string
 	topicId: string
-}): Promise<IChatResponse[]> => {
+	page?: number
+	limit?: number
+}): Promise<{
+	data: IChatResponse[]
+	pagination: IPagination
+}> => {
 	const resp = await fetchClientWithToken(
-		`/ai/chat/${courseId}/${topicId}?page=1&limit=10`,
+		`/ai/chat/${courseId}/${topicId}?page=${page}&limit=${limit}`,
 		{
 			method: "GET",
 		}
 	)
 
-	return resp.results.data
+	return resp.results
 }
 
 export const translateSlides = async ({

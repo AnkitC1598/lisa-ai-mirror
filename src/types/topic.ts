@@ -35,6 +35,7 @@ export interface IPracticeQuestion {
 	question: string
 	answer: string
 	bookmarked?: boolean
+	feedback?: string | null
 }
 
 export interface ISlides {
@@ -89,6 +90,7 @@ export interface IChatResponse {
 	body: string
 	isLisaAi: boolean
 	createdAt: Date
+	feedback?: string
 }
 
 export interface IChat {

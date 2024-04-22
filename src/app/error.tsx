@@ -1,7 +1,9 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { useEffect } from "react"
+import * as Sentry from "@sentry/nextjs"
+import { usePostHog } from "posthog-js/react"
+import { useCallback, useEffect } from "react"
 
 type TErrorWithDigest = Error & { digest?: string }
 
@@ -11,6 +13,8 @@ interface IErrorView {
 }
 
 const ErrorView: React.FC<IErrorView> = ({ error, reset }) => {
+	const posthog = usePostHog()
+
 	const handleReset = () => {
 		const resetAttempts = Number(
 			localStorage.getItem("resetAttempts") || "0"
@@ -29,14 +33,22 @@ const ErrorView: React.FC<IErrorView> = ({ error, reset }) => {
 		}
 	}
 
-	const reportError = (error: TErrorWithDigest) => {
-		console.error("Error:", error)
-	}
+	const reportError = useCallback(
+		(error: TErrorWithDigest) => {
+			posthog.capture("error", {
+				error,
+				from: "Error",
+			})
+			Sentry.captureException(error)
+			console.error("Error:", error)
+		},
+		[posthog]
+	)
 
 	useEffect(() => {
-		handleResetOnMultipleErrors()
 		reportError(error)
-	}, [error])
+		handleResetOnMultipleErrors()
+	}, [error, reportError])
 
 	return (
 		<div className="flex h-full w-full flex-col items-center justify-center gap-2 py-8">

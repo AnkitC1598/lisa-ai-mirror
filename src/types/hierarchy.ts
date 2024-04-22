@@ -190,3 +190,9 @@ export interface IDriveFile {
 	isVisible: boolean
 	fileType?: string
 }
+
+export interface IPagination {
+	total: number
+	next: number
+	previous: number
+}

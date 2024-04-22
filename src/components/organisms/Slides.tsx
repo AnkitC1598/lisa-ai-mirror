@@ -4,7 +4,9 @@ import { answerQuiz, recordSlideDuration } from "@/actions/hierarchy"
 import useTextToSpeech from "@/hooks/useTextToSpeech"
 import { handleVote } from "@/lib/interactions"
 import { cn } from "@/lib/utils"
+import useAIStore from "@/store"
 import { SetState } from "@/types"
+import { ITopic } from "@/types/hierarchy"
 import { IAnswer, ISlide } from "@/types/topic"
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/16/solid"
 import {
@@ -18,6 +20,7 @@ import {
 	SpeakerWaveIcon as SpeakerWaveIconSolid,
 } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
+import { usePostHog } from "posthog-js/react"
 import React, { useEffect, useRef, useState } from "react"
 import { useInView } from "react-intersection-observer"
 import Confetti from "../atoms/Confetti"
@@ -49,6 +52,7 @@ const Slides: React.FC<ISlidesProps> = ({ slides }) => {
 				.filter(v => v > -1),
 		],
 	})
+	const currentTopic = useAIStore(store => store.currentTopic)
 	const { courseId, topicId } = useParams<{
 		courseId: string
 		topicId: string
@@ -71,7 +75,7 @@ const Slides: React.FC<ISlidesProps> = ({ slides }) => {
 						idx={idx}
 						slide={slide}
 						setSlideState={setSlideState}
-						params={{ courseId, topicId }}
+						params={{ courseId, topicId, currentTopic }}
 						langCode={slides.language}
 						isLastSlide={idx === slides.slides.length - 1}
 					/>
@@ -115,6 +119,7 @@ interface ISlideProps {
 	params: {
 		courseId: string
 		topicId: string
+		currentTopic: ITopic | null
 	}
 	langCode?: string
 	isLastSlide?: boolean
@@ -124,7 +129,7 @@ const Slide: React.FC<ISlideProps> = ({
 	idx = 0,
 	slide,
 	setSlideState,
-	params: { courseId, topicId },
+	params: { courseId, topicId, currentTopic },
 	langCode,
 	isLastSlide = false,
 }) => {
@@ -140,25 +145,53 @@ const Slide: React.FC<ISlideProps> = ({
 	}>()
 	const confettiRef = useRef<{ run: () => void }>()
 
+	const posthog = usePostHog()
+
 	const { subscribe, handleAudio, unsubscribe, audioState } =
 		useTextToSpeech()
 
 	const resetVote = () => setVote(0)
 
 	const handleFeedback = (feedback: number) => {
+		let vote = ""
+		if (feedback === 1) vote = "like"
+		if (feedback === -1) vote = "dislike"
+		posthog.capture("feedback", {
+			hierarchy: {
+				type: "topic",
+				id: currentTopic?._id,
+				title: currentTopic?.title,
+				priority: currentTopic?.priority ?? null,
+			},
+			id: slide.id,
+			priority: slide.priority ?? null,
+			action: vote,
+			type: "slide",
+		})
 		setVote(feedback)
 		handleVote({
 			meta: { courseId, topicId, id: slide.id as string, type: "slide" },
 			resetVote,
 			body: {
 				langCode,
-				feedback:
-					feedback === 1 ? "like" : feedback === -1 ? "dislike" : "",
+				feedback: vote,
 			},
 		})
 	}
 
 	const handleAnswer = (answer: IAnswer) => {
+		posthog.capture("slide_quiz", {
+			hierarchy: {
+				type: "topic",
+				id: currentTopic?._id,
+				title: currentTopic?.title,
+				priority: currentTopic?.priority ?? null,
+			},
+			id: slide.id,
+			priority: slide.priority ?? null,
+			result: answer.isCorrect ? "right" : "wrong",
+			action: "answer",
+		})
 		setAnswerState(answer)
 		if (confettiRef.current && answer.isCorrect) confettiRef.current.run()
 		answerQuiz({
@@ -169,6 +202,31 @@ const Slide: React.FC<ISlideProps> = ({
 			answerId: answer.id,
 		})
 	}
+
+	useEffect(() => {
+		if (audioState === 0) return
+		posthog.capture("tts", {
+			hierarchy: {
+				type: "topic",
+				id: currentTopic?._id,
+				title: currentTopic?.title,
+				priority: currentTopic?.priority ?? null,
+			},
+			id: slide.id,
+			priority: slide.priority ?? null,
+			langCode: "en",
+			action: audioState === 1 ? "played" : "paused",
+			type: "slide",
+		})
+	}, [
+		audioState,
+		currentTopic?._id,
+		currentTopic?.priority,
+		currentTopic?.title,
+		posthog,
+		slide.id,
+		slide.priority,
+	])
 
 	useEffect(() => {
 		if (inView) subscribe(`${slide.title}\n${slide.body}`)
@@ -182,6 +240,16 @@ const Slide: React.FC<ISlideProps> = ({
 
 	useEffect(() => {
 		if (inView && inViewAt === null) {
+			posthog.capture("slide_visible", {
+				hierarchy: {
+					type: "topic",
+					id: currentTopic?._id,
+					title: currentTopic?.title,
+					priority: currentTopic?.priority ?? null,
+				},
+				id: slide.id,
+				priority: idx,
+			})
 			if (slide.type === "quiz" && !!answerState) return
 
 			setInViewAt(new Date().getTime())

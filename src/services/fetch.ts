@@ -1,7 +1,10 @@
 "use server"
 
+import PostHogClient from "@/components/organisms/PostHog/Client"
 import { clientEnv } from "@/env/client"
 import { serverEnv } from "@/env/server"
+import { IAccessToken } from "@/types/user"
+import { jwtDecode } from "jwt-decode"
 import { cookies, headers } from "next/headers"
 
 interface RequestOptions extends RequestInit {
@@ -26,8 +29,15 @@ const customFetch = async (
 	options: RequestOptions = { headers: {}, noContentType: false },
 	tokenType: TTokenType = "access"
 ): Promise<any> => {
+	const posthog = PostHogClient()
 	return new Promise(async (resolve, reject) => {
 		try {
+			let uid
+			if (tokenType === "access") {
+				const tokenData = jwtDecode(getToken("access")) as IAccessToken
+				uid = tokenData.uid
+			}
+
 			if (!options.noContentType) {
 				if (
 					options.headers &&
@@ -50,15 +60,20 @@ const customFetch = async (
 			}
 			let res = await fetch(`${baseUrl}${endpoint}`, options)
 
-			if (!res.ok || res.status !== 200) {
-				reject(
-					new Error(
-						`${baseUrl}${endpoint}: ${res.statusText}! Status: ${res.status}`
-					)
-				)
-			}
-
 			if (res.status === 401) {
+				if (uid)
+					posthog.capture({
+						distinctId: uid,
+						event: "error",
+						properties: {
+							error: "Token Expired",
+							from: "api",
+							status: res.status,
+							tokenType,
+							token: getToken(tokenType),
+							apiUrl: `${baseUrl}${endpoint}`,
+						},
+					})
 				const newToken = await refreshToken()
 				if (newToken) {
 					options.headers = {
@@ -67,13 +82,44 @@ const customFetch = async (
 					}
 					res = await fetch(`${baseUrl}${endpoint}`, options)
 				} else {
+					posthog.capture({
+						distinctId: uid as string,
+						event: "error",
+						properties: {
+							error: "Token refresh failed",
+							from: "tokenRotation",
+						},
+					})
+					await posthog.shutdown()
 					handleTokenRefreshFailure()
 					reject(new Error("Token refresh failed"))
 				}
 			}
 
+			if (!res.ok || res.status !== 200) {
+				if (uid) {
+					posthog.capture({
+						distinctId: uid,
+						event: "error",
+						properties: {
+							error: `${baseUrl}${endpoint}: ${res.statusText}! Status: ${res.status}`,
+							from: "api",
+							status: res.status,
+							apiUrl: `${baseUrl}${endpoint}`,
+						},
+					})
+					await posthog.shutdown()
+				}
+				reject(
+					new Error(
+						`${baseUrl}${endpoint}: ${res.statusText}! Status: ${res.status}`
+					)
+				)
+			}
+			await posthog.shutdown()
 			resolve(await res.json())
 		} catch (error) {
+			await posthog.shutdown()
 			reject(error)
 		}
 	})

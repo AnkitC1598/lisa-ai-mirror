@@ -1,16 +1,21 @@
 "use client"
 
 import { getChats } from "@/actions/hierarchy"
+import Loading from "@/components/atoms/Loading"
 import { AiMessage, UserMessage } from "@/components/organisms/Message"
 import { Input } from "@/components/ui/input"
 import { clientEnv } from "@/env/client"
+import usePaginatedAction from "@/hooks/usePaginatedAction"
+import { cn } from "@/lib/utils"
 import { fetchClientWithToken } from "@/services/fetch"
 import useAIStore from "@/store"
-import { IChat } from "@/types/topic"
+import { IChatResponse } from "@/types/topic"
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid"
 import { useChat } from "ai/react"
 import { useParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { usePostHog } from "posthog-js/react"
+import { useEffect, useRef } from "react"
+import { useInView } from "react-intersection-observer"
 import ScrollAnchor from "./ScrollAnchor"
 
 const baseMessages = [
@@ -21,29 +26,40 @@ const baseMessages = [
 
 const Chat = () => {
 	const currentTopic = useAIStore(store => store.currentTopic)
-	const [oldChats, setOldChats] = useState<IChat[] | []>([])
 	const { courseId, topicId } = useParams<{
 		courseId: string
 		topicId: string
 	}>()
+	const { ref, inView } = useInView()
+	const containerRef = useRef<HTMLDivElement>(null)
+
+	const posthog = usePostHog()
+
+	const {
+		data: oldChats,
+		loading,
+		fetchMore,
+		hasNextPage,
+	} = usePaginatedAction({
+		action: getChats,
+		meta: { courseId, topicId },
+	})
 
 	useEffect(() => {
-		getChats({
-			courseId,
-			topicId,
-		}).then(chats => {
-			setOldChats(
-				chats.reverse().map(chat => {
-					return {
-						id: chat._id,
-						content: chat.body,
-						role: chat.isLisaAi ? "assistant" : "user",
-						createdAt: chat.createdAt,
-					}
+		if (containerRef.current) {
+			const oldHeight = containerRef.current.scrollHeight
+			if (inView && hasNextPage && !loading) {
+				fetchMore().then(() => {
+					setTimeout(() => {
+						if (!containerRef.current) return
+						const newHeight = containerRef.current.scrollHeight
+						containerRef.current.scrollTop = newHeight - oldHeight
+					}, 100)
 				})
-			)
-		})
-	}, [courseId, currentTopic, topicId])
+			}
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [inView])
 
 	const {
 		messages,
@@ -67,25 +83,63 @@ const Chat = () => {
 				}),
 			})
 		},
-		async onResponse(message) {
-			await fetchClientWithToken(`/ai/chat/${courseId}/${topicId}`, {
-				method: "POST",
-				body: JSON.stringify({
-					isLisaAi: false,
-					body: input,
-				}),
+		async onResponse() {
+			let resp = await fetchClientWithToken(
+				`/ai/chat/${courseId}/${topicId}`,
+				{
+					method: "POST",
+					body: JSON.stringify({
+						isLisaAi: false,
+						body: input,
+					}),
+				}
+			)
+			resp = resp.results.data
+			posthog.capture("chat_message", {
+				hierarchy: {
+					type: "topic",
+					id: currentTopic?._id,
+					title: currentTopic?.title,
+					priority: currentTopic?.priority ?? null,
+				},
+				id: resp._id,
+				action: "sent",
 			})
 		},
-		initialMessages: oldChats,
-		onError(e: Error) {
-			console.error("chat Error:", e)
+		initialMessages: oldChats.toReversed().map((chat: IChatResponse) => {
+			return {
+				id: chat._id,
+				content: chat.body,
+				role: chat.isLisaAi ? "assistant" : "user",
+				createdAt: chat.createdAt,
+				feedback: chat.feedback,
+			}
+		}),
+		onError(error: Error) {
+			posthog.capture("error", {
+				error,
+				from: "chat_message",
+			})
+			console.error("chat Error:", error)
 		},
 	})
 
 	return (
 		<>
 			<div className="flex h-full flex-col gap-4">
-				<div className="scrollbar-both-edges flex flex-1 flex-col divide-y divide-neutral-200 overflow-y-auto scrollbar dark:divide-neutral-800">
+				<div
+					ref={containerRef}
+					className="scrollbar-both-edges flex flex-1 flex-col divide-y divide-neutral-200 overflow-y-auto scrollbar dark:divide-neutral-800"
+				>
+					<span
+						className={cn(
+							"flex w-full items-center justify-center",
+							hasNextPage ? "p-4" : ""
+						)}
+						ref={ref}
+					>
+						{loading ? <Loading /> : null}
+					</span>
 					{messages.map(message => {
 						const MessageComponent =
 							message.role === "user" ? UserMessage : AiMessage
@@ -93,7 +147,7 @@ const Chat = () => {
 							<MessageComponent
 								key={message.id}
 								message={message}
-								params={{ courseId, topicId }}
+								params={{ courseId, topicId, currentTopic }}
 							/>
 						)
 					})}
@@ -101,7 +155,7 @@ const Chat = () => {
 					{isLoading ? (
 						<AiMessage
 							loader
-							params={{ courseId, topicId }}
+							params={{ courseId, topicId, currentTopic }}
 							message={{
 								id: "loader",
 								content: "",
@@ -110,7 +164,7 @@ const Chat = () => {
 							}}
 						/>
 					) : !messages.length ? (
-						<div className="mt-auto grid grid-cols-2 gap-2 px-4">
+						<div className="mt-auto grid grid-cols-2 gap-2 !border-t-0 px-4">
 							{baseMessages.map(message => (
 								<button
 									key={message}
