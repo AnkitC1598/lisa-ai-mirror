@@ -29,6 +29,27 @@ export const metadata: Metadata = {
 	},
 	description: "Dive into learning with Lisa AI",
 	manifest: `${serverEnv.BASE_PATH}/manifest.json`,
+	openGraph: {
+		title: "lisa AI - Start Learning",
+		description: "Dive into learning with Lisa AI",
+		siteName: "lisa AI",
+		images: [
+			{
+				url: "https://lucdn.letsupgrade.net/assets/Auth_Meta_e7469c8fd7.jpg",
+				width: 1200,
+				height: 628,
+				alt: "lisa AI - Start Learning",
+			},
+		],
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "lisa AI - Start Learning",
+		description: "Dive into learning with Lisa AI",
+		images: [
+			"https://lucdn.letsupgrade.net/assets/Auth_Meta_e7469c8fd7.jpg",
+		],
+	},
 }
 
 interface IAppLayout {
