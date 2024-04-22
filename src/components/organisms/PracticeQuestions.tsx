@@ -20,10 +20,14 @@ import useAIStore from "@/store"
 import { IPracticeQuestion } from "@/types/topic"
 import {
 	BookmarkIcon as BookmarkIconOutline,
+	HandThumbDownIcon as HandThumbDownIconOutline,
+	HandThumbUpIcon as HandThumbUpIconOutline,
 	SpeakerWaveIcon as SpeakerWaveIconOutline,
 } from "@heroicons/react/24/outline"
 import {
 	BookmarkIcon as BookmarkIconSolid,
+	HandThumbDownIcon as HandThumbDownIconSolid,
+	HandThumbUpIcon as HandThumbUpIconSolid,
 	SpeakerWaveIcon as SpeakerWaveIconSolid,
 } from "@heroicons/react/24/solid"
 import { useParams } from "next/navigation"
@@ -99,7 +103,13 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 	peekIndex = 0,
 	showHierarchy = false,
 }) => {
-	const [vote, setVote] = useState<number>(0)
+	const [vote, setVote] = useState<number>(
+		question.feedback === "like"
+			? 1
+			: question.feedback === "dislike"
+				? -1
+				: 0
+	)
 	const [bookmarked, setBookmarked] = useState<boolean>(
 		question.bookmarked ?? false
 	)
@@ -139,8 +149,8 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 				feedback: vote,
 			},
 			meta: {
-				courseId,
-				topicId,
+				courseId: courseId ?? question.cohort._id,
+				topicId: topicId ?? question.topic?._id,
 				id: question.id as string,
 				type: "question",
 			},
@@ -320,40 +330,42 @@ export const PracticeQuestion: React.FC<IPracticeQuestionProps> = ({
 						<span className="text-gray-500">{question.answer}</span>
 						<div className="flex items-center justify-between">
 							<div className="flex gap-2">
-								{/* <Button
-								variant={vote === 1 ? "outline" : "outline"}
-								size="icon"
-								onClick={() => {
-									handleFeedback(1)
-								}}
-								className={cn(
-									vote === 1
-										? "border-green-600/20 bg-green-600/10 dark:border-green-600/20 dark:bg-green-600/10"
-										: ""
-								)}
-							>
-								{vote === 1 ? (
-									<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
-								) : (
-									<HandThumbUpIconOutline className="h-4 w-4" />
-								)}
-							</Button>
-							<Button
-								variant={vote === -1 ? "outline" : "outline"}
-								size="icon"
-								onClick={() => handleFeedback(-1)}
-								className={cn(
-									vote === -1
-										? "border-red-600/20 bg-red-600/10 dark:border-red-600/20 dark:bg-red-600/10"
-										: ""
-								)}
-							>
-								{vote === -1 ? (
-									<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
-								) : (
-									<HandThumbDownIconOutline className="h-4 w-4" />
-								)}
-							</Button> */}
+								<Button
+									variant={vote === 1 ? "outline" : "outline"}
+									size="icon"
+									onClick={() => {
+										handleFeedback(1)
+									}}
+									className={cn(
+										vote === 1
+											? "border-green-600/20 bg-green-600/10 dark:border-green-600/20 dark:bg-green-600/10"
+											: ""
+									)}
+								>
+									{vote === 1 ? (
+										<HandThumbUpIconSolid className="h-4 w-4 fill-green-500" />
+									) : (
+										<HandThumbUpIconOutline className="h-4 w-4" />
+									)}
+								</Button>
+								<Button
+									variant={
+										vote === -1 ? "outline" : "outline"
+									}
+									size="icon"
+									onClick={() => handleFeedback(-1)}
+									className={cn(
+										vote === -1
+											? "border-red-600/20 bg-red-600/10 dark:border-red-600/20 dark:bg-red-600/10"
+											: ""
+									)}
+								>
+									{vote === -1 ? (
+										<HandThumbDownIconSolid className="h-4 w-4 fill-red-500" />
+									) : (
+										<HandThumbDownIconOutline className="h-4 w-4" />
+									)}
+								</Button>
 								<Button
 									variant="outline"
 									size="icon"
