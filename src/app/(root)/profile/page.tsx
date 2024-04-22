@@ -17,7 +17,17 @@ import ProfileMenu from "./profileMenu"
 export const metadata: Metadata = {
 	title: "Profile",
 	description:
-		"Welcome to your Lisa AI profile page. Manage your account details, track your learning progress, and customize your learning preferences. Click to personalise your educational journey with Lisa AI.",
+		"Welcome to your Lisa AI profile page. Manage your account details, track your learning progress, and customize your learning preferences. Click to personalize your educational journey with Lisa AI.",
+	openGraph: {
+		title: "Profile",
+		description:
+			"Welcome to your Lisa AI profile page. Manage your account details, track your learning progress, and customize your learning preferences. Click to personalize your educational journey with Lisa AI.",
+	},
+	twitter: {
+		title: "Profile",
+		description:
+			"Welcome to your Lisa AI profile page. Manage your account details, track your learning progress, and customize your learning preferences. Click to personalize your educational journey with Lisa AI.",
+	},
 }
 
 const Profile = async () => {

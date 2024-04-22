@@ -12,6 +12,16 @@ export const metadata: Metadata = {
 	title: "Dashboard - Begin Learning",
 	description:
 		"Dive into learning with Lisa AI Dashboard. Start exploring all courses tailored to your learning style. Click a course or topuc to begin your learning journey today!",
+	openGraph: {
+		title: "Dashboard - Begin Learning",
+		description:
+			"Dive into learning with Lisa AI Dashboard. Start exploring all courses tailored to your learning style. Click a course or topuc to begin your learning journey today!",
+	},
+	twitter: {
+		title: "Dashboard - Begin Learning",
+		description:
+			"Dive into learning with Lisa AI Dashboard. Start exploring all courses tailored to your learning style. Click a course or topuc to begin your learning journey today!",
+	},
 }
 
 const Home = async () => {

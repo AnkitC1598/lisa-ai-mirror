@@ -9,6 +9,16 @@ export const metadata: Metadata = {
 	title: "Onboarding - First Few Steps",
 	description:
 		"Start your AI education journey with Lisa AI. Discover our innovative features and transform your learning. Click the link below to begin!",
+	openGraph: {
+		title: "Onboarding - First Few Steps",
+		description:
+			"Start your AI education journey with Lisa AI. Discover our innovative features and transform your learning. Click the link below to begin!",
+	},
+	twitter: {
+		title: "Onboarding - First Few Steps",
+		description:
+			"Start your AI education journey with Lisa AI. Discover our innovative features and transform your learning. Click the link below to begin!",
+	},
 }
 
 const OnboardingLayout: React.FC<Readonly<IOnboardingLayout>> = ({
