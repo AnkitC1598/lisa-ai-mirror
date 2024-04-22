@@ -62,13 +62,19 @@ const TABS = [
 	},
 ]
 
-type TFrom = "curriculum" | "recent" | "suggestion" | "bookmark"
+type TFrom =
+	| "curriculum"
+	| "recent"
+	| "suggestion"
+	| "bookmark"
+	| "globalSearch"
 
 const sourceOptions: Record<TFrom, string> = {
 	curriculum: "Curriculum",
 	recent: "Recent Topic",
 	suggestion: "Suggestions",
 	bookmark: "Bookmarks",
+	globalSearch: "Global Search",
 }
 
 interface ITopicContentLayout {
