@@ -17,7 +17,7 @@ import ProfileMenu from "./profileMenu"
 export const metadata: Metadata = {
 	title: "Profile",
 	description:
-		"View and edit your profile details, preferences, and social profiles.",
+		"Welcome to your Lisa AI profile page. Manage your account details, track your learning progress, and customize your learning preferences. Click to personalise your educational journey with Lisa AI.",
 }
 
 const Profile = async () => {

@@ -1,40 +1,31 @@
-"use client"
-
 import { getCourse } from "@/actions/hierarchy"
-import useAIStore from "@/store"
-import { notFound, useParams } from "next/navigation"
-import React, { useEffect } from "react"
-
-const objectIdPattern = /^[0-9a-fA-F]{24}$/
+import { getHierarchyMetaData } from "@/lib/metadata"
+import { Metadata } from "next"
+import React from "react"
+import GetCourseLayout from "./GetCourseLayout"
 
 interface ISlugLayout {
-	children: React.ReactElement<ChildProps> | React.ReactElement<ChildProps>[]
+	children: React.ReactElement | React.ReactElement[]
 }
 
-interface ChildProps {
-	currentView: string
+export async function generateMetadata({
+	params: { slug },
+}: {
+	params: {
+		slug: string[]
+	}
+}): Promise<Metadata> {
+	const {
+		type,
+	}: {
+		type: string[]
+	} = await getCourse({ cohortId: slug[0] })
+
+	return getHierarchyMetaData(type[slug.length])
 }
 
 const SlugLayout: React.FC<Readonly<ISlugLayout>> = ({ children }) => {
-	const params = useParams<{ slug: string[] }>()
-	const { slug } = params
-
-	const dispatch = useAIStore(store => store.dispatch)
-
-	useEffect(() => {
-		if (objectIdPattern.test(slug[0]))
-			getCourse({ cohortId: slug[0] }).then(course => {
-				dispatch({
-					type: "SET_STATE",
-					payload: {
-						currentHierarchy: course.type.map(t => t[0]).join(""),
-					},
-				})
-			})
-		else notFound()
-	}, [dispatch, slug])
-
-	return children
+	return <GetCourseLayout>{children}</GetCourseLayout>
 }
 
 export default SlugLayout
