@@ -12,6 +12,8 @@
 		"postinstall": "is-ci || (pnpm run prepare && pnpm run lint)"
 	},
 	"dependencies": {
+		"@ai-sdk/anthropic": "^0.0.9",
+		"@ai-sdk/openai": "^0.0.9",
 		"@heroicons/react": "^2.1.1",
 		"@hookform/resolvers": "^3.3.4",
 		"@langchain/core": "^0.1.52",
@@ -29,7 +31,7 @@
 		"@radix-ui/react-tabs": "^1.0.4",
 		"@sentry/nextjs": "^7.105.0",
 		"@t3-oss/env-nextjs": "^0.9.2",
-		"ai": "^3.0.14",
+		"ai": "^3.1.1",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.0",
 		"cmdk": "^1.0.0",

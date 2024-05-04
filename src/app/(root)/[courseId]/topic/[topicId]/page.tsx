@@ -1,15 +1,14 @@
 "use client"
 
 import { getSlides, translateSlides } from "@/actions/hierarchy"
+import { generateSlides } from "@/actions/slides"
 import ContentControls from "@/components/organisms/ContentControls"
 import Slides, { SlidesSkeletonLoader } from "@/components/organisms/Slides"
-import { clientEnv } from "@/env/client"
 import { getInterestStatements } from "@/lib/promptHelpers"
 import { fetchClientWithToken } from "@/services/fetch"
 import useAIStore from "@/store"
 import { ISlideSet } from "@/types/topic"
 import { IUser } from "@/types/user"
-import { useChat } from "ai/react"
 import { differenceInCalendarYears, differenceInSeconds } from "date-fns"
 import { useParams } from "next/navigation"
 import { usePostHog } from "posthog-js/react"
@@ -24,6 +23,7 @@ const TopicContent = () => {
 	const [time, setTime] = useState<string | number | Date | null>(null)
 	const [language, setLanguage] = useState<string>("en")
 	const [prevLang, setPrevLang] = useState<string>("en")
+	const [aiIsLoading, setAiIsLoading] = useState<boolean>(false)
 	const { courseId, topicId } = useParams<{
 		courseId: string
 		topicId: string
@@ -66,91 +66,75 @@ const TopicContent = () => {
 		return string
 	}, [currentTopic])
 
-	const {
-		isLoading: aiIsLoading,
-		setInput,
-		handleSubmit,
-	} = useChat({
-		api: `${clientEnv.NEXT_PUBLIC_BASE_PATH}/api/chat-with-functions`,
-		body: {
-			body: {
-				type: "explain_topic",
-				userContext: userContext,
-			},
-		},
-		async onFinish(message) {
-			posthog.capture("ai_generated", {
-				hierarchy: {
-					type: "topic",
-					id: currentTopic?._id,
-					title: currentTopic?.title,
-					priority: currentTopic?.priority ?? null,
-				},
-				timeTaken: time
-					? differenceInSeconds(new Date(), new Date(time))
-					: 0,
-				type: "slides",
-			})
-			setTime(null)
-
-			const { slides, quiz } = JSON.parse(message.content)
-			const finalSlides = [...slides, ...quiz].sort(
-				(a, b) => a.priority - b.priority
-			)
-			let resp = await fetchClientWithToken(
-				`/ai/slides/${courseId}/${topicId}`,
-				{
-					method: "POST",
-					body: JSON.stringify({
-						slides: finalSlides,
-					}),
-				}
-			)
-			setSlidesData(
-				resp?.results?.data?.slides ?? {
-					en: {
-						slides: finalSlides,
-						createdAt: new Date(),
-						language: "en",
-					},
-				}
-			)
-		},
-		onError(error: Error) {
-			posthog.capture("error", {
-				error,
-				from: "ai_generated",
-				hierarchy: {
-					type: "topic",
-					id: currentTopic?._id,
-					title: currentTopic?.title,
-					priority: currentTopic?.priority ?? null,
-				},
-				type: "slides",
-			})
-			console.error("chat-with-functions Error:", error.message)
-		},
-	})
-
-	const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		setTime(new Date())
-		handleSubmit(e)
-	}
-
 	useEffect(() => {
-		if (!currentTopic) return
+		if (!currentTopic && !!slidesData && !aiIsLoading) return
 		getSlides({
 			courseId,
 			topicId,
 		}).then(data => {
 			setSlidesData(data?.slides ?? null)
 			if (slidesData || data?.slides) return
-
-			if (hierarchyContext && !aiIsLoading) {
-				setInput(hierarchyContext)
-				setTimeout(() => {
-					document.getElementById("submit")?.click()
-				}, 100)
+			if (hierarchyContext) {
+				setAiIsLoading(true)
+				setTime(new Date())
+				generateSlides({
+					context: hierarchyContext ?? "",
+					userContext,
+					provider: "anthropic",
+					model: "claude-3-haiku-20240307",
+				})
+					.then(async (slides: any) => {
+						const body = JSON.stringify({
+							slides,
+						})
+						const resp = await fetchClientWithToken(
+							`/ai/slides/${courseId}/${topicId}`,
+							{
+								method: "POST",
+								body,
+							}
+						)
+						posthog.capture("ai_generated", {
+							hierarchy: {
+								type: "topic",
+								id: currentTopic?._id,
+								title: currentTopic?.title,
+								priority: currentTopic?.priority ?? null,
+							},
+							timeTaken: time
+								? differenceInSeconds(
+										new Date(),
+										new Date(time)
+									)
+								: 0,
+							type: "slides",
+						})
+						setTime(null)
+						setSlidesData(
+							resp?.results?.data?.slides ?? {
+								en: {
+									slides: slides,
+									createdAt: new Date(),
+									language: "en",
+								},
+							}
+						)
+					})
+					.catch((error: Error) => {
+						posthog.capture("error", {
+							error,
+							from: "ai_generated",
+							hierarchy: {
+								type: "topic",
+								id: currentTopic?._id,
+								title: currentTopic?.title,
+								priority: currentTopic?.priority ?? null,
+							},
+							type: "slides",
+						})
+						console.error("generateSlides Error:", error)
+					})
+					.finally(() => setAiIsLoading(false))
 			}
 		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -203,15 +187,7 @@ const TopicContent = () => {
 				)
 			) : aiIsLoading ? (
 				<SlidesSkeletonLoader />
-			) : (
-				<form onSubmit={handleFormSubmit}>
-					<button
-						type="submit"
-						className="hidden"
-						id="submit"
-					/>
-				</form>
-			)}
+			) : null}
 		</div>
 	)
 }

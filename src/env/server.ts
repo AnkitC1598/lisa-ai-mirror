@@ -5,6 +5,7 @@ export const serverEnv = createEnv({
 	server: {
 		BASE_PATH: z.string(),
 		OPENAI_API_KEY: z.string(),
+		ANTHROPIC_API_KEY: z.string(),
 		CLIENT_API_URL: z.string(),
 		ADMIN_API_URL: z.string(),
 		ACCESS_PATH: z.string(),
@@ -12,6 +13,7 @@ export const serverEnv = createEnv({
 	runtimeEnv: {
 		BASE_PATH: process.env.BASE_PATH,
 		OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+		ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
 		CLIENT_API_URL: process.env.CLIENT_API_URL,
 		ADMIN_API_URL: process.env.ADMIN_API_URL,
 		ACCESS_PATH: process.env.ACCESS_PATH,

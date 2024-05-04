@@ -24,7 +24,6 @@ import { usePostHog } from "posthog-js/react"
 import React, { useEffect, useRef, useState } from "react"
 import { useInView } from "react-intersection-observer"
 import Confetti from "../atoms/Confetti"
-import ReadMore from "../atoms/ReadMore"
 import { Button } from "../ui/button"
 import { Skeleton } from "../ui/skeleton"
 import ContentPagination from "./ContentPagination"
@@ -365,10 +364,7 @@ const Slide: React.FC<ISlideProps> = ({
 					</div>
 				) : (
 					<p className="h-full overflow-auto text-sm leading-7 text-gray-900 scrollbar dark:text-neutral-200">
-						<ReadMore
-							minLength={500}
-							text={slide.body}
-						/>
+						{slide.body}
 					</p>
 				)}
 			</div>
