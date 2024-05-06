@@ -80,8 +80,8 @@ const TopicContent = () => {
 				generateAiResponse({
 					context: hierarchyContext ?? "",
 					userContext,
-					provider: "anthropic",
-					model: "claude-3-haiku-20240307",
+					//provider: "anthropic",
+					//model: "claude-3-haiku-20240307",
 					promptType: "slides",
 				})
 					.then(async (object: any) => {
