@@ -1,15 +1,14 @@
 "use client"
 
+import { generateAiResponse } from "@/actions/ai"
 import { getQuestions } from "@/actions/hierarchy"
 import {
 	PracticeQuestionsSkeletonLoader,
 	default as QuestionsArray,
 } from "@/components/organisms/PracticeQuestions"
-import { clientEnv } from "@/env/client"
 import { fetchClientWithToken } from "@/services/fetch"
 import useAIStore from "@/store"
 import { IPracticeQuestion } from "@/types/topic"
-import { useChat } from "ai/react"
 import { differenceInSeconds } from "date-fns"
 import { useParams } from "next/navigation"
 import { usePostHog } from "posthog-js/react"
@@ -21,6 +20,7 @@ const PracticeQuestions = () => {
 		IPracticeQuestion[] | null
 	>(null)
 	const [time, setTime] = useState<string | number | Date | null>(null)
+	const [aiIsLoading, setAiIsLoading] = useState<boolean>(false)
 	const { courseId, topicId } = useParams<{
 		courseId: string
 		topicId: string
@@ -40,80 +40,72 @@ const PracticeQuestions = () => {
 		return string
 	}, [currentTopic])
 
-	const {
-		isLoading: aiIsLoading,
-		setInput,
-		handleSubmit,
-	} = useChat({
-		api: `${clientEnv.NEXT_PUBLIC_BASE_PATH}/api/chat-with-functions`,
-		body: {
-			body: { type: "generate_questions", userContext: false },
-		},
-		async onFinish(message) {
-			posthog.capture("ai_generated", {
-				hierarchy: {
-					type: "topic",
-					id: currentTopic?._id,
-					title: currentTopic?.title,
-					priority: currentTopic?.priority ?? null,
-				},
-				timeTaken: time
-					? differenceInSeconds(new Date(), new Date(time))
-					: 0,
-				type: "questions",
-			})
-			setTime(null)
-
-			const { questions } = JSON.parse(message.content)
-			const resp = await fetchClientWithToken(
-				`/ai/questions/${courseId}/${topicId}`,
-				{
-					method: "POST",
-					body: JSON.stringify({
-						questions,
-					}),
-				}
-			)
-			setPracticeQuestions(
-				resp?.results?.data?.questions ?? {
-					questions,
-				}
-			)
-		},
-		onError(error: Error) {
-			posthog.capture("error", {
-				error,
-				from: "ai_generated",
-				hierarchy: {
-					type: "topic",
-					id: currentTopic?._id,
-					title: currentTopic?.title,
-					priority: currentTopic?.priority ?? null,
-				},
-				type: "questions",
-			})
-			console.error("chat-with-functions Error:", error)
-		},
-	})
-
-	const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		setTime(new Date())
-		handleSubmit(e)
-	}
-
 	useEffect(() => {
-		if (!currentTopic) return
+		if (!currentTopic || aiIsLoading) return
 		getQuestions({
 			courseId,
 			topicId,
 		}).then(data => {
 			setPracticeQuestions(data?.questions ?? null)
 			if (practiceQuestions || data?.questions) return
-			if (hierarchyContext && !aiIsLoading) {
-				setInput(hierarchyContext)
-				setTimeout(() => {
-					document.getElementById("submit")?.click()
-				}, 100)
+			if (hierarchyContext) {
+				setAiIsLoading(true)
+				setTime(new Date())
+				generateAiResponse({
+					context: hierarchyContext ?? "",
+					provider: "anthropic",
+					model: "claude-3-haiku-20240307",
+					promptType: "questions",
+				})
+					.then(async (object: any) => {
+						const { questions } = object
+						const body = JSON.stringify({
+							questions,
+						})
+						const resp = await fetchClientWithToken(
+							`/ai/questions/${courseId}/${topicId}`,
+							{
+								method: "POST",
+								body,
+							}
+						)
+						posthog.capture("ai_generated", {
+							hierarchy: {
+								type: "topic",
+								id: currentTopic?._id,
+								title: currentTopic?.title,
+								priority: currentTopic?.priority ?? null,
+							},
+							timeTaken: time
+								? differenceInSeconds(
+										new Date(),
+										new Date(time)
+									)
+								: 0,
+							type: "questions",
+						})
+						setTime(null)
+						setPracticeQuestions(
+							resp?.results?.data?.questions ?? {
+								questions,
+							}
+						)
+					})
+					.catch((error: Error) => {
+						posthog.capture("error", {
+							error,
+							from: "ai_generated",
+							hierarchy: {
+								type: "topic",
+								id: currentTopic?._id,
+								title: currentTopic?.title,
+								priority: currentTopic?.priority ?? null,
+							},
+							type: "questions",
+						})
+						console.error("chat-with-functions Error:", error)
+					})
+					.finally(() => setAiIsLoading(false))
 			}
 		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -125,15 +117,7 @@ const PracticeQuestions = () => {
 				<QuestionsArray questions={practiceQuestions} />
 			) : aiIsLoading ? (
 				<PracticeQuestionsSkeletonLoader />
-			) : (
-				<form onSubmit={handleFormSubmit}>
-					<button
-						type="submit"
-						className="hidden"
-						id="submit"
-					/>
-				</form>
-			)}
+			) : null}
 		</>
 	)
 }

@@ -1,7 +1,7 @@
 "use client"
 
+import { generateAiResponse } from "@/actions/ai"
 import { getSlides, translateSlides } from "@/actions/hierarchy"
-import { generateSlides } from "@/actions/slides"
 import ContentControls from "@/components/organisms/ContentControls"
 import Slides, { SlidesSkeletonLoader } from "@/components/organisms/Slides"
 import { getInterestStatements } from "@/lib/promptHelpers"
@@ -67,7 +67,7 @@ const TopicContent = () => {
 	}, [currentTopic])
 
 	useEffect(() => {
-		if (!currentTopic && !!slidesData && !aiIsLoading) return
+		if ((!currentTopic && !!slidesData) || aiIsLoading) return
 		getSlides({
 			courseId,
 			topicId,
@@ -77,15 +77,20 @@ const TopicContent = () => {
 			if (hierarchyContext) {
 				setAiIsLoading(true)
 				setTime(new Date())
-				generateSlides({
+				generateAiResponse({
 					context: hierarchyContext ?? "",
 					userContext,
 					provider: "anthropic",
 					model: "claude-3-haiku-20240307",
+					promptType: "slides",
 				})
-					.then(async (slides: any) => {
+					.then(async (object: any) => {
+						const { slides, quiz } = object
+						const finalMergedSlides = [...slides, ...quiz].sort(
+							(a, b) => a.priority - b.priority
+						)
 						const body = JSON.stringify({
-							slides,
+							slides: finalMergedSlides,
 						})
 						const resp = await fetchClientWithToken(
 							`/ai/slides/${courseId}/${topicId}`,
@@ -113,7 +118,7 @@ const TopicContent = () => {
 						setSlidesData(
 							resp?.results?.data?.slides ?? {
 								en: {
-									slides: slides,
+									slides: finalMergedSlides,
 									createdAt: new Date(),
 									language: "en",
 								},
